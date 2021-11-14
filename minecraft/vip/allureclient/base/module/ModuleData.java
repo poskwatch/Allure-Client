@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 
 public @interface ModuleData {
 
-    String label();
+    String moduleName();
     int keyBind();
     ModuleCategory category();
 

@@ -1,6 +1,8 @@
 package vip.allureclient.impl.event.player;
 
+import net.minecraft.client.Minecraft;
 import vip.allureclient.base.event.CancellableEvent;
+import vip.allureclient.base.util.client.Wrapper;
 
 public class PlayerMoveEvent extends CancellableEvent {
 
@@ -34,5 +36,37 @@ public class PlayerMoveEvent extends CancellableEvent {
 
     public void setZ(double z) {
         this.z = z;
+    }
+
+    public void setSpeed(double speed) {
+        double forward = Minecraft.getMinecraft().thePlayer.movementInput.moveForward;
+        double strafe = Minecraft.getMinecraft().thePlayer.movementInput.moveStrafe;
+        float yaw = Minecraft.getMinecraft().thePlayer.rotationYaw;
+        if (forward == 0 && strafe == 0) {
+            setX(0);
+            setZ(0);
+        } else {
+            if (forward != 0) {
+                if (strafe > 0) {
+                    yaw += (forward > 0 ? -45 : 45);
+                } else if (strafe < 0) {
+                    yaw += (forward > 0 ? 45 : -45);
+                }
+                strafe = 0;
+                if (forward > 0) {
+                    forward = 1;
+                } else {
+                    forward = -1;
+                }
+            }
+            double cos = Math.cos(Math.toRadians(yaw + 90));
+            double sin = Math.sin(Math.toRadians(yaw + 90));
+            setX(forward * speed * cos + strafe * speed * sin);
+            setZ(forward * speed * sin - strafe * speed * cos);
+        }
+    }
+
+    public boolean isMoving() {
+        return Wrapper.getPlayer().moveForward != 0 || Wrapper.getPlayer().moveStrafing != 0;
     }
 }

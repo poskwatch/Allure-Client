@@ -9,7 +9,7 @@ import vip.allureclient.base.module.ModuleData;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
 
-@ModuleData(label = "Sprint", keyBind = Keyboard.KEY_V, category = ModuleCategory.MOVEMENT)
+@ModuleData(moduleName = "Sprint", keyBind = Keyboard.KEY_V, category = ModuleCategory.MOVEMENT)
 public class Sprint extends Module {
 
     @EventListener
@@ -17,7 +17,7 @@ public class Sprint extends Module {
 
     public Sprint(){
         this.onPlayerMoveEvent = (moveEvent -> {
-           if (Wrapper.getPlayer().moveForward > 0){
+           if (Wrapper.getPlayer().moveForward > 0 && !Wrapper.getPlayer().getFoodStats().needFood()){
                Wrapper.getPlayer().setSprinting(true);
            }
         });

@@ -5,18 +5,14 @@ import vip.allureclient.AllureClient;
 import vip.allureclient.impl.property.EnumProperty;
 import vip.allureclient.visual.screens.dropdown.component.Component;
 
-/**
- * @Author: Posk
- * @Date: 11/6/2021
- **/
 
 public class EnumPropertyComponent extends Component {
 
     private int offset;
-    private EnumProperty property;
-    private Component parent;
+    private final EnumProperty<?> property;
+    private final Component parent;
 
-    public EnumPropertyComponent(EnumProperty property, Component parent, int offset){
+    public EnumPropertyComponent(EnumProperty<?> property, Component parent, int offset){
         this.offset = offset;
         this.property = property;
         this.parent = parent;
@@ -29,9 +25,9 @@ public class EnumPropertyComponent extends Component {
 
         Gui.drawRectWithWidth(x, y, 115, 14, isMouseHovering(mouseX, mouseY) ? 0xff101010 : 0xff151515);
 
-        AllureClient.getInstance().getFontManager().mediumFontRenderer.drawStringWithShadow(property.getPropertyLabel(), x + 3, y + 4, -1);
-        AllureClient.getInstance().getFontManager().mediumFontRenderer.drawStringWithShadow(property.getEnumValueAsString(),
-                x + 115 - AllureClient.getInstance().getFontManager().mediumFontRenderer.getStringWidth(property.getEnumValueAsString()) - 3, y + 4, -1);
+        AllureClient.getInstance().getFontManager().smallFontRenderer.drawStringWithShadow(property.getPropertyLabel(), x + 3, y + 4, -1);
+        AllureClient.getInstance().getFontManager().smallFontRenderer.drawStringWithShadow(property.getEnumValueAsString(),
+                x + 115 - AllureClient.getInstance().getFontManager().smallFontRenderer.getStringWidth(property.getEnumValueAsString()) - 3, y + 4, 0xff999999);
     }
 
     @Override

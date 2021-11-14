@@ -31,6 +31,7 @@ import optifine.Reflector;
 
 import org.lwjgl.opengl.GL11;
 import shadersmod.client.Shaders;
+import vip.allureclient.impl.module.visual.Animations;
 
 public class ItemRenderer
 {
@@ -331,6 +332,7 @@ public class ItemRenderer
         float f1 = entityplayersp.getSwingProgress(partialTicks);
         float f2 = entityplayersp.prevRotationPitch + (entityplayersp.rotationPitch - entityplayersp.prevRotationPitch) * partialTicks;
         float f3 = entityplayersp.prevRotationYaw + (entityplayersp.rotationYaw - entityplayersp.prevRotationYaw) * partialTicks;
+        float scalableProg = MathHelper.sin((float) (MathHelper.sqrt_float(f1) * Math.toRadians(180)));
         this.func_178101_a(f2, f3);
         this.func_178109_a(entityplayersp);
         this.func_178110_a(entityplayersp, partialTicks);
@@ -360,10 +362,23 @@ public class ItemRenderer
                         break;
 
                     case 4:
-                        this.transformFirstPersonItem(f - 0.25f, f1);
-                        this.func_178103_d();
+                        GlStateManager.translate(Animations.getInstance().xValueProperty.getPropertyValue(),
+                                Animations.getInstance().yValueProperty.getPropertyValue(),
+                                Animations.getInstance().zValueProperty.getPropertyValue());
+                        switch (Animations.getInstance().blockModeProperty.getPropertyValue()){
+                            case Swing:
+                                this.transformFirstPersonItem(f - 0.25f, f1);
+                                this.func_178103_d();
+                                break;
+                            case Swong:
+                                this.transformFirstPersonItem(f, 0);
+                                GlStateManager.translate(0.1F, 0.3F, 0);
+                                GL11.glRotated(-scalableProg * 35.0F, scalableProg / 2.9, 0, 2.0F);
+                                GL11.glRotated(-scalableProg * 45.0F, 4.0F, scalableProg / 0.7, 0F);
+                                this.func_178103_d();
+                                break;
+                        }
                         break;
-
                     case 5:
                         this.transformFirstPersonItem(f, 0.0F);
                         this.func_178098_a(partialTicks, entityplayersp);

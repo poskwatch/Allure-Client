@@ -1,19 +1,14 @@
 package vip.allureclient.visual.screens.dropdown.component;
 
-/**
- * @Author: Posk
- * @Date: 11/6/2021
- **/
-
 public class Component {
 
-    private CategoryFrame parentFrame;
+    private ModuleCategoryFrame parentFrame;
 
-    public CategoryFrame getParentFrame() {
+    public ModuleCategoryFrame getParentFrame() {
         return parentFrame;
     }
 
-    public void setParentFrame(CategoryFrame frame){
+    public void setParentFrame(ModuleCategoryFrame frame){
         this.parentFrame = frame;
     }
 
@@ -43,10 +38,6 @@ public class Component {
 
     public void setOffset(int offset){
 
-    }
-
-    public boolean isHidden(){
-        return false;
     }
 
 }

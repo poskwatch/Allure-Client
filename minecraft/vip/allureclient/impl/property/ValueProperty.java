@@ -30,4 +30,6 @@ public class ValueProperty<T extends Number> extends Property<T> {
     public T getMaximumValue() {
         return maximumValue;
     }
+
+
 }

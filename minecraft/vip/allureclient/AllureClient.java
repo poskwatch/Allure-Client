@@ -24,7 +24,7 @@ public class AllureClient {
         fontManager = new FontManager();
         propertyManager = new PropertyManager();
         moduleManager = new ModuleManager();
-        GuiDropDown.setup();
+        GuiDropDown.onStartTask.run();
     };
 
     public Runnable onClientExit = () -> {

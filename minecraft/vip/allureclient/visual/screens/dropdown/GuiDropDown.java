@@ -7,7 +7,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 import vip.allureclient.base.module.ModuleCategory;
 import vip.allureclient.base.util.math.MathUtil;
-import vip.allureclient.visual.screens.dropdown.component.CategoryFrame;
+import vip.allureclient.visual.screens.dropdown.component.ModuleCategoryFrame;
 import vip.allureclient.visual.screens.dropdown.component.Component;
 import vip.allureclient.visual.screens.dropdown.component.sub.CheatButtonComponent;
 
@@ -16,19 +16,19 @@ import java.util.ArrayList;
 
 public class GuiDropDown extends GuiScreen {
 
-    private static final ArrayList<CategoryFrame> categoryFrames = new ArrayList<>();
+    private static final ArrayList<ModuleCategoryFrame> MODULE_CATEGORY_FRAMES = new ArrayList<>();
     private double nekoAnimation;
 
-    public static void setup(){
+    public static Runnable onStartTask = () -> {
         for(int i = 0; i < ModuleCategory.values().length; i++){
-            categoryFrames.add(new CategoryFrame(ModuleCategory.values()[i], 10 + i * 125, 10));
+            MODULE_CATEGORY_FRAMES.add(new ModuleCategoryFrame(ModuleCategory.values()[i], 10 + i * 125, 10));
         }
-    }
+    };
 
     @Override
     public void initGui() {
-        categoryFrames.forEach(categoryFrame -> {
-            for(Component component : categoryFrame.getChildrenComponents()){
+        MODULE_CATEGORY_FRAMES.forEach(moduleCategoryFrame -> {
+            for(Component component : moduleCategoryFrame.getChildrenComponents()){
                 if(component instanceof CheatButtonComponent){
                     ((CheatButtonComponent) component).subComponents.forEach(Component::onAnimationEvent);
                 }
@@ -40,7 +40,6 @@ public class GuiDropDown extends GuiScreen {
 
     @Override
     public void onGuiClosed() {
-        //Allure.getInstance().getModuleManager().getModule(ClickGUI.class).setToggled(false);
         super.onGuiClosed();
     }
 
@@ -54,22 +53,22 @@ public class GuiDropDown extends GuiScreen {
         nekoAnimation = MathUtil.animateDoubleValue(height - 330, nekoAnimation, 0.05);
         Gui.drawModalRectWithCustomSizedTexture(width - 175, Math.round((float) nekoAnimation), 0, 0, 175, 330, 175, 330);
         GL11.glPopMatrix();
-        categoryFrames.forEach(categoryFrame -> {
-            categoryFrame.onDrawScreen(mouseX, mouseY);
-            categoryFrame.updateComponents();
+        MODULE_CATEGORY_FRAMES.forEach(moduleCategoryFrame -> {
+            moduleCategoryFrame.onDrawScreen(mouseX, mouseY);
+            moduleCategoryFrame.updateComponents();
         });
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-        categoryFrames.forEach(categoryFrame -> categoryFrame.onMouseClicked(mouseX, mouseY, mouseButton));
+        MODULE_CATEGORY_FRAMES.forEach(moduleCategoryFrame -> moduleCategoryFrame.onMouseClicked(mouseX, mouseY, mouseButton));
         super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
     protected void mouseReleased(int mouseX, int mouseY, int state) {
-        categoryFrames.forEach(categoryFrame -> categoryFrame.onMouseReleased(mouseX, mouseY, state));
+        MODULE_CATEGORY_FRAMES.forEach(moduleCategoryFrame -> moduleCategoryFrame.onMouseReleased(mouseX, mouseY, state));
         super.mouseReleased(mouseX, mouseY, state);
     }
 
@@ -78,7 +77,7 @@ public class GuiDropDown extends GuiScreen {
         if(keyCode == Keyboard.KEY_RSHIFT){
             mc.thePlayer.closeScreen();
         }
-        categoryFrames.forEach(categoryFrame -> categoryFrame.onKeyTyped(keyCode));
+        MODULE_CATEGORY_FRAMES.forEach(moduleCategoryFrame -> moduleCategoryFrame.onKeyTyped(keyCode));
         super.keyTyped(typedChar, keyCode);
     }
 

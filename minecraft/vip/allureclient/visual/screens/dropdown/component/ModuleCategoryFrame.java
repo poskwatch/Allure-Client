@@ -9,7 +9,7 @@ import vip.allureclient.visual.screens.dropdown.component.sub.CheatButtonCompone
 
 import java.util.ArrayList;
 
-public class CategoryFrame {
+public class ModuleCategoryFrame {
 
     private final ModuleCategory category;
     private boolean frameExpanded = true, isDraggingFrame;
@@ -20,7 +20,7 @@ public class CategoryFrame {
     private double outlineAnimation = 14;
     private boolean completedOutlineAnimation;
 
-    public CategoryFrame(ModuleCategory category, int x, int y){
+    public ModuleCategoryFrame(ModuleCategory category, int x, int y){
         this.category = category;
         this.x = x;
         this.y = y;
@@ -34,34 +34,10 @@ public class CategoryFrame {
 
     public void onDrawScreen(int mouseX, int mouseY) {
         Gui.drawRectWithWidth(x - 1, y, frameWidth + 2, frameHeight, 0xff101010);
-        AllureClient.getInstance().getFontManager().mediumFontRenderer.drawStringWithShadow(category.name(), x + 17, y + 4, -1);
-        String icon;
-        /*
-        switch (category){
-            case COMBAT:
-                icon = IconUtil.COMBAT_ICON;
-                break;
-            case PLAYER:
-                icon = IconUtil.PLAYER_ICON;
-                break;
-            case MOVEMENT:
-                icon = IconUtil.MOVEMENT_ICON;
-                break;
-            case RENDER:
-                icon = IconUtil.RENDER_ICON;
-                break;
-            case EXPLOIT:
-                icon = IconUtil.EXPLOIT_ICON;
-                break;
-            case WORLD:
-                icon = IconUtil.WORLD_ICON;
-                break;
-            default:
-                icon = "0";
-        }
-        FontUtil.icons.drawString(icon, x + 4, y + 5, -1);
 
-         */
+        AllureClient.getInstance().getFontManager().smallFontRenderer.drawStringWithShadow(category.categoryName, x + 17, y + 4, -1);
+        AllureClient.getInstance().getFontManager().iconFontRenderer.drawString(category.iconCode, x + 4, y + 5, -1);
+
         outlineAnimation = MathUtil.animateDoubleValue(getFrameHeight() + 1, outlineAnimation, 0.03);
         if(frameExpanded)
             Gui.drawRectWithWidth(x - 1, y + 14, frameWidth + 2, completedOutlineAnimation ? getFrameHeight() + 1 : outlineAnimation, 0xff101010);
@@ -99,7 +75,7 @@ public class CategoryFrame {
                         ((CheatButtonComponent) childrenComponent).expanded = false;
                     }
                 }
-                childrenComponents.forEach(childComponent -> childComponent.onAnimationEvent());
+                childrenComponents.forEach(Component::onAnimationEvent);
             }
         }
         if(frameExpanded){

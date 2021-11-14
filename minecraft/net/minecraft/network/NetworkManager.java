@@ -48,6 +48,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+import vip.allureclient.AllureClient;
+import vip.allureclient.impl.event.network.PacketReceiveEvent;
+import vip.allureclient.impl.event.network.PacketSendEvent;
 
 public class NetworkManager extends SimpleChannelInboundHandler<Packet>
 {
@@ -152,6 +155,10 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet>
         {
             try
             {
+                PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(p_channelRead0_2_);
+                AllureClient.getInstance().getEventManager().post(packetReceiveEvent);
+                if(packetReceiveEvent.isCancelled())
+                    return;
                 p_channelRead0_2_.processPacket(this.packetListener);
             }
             catch (ThreadQuickExitException var4)
@@ -174,10 +181,11 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet>
 
     public void sendPacket(Packet packetIn)
     {
+
         if (this.isChannelOpen())
         {
             this.flushOutboundQueue();
-            this.dispatchPacket(packetIn, (GenericFutureListener <? extends Future <? super Void >> [])null);
+            this.dispatchPacket(packetIn, null);
         }
         else
         {

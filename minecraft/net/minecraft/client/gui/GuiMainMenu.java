@@ -18,7 +18,6 @@ import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.realms.RealmsBridge;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
@@ -31,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.util.glu.Project;
+import vip.allureclient.visual.screens.alt.GuiAltLogin;
 
 public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
 {
@@ -82,7 +82,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
     private ResourceLocation backgroundTexture;
 
     /** Minecraft Realms button. */
-    private GuiButton realmsButton;
+    private GuiButton altLoginButton;
 
     public GuiMainMenu()
     {
@@ -234,7 +234,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
     {
         this.buttonList.add(new GuiButton(1, this.width / 2 - 100, p_73969_1_, I18n.format("menu.singleplayer", new Object[0])));
         this.buttonList.add(new GuiButton(2, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 1, I18n.format("menu.multiplayer", new Object[0])));
-        this.buttonList.add(this.realmsButton = new GuiButton(14, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 2, I18n.format("menu.online", new Object[0])));
+        this.buttonList.add(this.altLoginButton = new GuiButton(14, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 2, "Alt Login"));
     }
 
     /**
@@ -278,9 +278,9 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
             this.mc.displayGuiScreen(new GuiMultiplayer(this));
         }
 
-        if (button.id == 14 && this.realmsButton.visible)
+        if (button.id == 14)
         {
-            this.switchToRealms();
+            mc.displayGuiScreen(new GuiAltLogin());
         }
 
         if (button.id == 4)
@@ -304,12 +304,6 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
                 this.mc.displayGuiScreen(guiyesno);
             }
         }
-    }
-
-    private void switchToRealms()
-    {
-        RealmsBridge realmsbridge = new RealmsBridge();
-        realmsbridge.switchToRealms(this);
     }
 
     public void confirmClicked(boolean result, int id)

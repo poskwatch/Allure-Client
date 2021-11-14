@@ -8,12 +8,19 @@ public class Module {
     private int moduleKeyBind;
     private final ModuleCategory moduleCategory;
     private boolean isModuleToggled;
+    private String moduleSuffix;
 
     public Module(){
-        final boolean hasDataAnnotation = getClass().isAnnotationPresent(ModuleData.class);
-        this.moduleName = hasDataAnnotation ? getClass().getAnnotation(ModuleData.class).label() : "No Name Found";
-        this.moduleKeyBind = hasDataAnnotation ? getClass().getAnnotation(ModuleData.class).keyBind() : 0;
-        this.moduleCategory = hasDataAnnotation ? getClass().getAnnotation(ModuleData.class).category() : ModuleCategory.WORLD;
+        if(isIdentified()) {
+            this.moduleName = getClass().getAnnotation(ModuleData.class).moduleName();
+            this.moduleKeyBind = getClass().getAnnotation(ModuleData.class).keyBind();
+            this.moduleCategory = getClass().getAnnotation(ModuleData.class).category();
+        }
+        else {
+            this.moduleName = "Unidentified Module";
+            this.moduleKeyBind = 0;
+            this.moduleCategory = ModuleCategory.COMBAT;
+        }
     }
 
     public Runnable onModuleEnabled = () -> {};
@@ -58,6 +65,18 @@ public class Module {
         return moduleName;
     }
 
+    public String getModuleDisplayName() {
+        return getModuleSuffix() == null ? getModuleName() : getModuleName() + " \2477" + getModuleSuffix();
+    }
+
+    public String getModuleSuffix() {
+        return moduleSuffix;
+    }
+
+    public void setModuleSuffix(String moduleSuffix) {
+        this.moduleSuffix = moduleSuffix;
+    }
+
     public int getModuleKeyBind(){
         return moduleKeyBind;
     }
@@ -68,5 +87,9 @@ public class Module {
 
     public ModuleCategory getModuleCategory() {
         return moduleCategory;
+    }
+
+    private boolean isIdentified() {
+        return getClass().isAnnotationPresent(ModuleData.class);
     }
 }

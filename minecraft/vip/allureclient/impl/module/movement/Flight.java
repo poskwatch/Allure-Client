@@ -1,24 +1,26 @@
 package vip.allureclient.impl.module.movement;
 
+import net.minecraft.network.play.client.C03PacketPlayer;
 import org.lwjgl.input.Keyboard;
-import vip.allureclient.AllureClient;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.event.Listener;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.base.module.ModuleCategory;
 import vip.allureclient.base.module.ModuleData;
 import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.base.util.visual.ChatUtil;
+import vip.allureclient.impl.event.network.PacketSendEvent;
+import vip.allureclient.impl.event.player.PlayerMoveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
+import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.EnumProperty;
 import vip.allureclient.impl.property.ValueProperty;
 
-@ModuleData(label = "Flight", keyBind = Keyboard.KEY_G, category = ModuleCategory.MOVEMENT)
+@ModuleData(moduleName = "Flight", keyBind = Keyboard.KEY_G, category = ModuleCategory.MOVEMENT)
 public class Flight extends Module {
 
     public Flight() {
         onUpdatePositionEvent = (updatePositionEvent -> {
-           switch (flightMode.getPropertyValue()){
+           switch (flightModeProperty.getPropertyValue()){
                case Vanilla:
                    Wrapper.getPlayer().motionY = 0;
                    break;
@@ -26,24 +28,36 @@ public class Flight extends Module {
                    Wrapper.getPlayer().motionY = 0.1;
                    break;
            }
+           setModuleSuffix(flightModeProperty.getEnumValueAsString());
         });
-
-        onModuleEnabled = () -> {
-            ChatUtil.sendMessageToPlayer("I just enabled flight! Mode: " + flightMode.getEnumValueAsString());
-            ChatUtil.sendMessageToPlayer("Settings: " + AllureClient.getInstance().getPropertyManager().getOptions(this).size());
-        };
-
-        onModuleDisabled = () -> {
-            ChatUtil.sendMessageToPlayer("I just disabled flight!");
-        };
+        onPacketSendEvent = (packetSendEvent -> {
+            if (blinkProperty.getPropertyValue()) {
+                if (packetSendEvent.getPacket() instanceof C03PacketPlayer) {
+                    packetSendEvent.setCancelled(true);
+                }
+            }
+        });
+        onPlayerMoveEvent = (playerMoveEvent -> {
+            playerMoveEvent.setSpeed(flightSpeedProperty.getPropertyValue());
+            if(!playerMoveEvent.isMoving())
+                playerMoveEvent.setSpeed(0);
+        });
     }
 
     @EventListener
     Listener<UpdatePositionEvent> onUpdatePositionEvent;
 
-    EnumProperty<flightModes> flightMode = new EnumProperty<>("Flight Mode", flightModes.Vanilla, this);
+    @EventListener
+    Listener<PacketSendEvent> onPacketSendEvent;
 
-    ValueProperty<Double> flightSpeed = new ValueProperty<Double>("Flight Speed", 0D, 0D, 10D, this);
+    @EventListener
+    Listener<PlayerMoveEvent> onPlayerMoveEvent;
+
+    EnumProperty<flightModes> flightModeProperty = new EnumProperty<>("Flight Mode", flightModes.Vanilla, this);
+
+    ValueProperty<Double> flightSpeedProperty = new ValueProperty<>("Flight Speed", 0.5D, 0.1D, 2D, this);
+
+    BooleanProperty blinkProperty = new BooleanProperty("Blink", true, this);
 
     enum flightModes {
         Vanilla,

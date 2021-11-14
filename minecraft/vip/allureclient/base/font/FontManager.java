@@ -19,6 +19,9 @@ public class FontManager {
     public MinecraftFontRenderer largeFontRenderer;
     private Font largeFontRendererFont;
 
+    public MinecraftFontRenderer iconFontRenderer;
+    private Font iconFontRendererFont;
+
     public FontManager() {
         setupFonts();
     }
@@ -52,22 +55,15 @@ public class FontManager {
         {
             Map<String, Font> locationMap = new HashMap<>();
 
-            smallFontRendererFont = getFont(locationMap, "font.ttf", 17);
-            mediumFontRendererFont = getFont(locationMap, "font.ttf", 19);
+            smallFontRendererFont = getFont(locationMap, "font.ttf", 19);
+            mediumFontRendererFont = getFont(locationMap, "font.ttf", 20);
             largeFontRendererFont = getFont(locationMap, "font.ttf", 21);
+            iconFontRendererFont = getFont(locationMap, "icon.ttf", 19);
 
             completed++;
         }).start();
-        new Thread(() ->
-        {
-            Map<String, Font> locationMap = new HashMap<>();
-            completed++;
-        }).start();
-        new Thread(() ->
-        {
-            Map<String, Font> locationMap = new HashMap<>();
-            completed++;
-        }).start();
+        new Thread(() -> completed++).start();
+        new Thread(() -> completed++).start();
         while (!hasLoaded()) {
             try {
                 //noinspection BusyWait
@@ -79,5 +75,6 @@ public class FontManager {
         smallFontRenderer = new MinecraftFontRenderer(smallFontRendererFont, true, true);
         mediumFontRenderer = new MinecraftFontRenderer(mediumFontRendererFont, true, true);
         largeFontRenderer = new MinecraftFontRenderer(largeFontRendererFont, true, true);
+        iconFontRenderer = new MinecraftFontRenderer(iconFontRendererFont, true, true);
     }
 }

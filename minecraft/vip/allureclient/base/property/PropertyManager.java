@@ -6,19 +6,19 @@ import java.util.ArrayList;
 
 public class PropertyManager {
 
-    private final ArrayList<Property> properties;
+    private final ArrayList<Property<?>> properties;
 
     public PropertyManager() {
         properties = new ArrayList<>();
     }
 
-    public ArrayList<Property> getProperties() {
+    public ArrayList<Property<?>> getProperties() {
         return properties;
     }
 
-    public ArrayList<Property> getOptions(Module module){
-        ArrayList<Property> filteredOptions = new ArrayList<>();
-        for (Property property : properties) {
+    public ArrayList<Property<?>> getOptions(Module module){
+        ArrayList<Property<?>> filteredOptions = new ArrayList<>();
+        for (Property<?> property : properties) {
             if(property.getParentModule() == module)
                 filteredOptions.add(property);
         }

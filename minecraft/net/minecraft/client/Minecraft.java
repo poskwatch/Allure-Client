@@ -231,7 +231,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
     private Entity renderViewEntity;
     public Entity pointedEntity;
     public EffectRenderer effectRenderer;
-    private final Session session;
+    public Session session;
     private boolean isGamePaused;
 
     /** The font renderer used for displaying and measuring text */
@@ -1924,7 +1924,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
                     else
                     {
 
-                        AllureClient.getInstance().getModuleManager().onKeyPressed(k);
+                        AllureClient.getInstance().getModuleManager().onKeyPressed.accept(k);
 
                         if(k == 54){
                             displayGuiScreen(new GuiDropDown());

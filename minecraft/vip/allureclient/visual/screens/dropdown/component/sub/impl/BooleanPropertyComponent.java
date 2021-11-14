@@ -7,12 +7,7 @@ import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.visual.screens.dropdown.component.Component;
 import vip.allureclient.visual.screens.dropdown.component.sub.CheatButtonComponent;
 
-/**
- * @Author: Posk
- * @Date: 11/6/2021
- **/
-
-public class CheckBoxComponent extends Component {
+public class BooleanPropertyComponent extends Component {
 
     private final CheatButtonComponent parent;
     private final BooleanProperty property;
@@ -20,7 +15,7 @@ public class CheckBoxComponent extends Component {
     private double checkboxAnimation;
     private boolean completedAnimation;
 
-    public CheckBoxComponent(BooleanProperty property, CheatButtonComponent parent, int offset){
+    public BooleanPropertyComponent(BooleanProperty property, CheatButtonComponent parent, int offset){
         this.parent = parent;
         this.property = property;
         this.offset = offset;
@@ -33,7 +28,7 @@ public class CheckBoxComponent extends Component {
 
         Gui.drawRectWithWidth(x, y, 115, 14, isMouseHovering(mouseX, mouseY) ? 0xff101010 : 0xff151515);
 
-        AllureClient.getInstance().getFontManager().mediumFontRenderer.drawStringWithShadow(property.getPropertyLabel(), x + 3, y + 4, -1);
+        AllureClient.getInstance().getFontManager().smallFontRenderer.drawStringWithShadow(property.getPropertyLabel(), x + 3, y + 4, -1);
         Gui.drawRectWithWidth(x + 115 - 28, y + 2, 26, 10, 0x99000000);
 
         checkboxAnimation = MathUtil.animateDoubleValue(x + 115 - 27 + (property.getPropertyValue() ? 12 : 0), checkboxAnimation, 0.03);

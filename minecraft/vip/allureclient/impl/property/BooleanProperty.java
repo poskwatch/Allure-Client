@@ -18,8 +18,4 @@ public class BooleanProperty extends Property<Boolean> {
     public void setPropertyValue(Boolean propertyValue) {
         super.setPropertyValue(propertyValue);
     }
-
-    public void togglePropertyValue() {
-        setPropertyValue(!getPropertyValue());
-    }
 }

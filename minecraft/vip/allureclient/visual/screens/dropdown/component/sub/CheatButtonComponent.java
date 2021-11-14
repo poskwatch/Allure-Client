@@ -9,9 +9,9 @@ import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.EnumProperty;
 import vip.allureclient.impl.property.ValueProperty;
 import vip.allureclient.visual.screens.dropdown.component.Component;
-import vip.allureclient.visual.screens.dropdown.component.sub.impl.CheckBoxComponent;
+import vip.allureclient.visual.screens.dropdown.component.sub.impl.BooleanPropertyComponent;
 import vip.allureclient.visual.screens.dropdown.component.sub.impl.EnumPropertyComponent;
-import vip.allureclient.visual.screens.dropdown.component.sub.impl.SliderComponent;
+import vip.allureclient.visual.screens.dropdown.component.sub.impl.ValuePropertyComponent;
 
 import java.util.ArrayList;
 
@@ -24,32 +24,33 @@ public class CheatButtonComponent extends Component {
 
     private double animationToggleBar;
     private double animationToggleBarTarget;
-    private double animationFlowY, animationFlowYTarget, y;
+    private double animationFlowY;
+    private double animationFlowYTarget;
     private boolean flowAnimationCompleted;
 
     public CheatButtonComponent(Module module, int offset){
         this.module = module;
         this.offset = offset;
         int settingOffset = offset + 14;
-        for(Property property : AllureClient.getInstance().getPropertyManager().getOptions(module)){
+        for(Property<?> property : AllureClient.getInstance().getPropertyManager().getOptions(module)){
             if(property instanceof BooleanProperty){
-                subComponents.add(new CheckBoxComponent((BooleanProperty) property, this, settingOffset));
+                subComponents.add(new BooleanPropertyComponent((BooleanProperty) property, this, settingOffset));
                 settingOffset += 14;
             }
             if(property instanceof ValueProperty){
-                subComponents.add(new SliderComponent((ValueProperty) property, this, settingOffset));
+                subComponents.add(new ValuePropertyComponent((ValueProperty<?>) property, this, settingOffset));
                 settingOffset += 14;
             }
             if(property instanceof EnumProperty){
-                subComponents.add(new EnumPropertyComponent((EnumProperty) property, this, settingOffset));
+                subComponents.add(new EnumPropertyComponent((EnumProperty<?>) property, this, settingOffset));
                 settingOffset += 14;
             }
-
         }
     }
 
     @Override
     public void onDrawScreen(int mouseX, int mouseY) {
+        double y;
         if(flowAnimationCompleted){
             y = getParentFrame().getY() + offset;
         }
@@ -63,8 +64,10 @@ public class CheatButtonComponent extends Component {
         Gui.drawHorizontalGradient(getParentFrame().getX(), (float) y, Math.round(animationToggleBar), getParentFrame().frameHeight,
                 0xffd742f5, 0xff42cef5);
 
-        AllureClient.getInstance().getFontManager().mediumFontRenderer.drawStringWithShadow(module.getModuleName(), getParentFrame().getX() + 4, y + 4, -1);
-        //FontUtil.icons.drawString(expanded ? IconUtil.ARROW_DOWN : IconUtil.ARROW_UP, getParentFrame().getX() + getParentFrame().frameWidth - 10, y + 5, -1);
+        AllureClient.getInstance().getFontManager().smallFontRenderer.drawStringWithShadow(module.getModuleName(), getParentFrame().getX() + 4, y + 4, -1);
+        final String ARROW_UP = "F";
+        final String ARROW_DOWN = "G";
+        AllureClient.getInstance().getFontManager().iconFontRenderer.drawString(expanded ? ARROW_DOWN : ARROW_UP, getParentFrame().getX() + getParentFrame().frameWidth - 10, y + 5, -1);
         animationToggleBar = MathUtil.animateDoubleValue(animationToggleBarTarget, animationToggleBar, 0.03);
         animationFlowY = MathUtil.animateDoubleValue(animationFlowYTarget, animationFlowY, 0.03);
         if(module.isModuleToggled()) {

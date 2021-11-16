@@ -816,7 +816,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
     public void addToSendQueue(Packet p_147297_1_)
     {
         PacketSendEvent packetSendEvent = new PacketSendEvent(p_147297_1_);
-        AllureClient.getInstance().getEventManager().post(packetSendEvent);
+        AllureClient.getInstance().getEventManager().callEvent(packetSendEvent);
         if(packetSendEvent.isCancelled())
             return;
         this.netManager.sendPacket(packetSendEvent.getPacket());

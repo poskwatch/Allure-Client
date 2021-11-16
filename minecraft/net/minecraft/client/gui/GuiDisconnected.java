@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.IChatComponent;
+import vip.allureclient.base.util.client.AccountUtil;
 
 public class GuiDisconnected extends GuiScreen
 {
@@ -64,6 +65,10 @@ public class GuiDisconnected extends GuiScreen
         {
             for (String s : this.multilineMessage)
             {
+                if (s.contains("Ban ID:")) {
+                    String banID = s.replace("\2477Ban ID: ", "");
+                    //s = s + "\2477(Reason: " + AccountUtil.getBanInformation(banID) + ")";
+                }
                 this.drawCenteredString(this.fontRendererObj, s, this.width / 2, i, 16777215);
                 i += this.fontRendererObj.FONT_HEIGHT;
             }

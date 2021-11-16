@@ -26,7 +26,10 @@ public class Animations extends Module {
 
     public enum blockModes {
         Swing,
-        Swong
+        Swong,
+        Swang,
+        Swank,
+        Slide
     }
 
     public static Animations getInstance() {

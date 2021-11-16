@@ -26,7 +26,7 @@ public class ModuleCategoryFrame {
         this.y = y;
 
         int buttonOffset = 14;
-        for(Module module : AllureClient.getInstance().getModuleManager().getModulesByCategory(category)){
+        for(Module module : AllureClient.getInstance().getModuleManager().getModulesByCategory.apply(category)){
             addChildComponent(new CheatButtonComponent(module, buttonOffset));
             buttonOffset += 14;
         }

@@ -185,6 +185,7 @@ import org.lwjgl.opengl.OpenGLException;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
 import vip.allureclient.AllureClient;
+import vip.allureclient.impl.event.world.WorldLoadEvent;
 import vip.allureclient.visual.screens.dropdown.GuiDropDown;
 
 public class Minecraft implements IThreadListener, IPlayerUsage
@@ -2403,6 +2404,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
             this.thePlayer.movementInput = new MovementInputFromOptions(this.gameSettings);
             this.playerController.setPlayerCapabilities(this.thePlayer);
             this.renderViewEntity = this.thePlayer;
+            AllureClient.getInstance().getEventManager().callEvent(new WorldLoadEvent());
         }
         else
         {

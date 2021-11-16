@@ -54,6 +54,7 @@ import net.minecraft.world.World;
 import vip.allureclient.AllureClient;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
+import vip.allureclient.impl.module.player.NoSlow;
 
 public class EntityPlayerSP extends AbstractClientPlayer
 {
@@ -194,7 +195,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
         boolean flag = this.isSprinting();
 
         UpdatePositionEvent updatePositionEvent = new UpdatePositionEvent(posX, getEntityBoundingBox().minY, posZ, rotationYaw, rotationPitch, onGround);
-        AllureClient.getInstance().getEventManager().post(updatePositionEvent);
+        AllureClient.getInstance().getEventManager().callEvent(updatePositionEvent);
 
         if (flag != this.serverSprintState)
         {
@@ -279,13 +280,13 @@ public class EntityPlayerSP extends AbstractClientPlayer
             }
 
             updatePositionEvent.setPre(false);
-            AllureClient.getInstance().getEventManager().post(updatePositionEvent);
+            AllureClient.getInstance().getEventManager().callEvent(updatePositionEvent);
         }
     }
 
     public void moveEntity(double x, double y, double z){
         PlayerMoveEvent playerMoveEvent = new PlayerMoveEvent(x, y, z);
-        AllureClient.getInstance().getEventManager().post(playerMoveEvent);
+        AllureClient.getInstance().getEventManager().callEvent(playerMoveEvent);
         if(playerMoveEvent.isCancelled()){
             return;
         }
@@ -804,7 +805,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
         boolean flag2 = this.movementInput.moveForward >= f;
         this.movementInput.updatePlayerMoveState();
 
-        if (this.isUsingItem() && !this.isRiding())
+        if (this.isUsingItem() && !this.isRiding() && !AllureClient.getInstance().getModuleManager().getModuleByName.apply("NoSlow").isModuleToggled())
         {
             this.movementInput.moveStrafe *= 0.2F;
             this.movementInput.moveForward *= 0.2F;

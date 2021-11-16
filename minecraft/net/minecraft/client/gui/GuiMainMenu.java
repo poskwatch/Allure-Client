@@ -30,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.util.glu.Project;
+import vip.allureclient.AllureClient;
 import vip.allureclient.visual.screens.alt.GuiAltLogin;
 
 public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
@@ -198,7 +199,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
         }
 
         int i = 24;
-        int j = this.height / 4 + 48;
+        int j = this.height / 2 - 55;
 
         if (this.mc.isDemo())
         {
@@ -232,8 +233,8 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
      */
     private void addSingleplayerMultiplayerButtons(int p_73969_1_, int p_73969_2_)
     {
-        this.buttonList.add(new GuiButton(1, this.width / 2 - 100, p_73969_1_, I18n.format("menu.singleplayer", new Object[0])));
-        this.buttonList.add(new GuiButton(2, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 1, I18n.format("menu.multiplayer", new Object[0])));
+        this.buttonList.add(new GuiButton(1, this.width / 2 - 100, p_73969_1_, "Singleplayer"));
+        this.buttonList.add(new GuiButton(2, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 1, "Multiplayer"));
         this.buttonList.add(this.altLoginButton = new GuiButton(14, this.width / 2 - 100, p_73969_1_ + p_73969_2_ * 2, "Alt Login"));
     }
 
@@ -498,6 +499,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
         GlStateManager.disableAlpha();
+        this.splashText = "\2475Allure Client!";
         this.renderSkybox(mouseX, mouseY, partialTicks);
         GlStateManager.enableAlpha();
         Tessellator tessellator = Tessellator.getInstance();
@@ -510,6 +512,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
         this.mc.getTextureManager().bindTexture(minecraftTitleTextures);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
+        /*
         if ((double)this.updateCounter < 1.0E-4D)
         {
             this.drawTexturedModalRect(j + 0, k + 0, 0, 0, 99, 44);
@@ -524,15 +527,17 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
             this.drawTexturedModalRect(j + 155, k + 0, 0, 45, 155, 44);
         }
 
+         */
+
         GlStateManager.pushMatrix();
         GlStateManager.translate((float)(this.width / 2 + 90), 70.0F, 0.0F);
         GlStateManager.rotate(-20.0F, 0.0F, 0.0F, 1.0F);
         float f = 1.8F - MathHelper.abs(MathHelper.sin((float)(Minecraft.getSystemTime() % 1000L) / 1000.0F * (float)Math.PI * 2.0F) * 0.1F);
         f = f * 100.0F / (float)(this.fontRendererObj.getStringWidth(this.splashText) + 32);
         GlStateManager.scale(f, f, f);
-        this.drawCenteredString(this.fontRendererObj, this.splashText, 0, -8, -256);
+        //this.drawCenteredString(this.fontRendererObj, this.splashText, 0, -8, -256);
         GlStateManager.popMatrix();
-        String s = "Minecraft 1.8.8";
+        String s = "Allure Client Version " + AllureClient.getInstance().CLIENT_VERSION;
 
         if (this.mc.isDemo())
         {

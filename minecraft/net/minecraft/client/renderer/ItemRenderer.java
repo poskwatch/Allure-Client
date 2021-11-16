@@ -372,9 +372,26 @@ public class ItemRenderer
                                 break;
                             case Swong:
                                 this.transformFirstPersonItem(f, 0);
-                                GlStateManager.translate(0.1F, 0.3F, 0);
+                                GlStateManager.translate(0F, 0.3F, 0);
                                 GL11.glRotated(-scalableProg * 35.0F, scalableProg / 2.9, 0, 2.0F);
                                 GL11.glRotated(-scalableProg * 45.0F, 4.0F, scalableProg / 0.7, 0F);
+                                this.func_178103_d();
+                                break;
+                            case Swang:
+                                this.transformFirstPersonItem(f - 0.15f, f1);
+                                GlStateManager.rotate(scalableProg * 35.0F / 2.0F, -scalableProg, -0.0F, 23.0F);
+                                GlStateManager.rotate(scalableProg * 50.0F, 1.0F, -scalableProg / 2.0F, 0.F);
+                                this.func_178103_d();
+                                break;
+                            case Swank:
+                                this.transformFirstPersonItem(f - 0.15f, f1);
+                                GlStateManager.rotate(scalableProg * 35.0F / 2.0F, -scalableProg, -0.0F, 23.0F);
+                                GlStateManager.rotate(scalableProg * 30.0F, 1.0F, -scalableProg / 2.0F, 0.F);
+                                this.func_178103_d();
+                                break;
+                            case Slide:
+                                this.transformFirstPersonItem(f - 0.15f, 0);
+                                GlStateManager.rotate(scalableProg * -35.0F, 1, -0.0F, 0.0F);
                                 this.func_178103_d();
                                 break;
                         }

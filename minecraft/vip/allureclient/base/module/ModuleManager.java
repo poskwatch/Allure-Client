@@ -1,17 +1,19 @@
 package vip.allureclient.base.module;
 
-import com.sun.org.apache.xpath.internal.operations.Mod;
 import vip.allureclient.base.font.MinecraftFontRenderer;
 import vip.allureclient.impl.module.combat.KillAura;
+import vip.allureclient.impl.module.combat.Velocity;
 import vip.allureclient.impl.module.movement.Flight;
+import vip.allureclient.impl.module.movement.Speed;
 import vip.allureclient.impl.module.movement.Sprint;
+import vip.allureclient.impl.module.player.Disabler;
 import vip.allureclient.impl.module.player.NoFall;
+import vip.allureclient.impl.module.player.NoSlow;
 import vip.allureclient.impl.module.player.PingSpoof;
-import vip.allureclient.impl.module.visual.Animations;
-import vip.allureclient.impl.module.visual.HUD;
+import vip.allureclient.impl.module.visual.*;
 import vip.allureclient.impl.module.world.Atmosphere;
+import vip.allureclient.impl.module.world.ChestStealer;
 
-import javax.xml.bind.Marshaller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -25,54 +27,57 @@ public class ModuleManager {
 
     public ModuleManager(){
         final Runnable onModuleManagerStart = () -> {
-            registerModules(
+            registerModules.accept(new Module[]{
                     // Combat Modules
                     new KillAura(),
+                    new Velocity(),
                     // Player Modules
                     new NoFall(),
                     new PingSpoof(),
+                    new Disabler(),
+                    new NoSlow(),
                     // Movement Modules
                     new Sprint(),
                     new Flight(),
+                    new Speed(),
                     // Visual Modules
                     new HUD(),
+                    new ClientColor(),
                     new Animations(),
+                    new Crosshair(),
+                    new TargetHUD(),
                     // World Modules
-                    new Atmosphere()
+                    new Atmosphere(),
+                    new ChestStealer()
+                }
             );
             System.out.println("Module Manager Initiated...");
         };
         onModuleManagerStart.run();
     }
 
-    private void registerModules(Module... modules){
-        this.modules.addAll(Arrays.asList(modules));
-    }
+    private final Consumer<Module[]> registerModules = (modulesArray -> modules.addAll(Arrays.asList(modulesArray)));
 
-    public ArrayList<Module> getModules(){
-        return modules;
-    }
+    public Supplier<ArrayList<Module>> getModules = () -> modules;
 
-    public ArrayList<Module> getModulesByCategory(ModuleCategory category){
+    public final Function<ModuleCategory, ArrayList<Module>> getModulesByCategory = (moduleCategory -> {
         ArrayList<Module> filteredModules = new ArrayList<>();
-        getModules().stream().filter(module -> module.getModuleCategory() == category).forEach(filteredModules::add);
+        getModules.get().stream().filter(module -> module.getModuleCategory() == moduleCategory).forEach(filteredModules::add);
         return filteredModules;
-    }
+    });
 
     public Function<MinecraftFontRenderer, ArrayList<Module>> getSortedDisplayModules = (fontRenderer -> {
-        ArrayList<Module> sortedDisplayModules = new ArrayList<>(getModules());
+        ArrayList<Module> sortedDisplayModules = new ArrayList<>(getModules.get());
         sortedDisplayModules.removeIf(module -> (!module.isModuleToggled()));
         sortedDisplayModules.sort(Comparator.comparingDouble(module -> fontRenderer.getStringWidth(((Module) module).getModuleDisplayName())).reversed());
         return sortedDisplayModules;
     });
 
     public Function<String, Module> getModuleByName =
-            (label -> getModules().stream().filter(module -> module.getModuleName().equals(label)).findFirst().orElse(null));
+            (label -> getModules.get().stream().filter(module -> module.getModuleName().equals(label)).findFirst().orElse(null));
 
     public Function<Class<? extends Module>, Module> getModuleByClass =
-            (moduleClass -> getModules().stream().filter(module -> module.getClass() == moduleClass).findFirst().orElse(null));
+            (moduleClass -> getModules.get().stream().filter(module -> module.getClass() == moduleClass).findFirst().orElse(null));
 
-    public Consumer<Integer> onKeyPressed = (key -> {
-        modules.forEach(module -> module.onKeyPressed(key));
-    });
+    public Consumer<Integer> onKeyPressed = (key -> modules.forEach(module -> module.onKeyPressed(key)));
 }

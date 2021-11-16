@@ -2,7 +2,7 @@ package vip.allureclient.impl.module.player;
 
 import net.minecraft.network.play.client.C03PacketPlayer;
 import vip.allureclient.base.event.EventListener;
-import vip.allureclient.base.event.Listener;
+import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.base.module.ModuleCategory;
 import vip.allureclient.base.module.ModuleData;
@@ -14,7 +14,7 @@ import vip.allureclient.impl.property.EnumProperty;
 public class NoFall extends Module {
 
     @EventListener
-    Listener<UpdatePositionEvent> onUpdatePositionEvent;
+    EventConsumer<UpdatePositionEvent> onUpdatePositionEvent;
 
     private final EnumProperty<NoFallModes> mode = new EnumProperty<>("Mode", NoFallModes.WATCHDOG, this);
 

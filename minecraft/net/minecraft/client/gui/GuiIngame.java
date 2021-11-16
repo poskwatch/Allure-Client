@@ -43,8 +43,10 @@ import net.minecraft.util.StringUtils;
 import net.minecraft.world.border.WorldBorder;
 import optifine.Config;
 import optifine.CustomColors;
+import org.lwjgl.opengl.GL11;
 import vip.allureclient.AllureClient;
 import vip.allureclient.impl.event.visual.Render2DEvent;
+import vip.allureclient.impl.module.visual.Crosshair;
 
 public class GuiIngame extends Gui
 {
@@ -163,7 +165,7 @@ public class GuiIngame extends Gui
         this.mc.getTextureManager().bindTexture(icons);
         GlStateManager.enableBlend();
 
-        if (this.showCrosshair() && this.mc.gameSettings.thirdPersonView < 1)
+        if (this.showCrosshair() && this.mc.gameSettings.thirdPersonView < 1 && !AllureClient.getInstance().getModuleManager().getModuleByClass.apply(Crosshair.class).isModuleToggled())
         {
             GlStateManager.tryBlendFuncSeparate(775, 769, 1, 0);
             GlStateManager.enableAlpha();
@@ -181,7 +183,7 @@ public class GuiIngame extends Gui
         }
 
         Render2DEvent render2DEvent = new Render2DEvent(partialTicks, scaledresolution);
-        AllureClient.getInstance().getEventManager().post(render2DEvent);
+        AllureClient.getInstance().getEventManager().callEvent(render2DEvent);
 
         GlStateManager.disableBlend();
 

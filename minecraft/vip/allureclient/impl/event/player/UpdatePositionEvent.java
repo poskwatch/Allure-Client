@@ -1,6 +1,7 @@
 package vip.allureclient.impl.event.player;
 
 import vip.allureclient.base.event.CancellableEvent;
+import vip.allureclient.base.util.client.Wrapper;
 
 public class UpdatePositionEvent extends CancellableEvent {
 
@@ -33,10 +34,13 @@ public class UpdatePositionEvent extends CancellableEvent {
 
     public void setYaw(float yaw) {
         this.yaw = yaw;
+        Wrapper.getPlayer().renderYawOffset = yaw;
+        Wrapper.getPlayer().rotationYawHead = yaw;
     }
 
     public void setPitch(float pitch) {
         this.pitch = pitch;
+        Wrapper.getPlayer().rotationPitchHead = pitch;
     }
 
     public void setOnGround(boolean onGround) {

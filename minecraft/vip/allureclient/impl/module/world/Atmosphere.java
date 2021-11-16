@@ -2,7 +2,7 @@ package vip.allureclient.impl.module.world;
 
 import net.minecraft.network.play.server.S03PacketTimeUpdate;
 import vip.allureclient.base.event.EventListener;
-import vip.allureclient.base.event.Listener;
+import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.base.module.ModuleCategory;
 import vip.allureclient.base.module.ModuleData;
@@ -17,10 +17,10 @@ public class Atmosphere extends Module {
     private final ValueProperty<Long> timeProperty = new ValueProperty<>("Time", 0L, 0L, 20000L, this);
 
     @EventListener
-    Listener<UpdatePositionEvent> onUpdatePositionEvent;
+    EventConsumer<UpdatePositionEvent> onUpdatePositionEvent;
 
     @EventListener
-    Listener<PacketReceiveEvent> onPacketReceiveEvent;
+    EventConsumer<PacketReceiveEvent> onPacketReceiveEvent;
 
     public Atmosphere(){
         onUpdatePositionEvent = (updatePositionEvent -> Wrapper.getWorld().setWorldTime(timeProperty.getPropertyValue()));

@@ -104,6 +104,10 @@ public abstract class EntityLivingBase extends Entity
     /** Entity head rotation yaw */
     public float rotationYawHead;
 
+    public float rotationPitchHead;
+
+    public float prevRotationPitchHead;
+
     /** Entity head rotation yaw at previous tick */
     public float prevRotationYawHead;
 
@@ -207,6 +211,8 @@ public abstract class EntityLivingBase extends Entity
         this.rotationYaw = (float)(Math.random() * Math.PI * 2.0D);
         this.rotationYawHead = this.rotationYaw;
         this.stepHeight = 0.6F;
+        this.rotationYawHead = this.rotationYaw;
+        this.rotationPitchHead = this.rotationPitch;
     }
 
     protected void entityInit()
@@ -383,7 +389,9 @@ public abstract class EntityLivingBase extends Entity
         this.prevRotationYaw = this.rotationYaw;
         this.prevRotationPitch = this.rotationPitch;
         this.worldObj.theProfiler.endSection();
+        this.prevRotationPitchHead = this.rotationPitchHead;
     }
+
 
     /**
      * If Animal, checks if the age timer is negative
@@ -2035,6 +2043,7 @@ public abstract class EntityLivingBase extends Entity
 
     protected void updateEntityActionState()
     {
+
     }
 
     protected void collideWithNearbyEntities()

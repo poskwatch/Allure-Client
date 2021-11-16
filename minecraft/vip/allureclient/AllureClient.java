@@ -5,6 +5,7 @@ import vip.allureclient.base.event.EventManager;
 import vip.allureclient.base.font.FontManager;
 import vip.allureclient.base.module.ModuleManager;
 import vip.allureclient.base.property.PropertyManager;
+import vip.allureclient.base.util.client.AccountUtil;
 import vip.allureclient.visual.screens.dropdown.GuiDropDown;
 
 public class AllureClient {

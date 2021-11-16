@@ -1,6 +1,6 @@
 package vip.allureclient.base.event;
 
 @FunctionalInterface
-public interface Listener<Event> {
+public interface EventConsumer<Event> {
     void call(Event paramEvent);
 }

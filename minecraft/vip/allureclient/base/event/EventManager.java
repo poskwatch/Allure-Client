@@ -11,7 +11,7 @@ import java.util.Map;
 
 public final class EventManager<Event> {
     private final Map<Type, List<CallSite<Event>>> callSiteMap = new HashMap<>();
-    private final Map<Type, List<Listener<Event>>> listenerCache = new HashMap<>();
+    private final Map<Type, List<EventConsumer<Event>>> listenerCache = new HashMap<>();
     public final void subscribe(Object subscriber) {
         byte b;
         int i;
@@ -25,15 +25,15 @@ public final class EventManager<Event> {
                 }
                 try {
                     byte priority;
-                    Listener<Event> listener = (Listener<Event>) field.get(subscriber);
+                    EventConsumer<Event> eventConsumer = (EventConsumer<Event>) field.get(subscriber);
                      priority = 2;
                      if (this.callSiteMap.containsKey(eventType)) {
                         List<CallSite<Event>> callSites = this.callSiteMap.get(eventType);
-                        callSites.add(new CallSite<>(subscriber, listener, priority));
+                        callSites.add(new CallSite<>(subscriber, eventConsumer, priority));
                         callSites.sort((o1, o2) -> o2.priority - o1.priority);
                      }
                      else {
-                        this.callSiteMap.put(eventType, new ArrayList<>(Arrays.asList((CallSite<Event>[])new CallSite[] {new CallSite<>(subscriber, listener, priority) })));
+                        this.callSiteMap.put(eventType, new ArrayList<>(Arrays.asList((CallSite<Event>[])new CallSite[] {new CallSite<>(subscriber, eventConsumer, priority) })));
                      }
                 }
                 catch (IllegalAccessException ignored) {
@@ -47,14 +47,14 @@ public final class EventManager<Event> {
 
     private void populateListenerCache() {
         Map<Type, List<CallSite<Event>>> callSiteMap = this.callSiteMap;
-        Map<Type, List<Listener<Event>>> listenerCache = this.listenerCache;
+        Map<Type, List<EventConsumer<Event>>> listenerCache = this.listenerCache;
         for (Type type : callSiteMap.keySet()) {
             List<CallSite<Event>> callSites = callSiteMap.get(type);
             int size = callSites.size();
-            List<Listener<Event>> listeners = new ArrayList<>(size);
+            List<EventConsumer<Event>> eventConsumers = new ArrayList<>(size);
             for (CallSite<Event> callSite : callSites)
-                listeners.add(callSite.listener);
-                listenerCache.put(type, listeners);
+                eventConsumers.add(callSite.eventConsumer);
+                listenerCache.put(type, eventConsumers);
         }
     }
 
@@ -65,20 +65,20 @@ public final class EventManager<Event> {
         populateListenerCache();
     }
 
-    public final void post(Event event) {
-        List<Listener<Event>> listeners = this.listenerCache.get(event.getClass());
-        if (listeners != null)
-            for (Listener<Event> listener : listeners) {
-                listener.call(event);
+    public final void callEvent(Event event) {
+        List<EventConsumer<Event>> eventConsumers = this.listenerCache.get(event.getClass());
+        if (eventConsumers != null)
+            for (EventConsumer<Event> eventConsumer : eventConsumers) {
+                eventConsumer.call(event);
             }
     }
     private static class CallSite<Event> {
         private final Object owner;
-        private final Listener<Event> listener;
+        private final EventConsumer<Event> eventConsumer;
         private final byte priority;
-        public CallSite(Object owner, Listener<Event> listener, byte priority) {
+        public CallSite(Object owner, EventConsumer<Event> eventConsumer, byte priority) {
             this.owner = owner;
-            this.listener = listener;
+            this.eventConsumer = eventConsumer;
             this.priority = priority;
         }
     }

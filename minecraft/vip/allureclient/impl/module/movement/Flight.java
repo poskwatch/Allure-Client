@@ -3,7 +3,7 @@ package vip.allureclient.impl.module.movement;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import org.lwjgl.input.Keyboard;
 import vip.allureclient.base.event.EventListener;
-import vip.allureclient.base.event.Listener;
+import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.base.module.ModuleCategory;
 import vip.allureclient.base.module.ModuleData;
@@ -31,7 +31,7 @@ public class Flight extends Module {
            setModuleSuffix(flightModeProperty.getEnumValueAsString());
         });
         onPacketSendEvent = (packetSendEvent -> {
-            if (blinkProperty.getPropertyValue()) {
+            if (chokePacketsProperty.getPropertyValue()) {
                 if (packetSendEvent.getPacket() instanceof C03PacketPlayer) {
                     packetSendEvent.setCancelled(true);
                 }
@@ -45,19 +45,19 @@ public class Flight extends Module {
     }
 
     @EventListener
-    Listener<UpdatePositionEvent> onUpdatePositionEvent;
+    EventConsumer<UpdatePositionEvent> onUpdatePositionEvent;
 
     @EventListener
-    Listener<PacketSendEvent> onPacketSendEvent;
+    EventConsumer<PacketSendEvent> onPacketSendEvent;
 
     @EventListener
-    Listener<PlayerMoveEvent> onPlayerMoveEvent;
+    EventConsumer<PlayerMoveEvent> onPlayerMoveEvent;
 
     EnumProperty<flightModes> flightModeProperty = new EnumProperty<>("Flight Mode", flightModes.Vanilla, this);
 
     ValueProperty<Double> flightSpeedProperty = new ValueProperty<>("Flight Speed", 0.5D, 0.1D, 2D, this);
 
-    BooleanProperty blinkProperty = new BooleanProperty("Blink", true, this);
+    BooleanProperty chokePacketsProperty = new BooleanProperty("Choke Packets", true, this);
 
     enum flightModes {
         Vanilla,

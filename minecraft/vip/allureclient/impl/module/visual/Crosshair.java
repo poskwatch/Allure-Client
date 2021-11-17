@@ -32,39 +32,41 @@ public class Crosshair extends Module {
 
     public Crosshair() {
         this.onRender2DEvent = (render2DEvent -> {
-            final double centerX = render2DEvent.getScaledResolution().getScaledWidth() / 2.0D;
-            final double centerY = render2DEvent.getScaledResolution().getScaledHeight() / 2.0D;
+            if (Wrapper.getMinecraft().gameSettings.thirdPersonView == 0) {
+                final double centerX = render2DEvent.getScaledResolution().getScaledWidth() / 2.0D;
+                final double centerY = render2DEvent.getScaledResolution().getScaledHeight() / 2.0D;
 
-            double gap = gapProperty.getPropertyValue();
-            final double width = widthProperty.getPropertyValue();
-            final double height = heightProperty.getPropertyValue();
+                double gap = gapProperty.getPropertyValue();
+                final double width = widthProperty.getPropertyValue();
+                final double height = heightProperty.getPropertyValue();
 
-            final int crosshairColor = ClientColor.getInstance().getColorRGB();
+                final int crosshairColor = ClientColor.getInstance().getColorRGB();
 
-            if (dynamicProperty.getPropertyValue()) {
-                if (Wrapper.getPlayer().isSneaking())
-                    gap *= 0.5D;
-                if(MovementUtil.isMoving())
-                    gap *= 2.0D;
-            }
+                if (dynamicProperty.getPropertyValue()) {
+                    if (Wrapper.getPlayer().isSneaking())
+                        gap *= 0.5D;
+                    if (MovementUtil.isMoving())
+                        gap *= 2.0D;
+                }
 
-            if (centerDotProperty.getPropertyValue()) {
-                Gui.drawRect(centerX - 1D, centerY - 1D, centerX + 1D, centerY + 1D, 0xff000000);
-                Gui.drawRect(centerX - 0.5D, centerY - 0.5D, centerX + 0.5D, centerY + 0.5D, crosshairColor);
-            }
+                if (centerDotProperty.getPropertyValue()) {
+                    Gui.drawRect(centerX - 1D, centerY - 1D, centerX + 1D, centerY + 1D, 0xff000000);
+                    Gui.drawRect(centerX - 0.5D, centerY - 0.5D, centerX + 0.5D, centerY + 0.5D, crosshairColor);
+                }
 
-            Gui.drawRect(centerX - gap - width - 0.5D, centerY - (height/2) - 0.5D, centerX - gap + 0.5D, centerY + (height/2) + 0.5D, 0xff000000);
-            Gui.drawRect(centerX - gap - width, centerY - (height/2), centerX - gap, centerY + (height/2), crosshairColor);
+                Gui.drawRect(centerX - gap - width - 0.5D, centerY - (height / 2) - 0.5D, centerX - gap + 0.5D, centerY + (height / 2) + 0.5D, 0xff000000);
+                Gui.drawRect(centerX - gap - width, centerY - (height / 2), centerX - gap, centerY + (height / 2), crosshairColor);
 
-            Gui.drawRect(centerX + gap - 0.5D, centerY - (height/2) - 0.5D, centerX + gap + width + 0.5D, centerY + (height/2) + 0.5D, 0xff000000);
-            Gui.drawRect(centerX + gap, centerY - (height/2), centerX + gap + width, centerY + (height/2), crosshairColor);
+                Gui.drawRect(centerX + gap - 0.5D, centerY - (height / 2) - 0.5D, centerX + gap + width + 0.5D, centerY + (height / 2) + 0.5D, 0xff000000);
+                Gui.drawRect(centerX + gap, centerY - (height / 2), centerX + gap + width, centerY + (height / 2), crosshairColor);
 
-            Gui.drawRect(centerX - (height / 2.0D) - 0.5D, centerY + gap - 0.5D, centerX + (height / 2.0D) + 0.5D, centerY + gap + width + 0.5D, 0xff000000);
-            Gui.drawRect(centerX - (height / 2.0D), centerY + gap, centerX + (height / 2.0D), centerY + gap + width, crosshairColor);
+                Gui.drawRect(centerX - (height / 2.0D) - 0.5D, centerY + gap - 0.5D, centerX + (height / 2.0D) + 0.5D, centerY + gap + width + 0.5D, 0xff000000);
+                Gui.drawRect(centerX - (height / 2.0D), centerY + gap, centerX + (height / 2.0D), centerY + gap + width, crosshairColor);
 
-            if (!tShapeProperty.getPropertyValue()) {
-                Gui.drawRect(centerX - (height / 2.0D) - 0.5D, centerY - gap - width - 0.5D, centerX + (height / 2.0D) + 0.5D, centerY - gap + 0.5D, 0xff000000);
-                Gui.drawRect(centerX - (height / 2.0D), centerY - gap - width, centerX + (height / 2.0D), centerY - gap, crosshairColor);
+                if (!tShapeProperty.getPropertyValue()) {
+                    Gui.drawRect(centerX - (height / 2.0D) - 0.5D, centerY - gap - width - 0.5D, centerX + (height / 2.0D) + 0.5D, centerY - gap + 0.5D, 0xff000000);
+                    Gui.drawRect(centerX - (height / 2.0D), centerY - gap - width, centerX + (height / 2.0D), centerY - gap, crosshairColor);
+                }
             }
         });
     }

@@ -18,7 +18,7 @@ public class ColorUtil {
                 (int) (MathUtil.linearInterpolate(c1.getGreen(), c2.getGreen(), healthPercentage)),
                 (int) (MathUtil.linearInterpolate(c1.getBlue(), c2.getBlue(), healthPercentage))
         );
-        return healthColor.darker().darker().getRGB();
+        return healthColor.darker().getRGB();
     }
 
     public static Color interpolateColors(Color color1, Color color2, float point) {

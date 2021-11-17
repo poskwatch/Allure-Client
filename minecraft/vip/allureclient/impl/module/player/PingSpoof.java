@@ -16,7 +16,7 @@ import vip.allureclient.impl.property.ValueProperty;
 
 import java.util.ArrayList;
 
-@ModuleData(moduleName = "PingSpoof", keyBind = 0, category = ModuleCategory.PLAYER)
+@ModuleData(moduleName = "Ping Spoof", keyBind = 0, category = ModuleCategory.PLAYER)
 public class PingSpoof extends Module {
 
     private final ArrayList<Packet> delayedPackets = new ArrayList<>();

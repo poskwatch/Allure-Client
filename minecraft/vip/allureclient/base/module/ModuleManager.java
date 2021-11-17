@@ -6,13 +6,13 @@ import vip.allureclient.impl.module.combat.Velocity;
 import vip.allureclient.impl.module.movement.Flight;
 import vip.allureclient.impl.module.movement.Speed;
 import vip.allureclient.impl.module.movement.Sprint;
-import vip.allureclient.impl.module.player.Disabler;
-import vip.allureclient.impl.module.player.NoFall;
-import vip.allureclient.impl.module.player.NoSlow;
-import vip.allureclient.impl.module.player.PingSpoof;
+import vip.allureclient.impl.module.movement.Step;
+import vip.allureclient.impl.module.player.*;
 import vip.allureclient.impl.module.visual.*;
 import vip.allureclient.impl.module.world.Atmosphere;
+import vip.allureclient.impl.module.world.ChatBypass;
 import vip.allureclient.impl.module.world.ChestStealer;
+import vip.allureclient.impl.module.world.GameSpeed;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,10 +36,12 @@ public class ModuleManager {
                     new PingSpoof(),
                     new Disabler(),
                     new NoSlow(),
+                    new GuiMove(),
                     // Movement Modules
                     new Sprint(),
                     new Flight(),
                     new Speed(),
+                    new Step(),
                     // Visual Modules
                     new HUD(),
                     new ClientColor(),
@@ -48,7 +50,9 @@ public class ModuleManager {
                     new TargetHUD(),
                     // World Modules
                     new Atmosphere(),
-                    new ChestStealer()
+                    new ChestStealer(),
+                    new GameSpeed(),
+                    new ChatBypass()
                 }
             );
             System.out.println("Module Manager Initiated...");

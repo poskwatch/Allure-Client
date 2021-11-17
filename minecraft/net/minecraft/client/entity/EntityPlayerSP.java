@@ -52,6 +52,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
 import vip.allureclient.AllureClient;
+import vip.allureclient.impl.event.player.ChatMessageSendEvent;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.module.player.NoSlow;
@@ -315,7 +316,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
      */
     public void sendChatMessage(String message)
     {
-        this.sendQueue.addToSendQueue(new C01PacketChatMessage(message));
+        ChatMessageSendEvent chatMessageSendEvent = new ChatMessageSendEvent(message);
+        AllureClient.getInstance().getEventManager().callEvent(chatMessageSendEvent);
+        this.sendQueue.addToSendQueue(new C01PacketChatMessage(chatMessageSendEvent.getMessage()));
     }
 
     /**
@@ -805,7 +808,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
         boolean flag2 = this.movementInput.moveForward >= f;
         this.movementInput.updatePlayerMoveState();
 
-        if (this.isUsingItem() && !this.isRiding() && !AllureClient.getInstance().getModuleManager().getModuleByName.apply("NoSlow").isModuleToggled())
+        if (this.isUsingItem() && !this.isRiding() && !AllureClient.getInstance().getModuleManager().getModuleByClass.apply(NoSlow.class).isModuleToggled())
         {
             this.movementInput.moveStrafe *= 0.2F;
             this.movementInput.moveForward *= 0.2F;

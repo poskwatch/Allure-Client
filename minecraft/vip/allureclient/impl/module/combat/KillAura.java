@@ -61,7 +61,8 @@ public class KillAura extends Module {
         };
 
         this.onModuleDisabled = () -> {
-
+            currentTarget = null;
+            apsTimerUtil.reset();
         };
 
         this.onUpdatePositionEvent = (updatePositionEvent -> {

@@ -1,5 +1,6 @@
 package vip.allureclient.impl.module.movement;
 
+import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
@@ -36,10 +37,10 @@ public class Speed extends Module {
         };
         this.onPlayerMoveEvent = (playerMoveEvent -> {
            if (MovementUtil.isMoving() && Wrapper.getPlayer().onGround && hopStage == 1) {
-               moveSpeed = 0.8 * MovementUtil.getBaseMoveSpeed();
+               moveSpeed = 1.1 * MovementUtil.getBaseMoveSpeed();
            }
            else if (MovementUtil.isMoving() && Wrapper.getPlayer().onGround && hopStage == 2) {
-               moveSpeed = 0.8 * MovementUtil.getBaseMoveSpeed();
+               moveSpeed = 1.1 * MovementUtil.getBaseMoveSpeed();
            }
            else if (hopStage == 3) {
                final double difference = 0.45 * (lastDist - MovementUtil.getBaseMoveSpeed()) - 1.0E-5;
@@ -49,7 +50,7 @@ public class Speed extends Module {
                if(MovementUtil.isOnGround(-Wrapper.getPlayer().motionY) || Wrapper.getPlayer().isCollidedVertically && Wrapper.getPlayer().onGround) {
                    hopStage = 1;
                }
-               moveSpeed = lastDist - lastDist / 30.0;
+               moveSpeed = lastDist - lastDist / 90.0;
            }
            moveSpeed = Math.max(moveSpeed, MovementUtil.getBaseMoveSpeed());
            playerMoveEvent.setSpeed(moveSpeed);

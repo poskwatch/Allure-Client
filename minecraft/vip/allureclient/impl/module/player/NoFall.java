@@ -10,29 +10,30 @@ import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.property.EnumProperty;
 
-@ModuleData(moduleName = "NoFall", keyBind = 0, category = ModuleCategory.PLAYER)
+@ModuleData(moduleName = "No Fall", keyBind = 0, category = ModuleCategory.PLAYER)
 public class NoFall extends Module {
 
     @EventListener
     EventConsumer<UpdatePositionEvent> onUpdatePositionEvent;
 
-    private final EnumProperty<NoFallModes> mode = new EnumProperty<>("Mode", NoFallModes.WATCHDOG, this);
+    private final EnumProperty<NoFallModes> mode = new EnumProperty<>("Mode", NoFallModes.Edit, this);
 
     private enum NoFallModes {
-        VANILLA,
-        WATCHDOG
+        Packet,
+        Edit
     }
 
     public NoFall() {
         this.onUpdatePositionEvent = (updatePositionEvent -> {
+            setModuleSuffix(mode.getEnumValueAsString());
             if(updatePositionEvent.isPre()) {
-                if (mode.getPropertyValue().equals(NoFallModes.VANILLA)) {
-                    if (Wrapper.getPlayer().fallDistance > 2) {
+                if (mode.getPropertyValue().equals(NoFallModes.Packet)) {
+                    if (Wrapper.getPlayer().fallDistance >= 3) {
                         Wrapper.getPlayer().sendQueue.addToSendQueue(new C03PacketPlayer(true));
                     }
                 }
-                if (mode.getPropertyValue().equals(NoFallModes.WATCHDOG)) {
-                    if (Wrapper.getPlayer().fallDistance > 2 && Wrapper.getPlayer().fallDistance < 10) {
+                if (mode.getPropertyValue().equals(NoFallModes.Edit)) {
+                    if (Wrapper.getPlayer().fallDistance >= 3) {
                         updatePositionEvent.setOnGround(true);
                     }
                 }

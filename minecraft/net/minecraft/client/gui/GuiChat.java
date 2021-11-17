@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import vip.allureclient.impl.module.visual.TargetHUD;
 
 public class GuiChat extends GuiScreen
 {
@@ -169,6 +170,10 @@ public class GuiChat extends GuiScreen
     /**
      * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
      */
+
+    private boolean draggingTargetHUD;
+    private double distX, distY;
+
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
     {
         if (mouseButton == 0)
@@ -179,10 +184,24 @@ public class GuiChat extends GuiScreen
             {
                 return;
             }
+
+            if (mouseX >= 5 + TargetHUD.getInstance().xLocation && mouseX <= 5 + TargetHUD.getInstance().xLocation + 125 && mouseY >= 7 + TargetHUD.getInstance().yLocation && mouseY <= 7 + TargetHUD.getInstance().yLocation + 45) {
+                draggingTargetHUD = true;
+                distX = mouseX - TargetHUD.getInstance().xLocation;
+                distY = mouseY - TargetHUD.getInstance().yLocation;
+            }
         }
+
+
 
         this.inputField.mouseClicked(mouseX, mouseY, mouseButton);
         super.mouseClicked(mouseX, mouseY, mouseButton);
+    }
+
+    @Override
+    protected void mouseReleased(int mouseX, int mouseY, int state) {
+        draggingTargetHUD = false;
+        super.mouseReleased(mouseX, mouseY, state);
     }
 
     /**
@@ -307,6 +326,11 @@ public class GuiChat extends GuiScreen
         if (ichatcomponent != null && ichatcomponent.getChatStyle().getChatHoverEvent() != null)
         {
             this.handleComponentHover(ichatcomponent, mouseX, mouseY);
+        }
+
+        if (draggingTargetHUD) {
+            TargetHUD.getInstance().xLocation = mouseX - distX;
+            TargetHUD.getInstance().yLocation = mouseY - distY;
         }
 
         super.drawScreen(mouseX, mouseY, partialTicks);

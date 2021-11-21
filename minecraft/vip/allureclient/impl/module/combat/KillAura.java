@@ -1,6 +1,6 @@
 package vip.allureclient.impl.module.combat;
 
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityMob;
@@ -10,9 +10,9 @@ import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.event.EventConsumer;
@@ -22,6 +22,7 @@ import vip.allureclient.base.module.ModuleCategory;
 import vip.allureclient.base.module.ModuleData;
 import vip.allureclient.base.util.client.TimerUtil;
 import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.impl.event.network.PacketSendEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.EnumProperty;
@@ -36,9 +37,12 @@ public class KillAura extends Module {
     @EventListener
     EventConsumer<UpdatePositionEvent> onUpdatePositionEvent;
 
+    @EventListener
+    EventConsumer<PacketSendEvent> onPacketSendEvent;
+
     private final TimerUtil apsTimerUtil = new TimerUtil();
 
-    private final ValueProperty<Integer> averageAPSProperty = new ValueProperty<>("Average APS", 10, 0, 13, this);
+    private final ValueProperty<Integer> averageAPSProperty = new ValueProperty<>("Average APS", 13, 0, 20, this);
 
     private final ValueProperty<Double> attackRangeProperty = new ValueProperty<>("Attack Range", 4.1D, 0.0D, 6.0D, this);
 
@@ -61,6 +65,10 @@ public class KillAura extends Module {
         };
 
         this.onModuleDisabled = () -> {
+            if (isBlocking) {
+                isBlocking = false;
+                Wrapper.sendPacketDirect(new C08PacketPlayerBlockPlacement( new BlockPos(-1, -1, -1), 255, null, 0.0F, 0.0F, 0.0F));
+            }
             currentTarget = null;
             apsTimerUtil.reset();
         };
@@ -87,8 +95,8 @@ public class KillAura extends Module {
                                 Wrapper.sendPacketDirect(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
                             }
                         }
-                        updatePositionEvent.setYaw(getNCPRotations(currentTarget)[0]);
-                        updatePositionEvent.setPitch(getNCPRotations(currentTarget)[1]);
+                        updatePositionEvent.setYaw(getRotations((EntityLivingBase) currentTarget)[0]);
+                        updatePositionEvent.setPitch(getRotations((EntityLivingBase) currentTarget)[1]);
                         if (apsTimerUtil.hasReached(1000 / averageAPSProperty.getPropertyValue())) {
                             Wrapper.getPlayer().swingItem();
                             Wrapper.sendPacketDirect(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));
@@ -110,6 +118,16 @@ public class KillAura extends Module {
                 }
             }
         });
+
+        this.onPacketSendEvent = (packetSendEvent -> {
+            //To ensure block packets aren't messed up.
+           if (packetSendEvent.getPacket() instanceof C07PacketPlayerDigging) {
+               isBlocking = false;
+           }
+           if (packetSendEvent.getPacket() instanceof C08PacketPlayerBlockPlacement) {
+               isBlocking = true;
+           }
+        });
     }
 
     private boolean isEntityValid(Entity entity) {
@@ -126,31 +144,22 @@ public class KillAura extends Module {
         return attackInvisiblesProperty.getPropertyValue() || !entity.isInvisible();
     }
 
-    private static float[] getNCPRotations(Entity entity) {
-        float pitch;
-        EntityPlayerSP player = Wrapper.getPlayer();
-        double xDist = entity.posX - player.posX;
-        double zDist = entity.posZ - player.posZ;
-        double yDist = entity.posY - player.posY;
-        double dist = StrictMath.sqrt(xDist * xDist + zDist * zDist);
-        AxisAlignedBB entityBB = entity.getEntityBoundingBox().expand(0.10000000149011612D, 0.10000000149011612D, 0.10000000149011612D);
-        double playerEyePos = player.posY + player.getEyeHeight();
-        boolean close = (dist < 2.0D && Math.abs(yDist) < 2.0D);
-        if (close && playerEyePos > entityBB.minY) {
-            pitch = 60.0F;
-        } else {
-            yDist = (playerEyePos > entityBB.maxY) ? (entityBB.maxY - playerEyePos) : (
-                    (playerEyePos < entityBB.minY) ? (entityBB.minY - playerEyePos) :
-                            0.0D);
-            pitch = (float)-(StrictMath.atan2(yDist, dist) * 57.29577951308232D);
-        }
+    public static float[] getRotationFromPosition(double x, double z, double y) {
+        double xDiff = x - Minecraft.getMinecraft().thePlayer.posX;
+        double zDiff = z - Minecraft.getMinecraft().thePlayer.posZ;
+        double yDiff = y - Minecraft.getMinecraft().thePlayer.posY - 1.2;
 
-        float yaw = (float)(StrictMath.atan2(zDist, xDist) * 57.29577951308232D) - 90.0F;
-        if (close) {
-            int inc = (dist < 1.0D) ? 180 : 90;
-            yaw = (Math.round(yaw / inc) * inc);
-        }
-        return new float[] { yaw, pitch };
+        double dist = MathHelper.sqrt_double(xDiff * xDiff + zDiff * zDiff);
+        float yaw = (float) (Math.atan2(zDiff, xDiff) * 180.0D / 3.141592653589793D) - 90.0F;
+        float pitch = (float) -(Math.atan2(yDiff, dist) * 180.0D / 3.141592653589793D);
+        return new float[]{yaw, pitch};
+    }
+
+    public static float[] getRotations(EntityLivingBase ent) {
+        double x = ent.posX;
+        double z = ent.posZ;
+        double y = ent.posY + (ent.getEyeHeight() / 3.1F);
+        return getRotationFromPosition(x, z, y);
     }
 
     private boolean isHoldingSword() {

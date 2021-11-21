@@ -1,6 +1,7 @@
 package vip.allureclient.base.module;
 
 import vip.allureclient.base.font.MinecraftFontRenderer;
+import vip.allureclient.impl.module.combat.AntiBot;
 import vip.allureclient.impl.module.combat.KillAura;
 import vip.allureclient.impl.module.combat.Velocity;
 import vip.allureclient.impl.module.movement.Flight;
@@ -31,6 +32,7 @@ public class ModuleManager {
                     // Combat Modules
                     new KillAura(),
                     new Velocity(),
+                    new AntiBot(),
                     // Player Modules
                     new NoFall(),
                     new PingSpoof(),

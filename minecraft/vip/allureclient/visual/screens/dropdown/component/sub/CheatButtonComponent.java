@@ -11,6 +11,7 @@ import vip.allureclient.impl.property.ValueProperty;
 import vip.allureclient.visual.screens.dropdown.component.Component;
 import vip.allureclient.visual.screens.dropdown.component.sub.impl.BooleanPropertyComponent;
 import vip.allureclient.visual.screens.dropdown.component.sub.impl.EnumPropertyComponent;
+import vip.allureclient.visual.screens.dropdown.component.sub.impl.KeybindingComponent;
 import vip.allureclient.visual.screens.dropdown.component.sub.impl.ValuePropertyComponent;
 
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ public class CheatButtonComponent extends Component {
                 settingOffset += 14;
             }
         }
+        subComponents.add(new KeybindingComponent(module::getModuleKeyBind, module::setModuleKeyBind, this, settingOffset));
     }
 
     @Override

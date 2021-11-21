@@ -17,7 +17,7 @@ public class ChatBypass extends Module {
         onChatMessageSendEvent = (chatMessageSendEvent -> {
             StringBuilder stringBuilder = new StringBuilder();
             for (char character : chatMessageSendEvent.getMessage().toCharArray()) {
-                stringBuilder.append(character).append("ㅤ");
+                stringBuilder.append(character).append(".");
             }
             chatMessageSendEvent.setMessage(stringBuilder.toString());
         });

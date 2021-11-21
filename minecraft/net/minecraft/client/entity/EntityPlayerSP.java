@@ -304,6 +304,30 @@ public class EntityPlayerSP extends AbstractClientPlayer
         return null;
     }
 
+    public void setSpeed(float speed) {
+        this.motionX = (-(Math.sin(getDirection()) * speed));
+        this.motionZ = (Math.cos(getDirection()) * speed);
+    }
+
+    public float getDirection() {
+        float var1 = this.rotationYaw;
+
+        if(this.moveForward < 0)
+            var1 += 180F;
+        float forward = 1F;
+        if(this.moveForward < 0)
+            forward = -.5F;
+        else if(moveForward > 0)
+            forward = .5F;
+
+        if(moveStrafing > 0)
+            var1 -= 90F * forward;
+        if(moveStrafing < 0)
+            var1 += 90F * forward;
+        var1 *= .017453292F;
+        return var1;
+    }
+
     /**
      * Joins the passed in entity item with the world. Args: entityItem
      */

@@ -2,6 +2,7 @@ package vip.allureclient.impl.module.player;
 
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C03PacketPlayer;
+import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
@@ -36,6 +37,7 @@ public class Disabler extends Module {
                 final C03PacketPlayer.C06PacketPlayerPosLook c06 = (C03PacketPlayer.C06PacketPlayerPosLook) packet;
                 packetSendEvent.setPacket(new C03PacketPlayer.C04PacketPlayerPosition(c06.getPositionX(), c06.getPositionY(), c06.getPositionZ(), c06.isOnGround()));
             }
+
         });
         this.onPacketReceiveEvent = (packetReceiveEvent -> {
             final Packet<?> packet = packetReceiveEvent.getPacket();

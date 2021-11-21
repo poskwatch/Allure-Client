@@ -1,8 +1,15 @@
 package vip.allureclient.visual.screens.dropdown.component;
 
+import vip.allureclient.AllureClient;
+import vip.allureclient.base.font.MinecraftFontRenderer;
+
 public class Component {
 
     private ModuleCategoryFrame parentFrame;
+
+    public final MinecraftFontRenderer getFontRenderer() {
+        return AllureClient.getInstance().getFontManager().smallFontRenderer;
+    }
 
     public ModuleCategoryFrame getParentFrame() {
         return parentFrame;

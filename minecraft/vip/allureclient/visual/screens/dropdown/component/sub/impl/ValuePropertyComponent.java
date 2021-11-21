@@ -67,9 +67,8 @@ public class ValuePropertyComponent extends Component {
             currentValue = String.format("%.2f", property.getPropertyValue().doubleValue());
         }
 
-        AllureClient.getInstance().getFontManager().smallFontRenderer.drawStringWithShadow(property.getPropertyLabel(), x + 3, y + 4, -1);
-        AllureClient.getInstance().getFontManager().smallFontRenderer.drawStringWithShadow(currentValue,
-                x + 112 - AllureClient.getInstance().getFontManager().smallFontRenderer.getStringWidth(currentValue), y + 4, -1);
+        getFontRenderer().drawStringWithShadow(property.getPropertyLabel(), x + 3, y + 4, -1);
+        getFontRenderer().drawStringWithShadow(currentValue, x + 112 - AllureClient.getInstance().getFontManager().smallFontRenderer.getStringWidth(currentValue), y + 4, -1);
 
         super.onDrawScreen(mouseX, mouseY);
     }

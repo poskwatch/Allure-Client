@@ -16,13 +16,9 @@ public class PropertyManager {
         return properties;
     }
 
-    public ArrayList<Property<?>> getOptions(Module module){
+    public ArrayList<Property<?>> getPropertiesByModule(Module module){
         ArrayList<Property<?>> filteredOptions = new ArrayList<>();
-        for (Property<?> property : properties) {
-            if(property.getParentModule() == module)
-                filteredOptions.add(property);
-        }
+        getProperties().stream().filter(property -> property.getParentModule() == module).forEach(filteredOptions::add);
         return filteredOptions;
     }
-
 }

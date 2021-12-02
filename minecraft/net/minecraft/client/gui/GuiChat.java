@@ -14,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.module.visual.TargetHUD;
 
 public class GuiChat extends GuiScreen
@@ -185,7 +186,7 @@ public class GuiChat extends GuiScreen
                 return;
             }
 
-            if (mouseX >= 5 + TargetHUD.getInstance().xLocation && mouseX <= 5 + TargetHUD.getInstance().xLocation + 125 && mouseY >= 7 + TargetHUD.getInstance().yLocation && mouseY <= 7 + TargetHUD.getInstance().yLocation + 45) {
+            if (mouseX >= 5 + TargetHUD.getInstance().xLocation && mouseX <= 5 + TargetHUD.getInstance().xLocation + 125 && mouseY >= 7 + TargetHUD.getInstance().yLocation && mouseY <= 7 + TargetHUD.getInstance().yLocation + 32) {
                 draggingTargetHUD = true;
                 distX = mouseX - TargetHUD.getInstance().xLocation;
                 distY = mouseY - TargetHUD.getInstance().yLocation;
@@ -319,7 +320,8 @@ public class GuiChat extends GuiScreen
      */
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
-        drawRect(2, this.height - 14, this.width - 2, this.height - 2, Integer.MIN_VALUE);
+        double chatBoxWidth = Math.max(GuiNewChat.calculateChatboxWidth(Wrapper.getMinecraft().gameSettings.chatWidth) + 6, fontRendererObj.getStringWidth(inputField.getText()) + 11);
+        drawRect(2, this.height - 14, chatBoxWidth, this.height - 2, Integer.MIN_VALUE);
         this.inputField.drawTextBox();
         IChatComponent ichatcomponent = this.mc.ingameGUI.getChatGUI().getChatComponent(Mouse.getX(), Mouse.getY());
 

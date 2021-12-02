@@ -185,6 +185,7 @@ import org.lwjgl.opengl.OpenGLException;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
 import vip.allureclient.AllureClient;
+import vip.allureclient.base.util.visual.BlurUtil;
 import vip.allureclient.impl.event.world.WorldLoadEvent;
 import vip.allureclient.visual.screens.dropdown.GuiDropDown;
 
@@ -1709,6 +1710,8 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         {
             this.entityRenderer.updateShaderGroupSize(this.displayWidth, this.displayHeight);
         }
+
+        BlurUtil.onFrameBufferResize(displayWidth, displayHeight);
     }
 
     public MusicTicker func_181535_r()

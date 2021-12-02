@@ -67,6 +67,6 @@ public class PlayerMoveEvent extends CancellableEvent {
     }
 
     public boolean isMoving() {
-        return Wrapper.getPlayer().moveForward != 0 || Wrapper.getPlayer().moveStrafing != 0;
+        return x != 0 || z != 0;
     }
 }

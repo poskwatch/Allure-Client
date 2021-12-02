@@ -30,6 +30,7 @@ public class EnumProperty<T extends Enum<T>> extends Property<T> {
     @Override
     public void setPropertyValue(T propertyValue) {
         super.setPropertyValue(propertyValue);
+        onValueChange.run();
     }
 
     public void increment() {
@@ -48,6 +49,7 @@ public class EnumProperty<T extends Enum<T>> extends Property<T> {
             setPropertyValue(newValue);
             return;
         }
+        onValueChange.run();
     }
 
     public void decrement() {
@@ -66,5 +68,6 @@ public class EnumProperty<T extends Enum<T>> extends Property<T> {
             setPropertyValue(newValue);
             return;
         }
+        onValueChange.run();
     }
 }

@@ -35,12 +35,20 @@ public class Component {
 
     }
 
+    public void onGuiClosed() {
+
+    }
+
     public double getHeight(){
         return 14;
     }
 
     public void onAnimationEvent(){
 
+    }
+
+    public boolean isHidden() {
+        return false;
     }
 
     public void setOffset(int offset){

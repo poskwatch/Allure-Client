@@ -15,7 +15,7 @@ import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.ValueProperty;
 
-@ModuleData(moduleName = "ChestStealer", keyBind = 0, category = ModuleCategory.WORLD)
+@ModuleData(moduleName = "Chest Stealer", moduleBind = 0, moduleCategory = ModuleCategory.WORLD)
 public class ChestStealer extends Module {
 
     @EventListener
@@ -52,7 +52,7 @@ public class ChestStealer extends Module {
         if(Minecraft.getMinecraft().currentScreen instanceof GuiChest) {
             GuiChest chestGui = (GuiChest) Minecraft.getMinecraft().currentScreen;
             String name = chestGui.lowerChestInventory.getDisplayName().getUnformattedText();
-            return name.equals("Chest") || name.equals("Large Chest") || name.equals("") || name.contains("Chest");
+            return name.equals("Chest") || name.equals("Large Chest") || name.contains("Chest");
         }
         return false;
     }
@@ -65,5 +65,4 @@ public class ChestStealer extends Module {
         }
         return true;
     }
-
 }

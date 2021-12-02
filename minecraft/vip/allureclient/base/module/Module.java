@@ -13,8 +13,8 @@ public class Module {
     public Module(){
         if(isIdentified()) {
             this.moduleName = getClass().getAnnotation(ModuleData.class).moduleName();
-            this.moduleKeyBind = getClass().getAnnotation(ModuleData.class).keyBind();
-            this.moduleCategory = getClass().getAnnotation(ModuleData.class).category();
+            this.moduleKeyBind = getClass().getAnnotation(ModuleData.class).moduleBind();
+            this.moduleCategory = getClass().getAnnotation(ModuleData.class).moduleCategory();
         }
         else {
             this.moduleName = "Unidentified Module";

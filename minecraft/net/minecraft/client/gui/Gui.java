@@ -92,7 +92,7 @@ public class Gui
      * Draws a rectangle with a vertical gradient between the specified colors (ARGB format). Args : x1, y1, x2, y2,
      * topColor, bottomColor
      */
-    public static void drawGradientRect(int left, int top, int right, int bottom, int startColor, int endColor)
+    public static void drawGradientRect(double left, double top, double right, double bottom, int startColor, int endColor)
     {
         float f = (float)(startColor >> 24 & 255) / 255.0F;
         float f1 = (float)(startColor >> 16 & 255) / 255.0F;
@@ -121,7 +121,7 @@ public class Gui
         GlStateManager.enableTexture2D();
     }
 
-    public static void drawHorizontalGradient(final float x, final float y, final float width, final float height,
+    public static void drawHorizontalGradient(final double x, final double y, final double width, final double height,
                                               final int leftColor, final int rightColor) {
         GL11.glPushMatrix();
         GL11.glEnable(3042);
@@ -140,8 +140,8 @@ public class Gui
 
         glColor(rightColor);
 
-        GL11.glVertex2f(x + width, y + height);
-        GL11.glVertex2f(x + width, y);
+        GL11.glVertex2d(x + width, y + height);
+        GL11.glVertex2d(x + width, y);
 
         GL11.glEnd();
         GL11.glPopMatrix();

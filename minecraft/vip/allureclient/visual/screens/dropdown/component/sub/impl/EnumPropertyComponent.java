@@ -50,7 +50,16 @@ public class EnumPropertyComponent extends Component {
     }
 
     @Override
+    public boolean isHidden() {
+        return getProperty().isPropertyHidden();
+    }
+
+    @Override
     public void setOffset(int offset) {
         this.offset = offset;
+    }
+
+    public EnumProperty<?> getProperty() {
+        return property;
     }
 }

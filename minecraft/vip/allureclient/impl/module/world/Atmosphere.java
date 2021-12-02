@@ -11,7 +11,7 @@ import vip.allureclient.impl.event.network.PacketReceiveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.property.ValueProperty;
 
-@ModuleData(moduleName = "Atmosphere", keyBind = 0, category = ModuleCategory.WORLD)
+@ModuleData(moduleName = "Atmosphere", moduleBind = 0, moduleCategory = ModuleCategory.WORLD)
 public class Atmosphere extends Module {
 
     private final ValueProperty<Long> timeProperty = new ValueProperty<>("Time", 0L, 0L, 20000L, this);

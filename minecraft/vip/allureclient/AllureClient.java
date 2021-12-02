@@ -5,7 +5,7 @@ import vip.allureclient.base.event.EventManager;
 import vip.allureclient.base.font.FontManager;
 import vip.allureclient.base.module.ModuleManager;
 import vip.allureclient.base.property.PropertyManager;
-import vip.allureclient.base.util.client.AccountUtil;
+import vip.allureclient.visual.notification.NotificationManager;
 import vip.allureclient.visual.screens.dropdown.GuiDropDown;
 
 public class AllureClient {
@@ -18,6 +18,7 @@ public class AllureClient {
     private EventManager<Event> eventManager;
     private FontManager fontManager;
     private PropertyManager propertyManager;
+    private final NotificationManager notificationManager = new NotificationManager();
 
     public Runnable onClientStart = () -> {
         System.out.printf("Starting %s Client. Version %s%n", CLIENT_NAME, CLIENT_VERSION);
@@ -47,6 +48,10 @@ public class AllureClient {
 
     public PropertyManager getPropertyManager() {
         return propertyManager;
+    }
+
+    public NotificationManager getNotificationManager() {
+        return notificationManager;
     }
 
     public static AllureClient getInstance(){

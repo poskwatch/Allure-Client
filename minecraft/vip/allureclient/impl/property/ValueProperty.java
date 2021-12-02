@@ -5,7 +5,8 @@ import vip.allureclient.base.property.Property;
 
 public class ValueProperty<T extends Number> extends Property<T> {
 
-    private T minimumValue, maximumValue;
+    private final T minimumValue;
+    private final T maximumValue;
 
     public ValueProperty(String propertyLabel, T propertyValue, T minimumValue, T maximumValue, Module parentModule) {
         super(propertyLabel, propertyValue, parentModule);
@@ -21,6 +22,7 @@ public class ValueProperty<T extends Number> extends Property<T> {
     @Override
     public void setPropertyValue(T propertyValue) {
         super.setPropertyValue(propertyValue);
+        onValueChange.run();
     }
 
     public T getMinimumValue() {
@@ -30,6 +32,4 @@ public class ValueProperty<T extends Number> extends Property<T> {
     public T getMaximumValue() {
         return maximumValue;
     }
-
-
 }

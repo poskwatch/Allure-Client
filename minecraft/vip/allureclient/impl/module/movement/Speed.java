@@ -13,7 +13,7 @@ import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.EnumProperty;
 
-@ModuleData(moduleName = "Speed", keyBind = Keyboard.KEY_V, category = ModuleCategory.MOVEMENT)
+@ModuleData(moduleName = "Speed", moduleBind = Keyboard.KEY_V, moduleCategory = ModuleCategory.MOVEMENT)
 public class Speed extends Module {
 
     private double moveSpeed;
@@ -40,9 +40,9 @@ public class Speed extends Module {
         this.onPlayerMoveEvent = (playerMoveEvent -> {
             if(speedModesProperty.getPropertyValue().equals(SpeedModes.Strafe)) {
                 if (MovementUtil.isMoving() && Wrapper.getPlayer().onGround && hopStage == 1) {
-                    moveSpeed = MovementUtil.getBaseMoveSpeed();
+                    moveSpeed = 1.12 * MovementUtil.getBaseMoveSpeed();
                 } else if (MovementUtil.isMoving() && Wrapper.getPlayer().onGround && hopStage == 2) {
-                    moveSpeed = MovementUtil.getBaseMoveSpeed();
+                    moveSpeed = 1.12 * MovementUtil.getBaseMoveSpeed();
                 } else if (hopStage == 3) {
                     final double difference = 0.45 * (lastDist - MovementUtil.getBaseMoveSpeed()) - 1.0E-5;
                     moveSpeed = lastDist - difference;

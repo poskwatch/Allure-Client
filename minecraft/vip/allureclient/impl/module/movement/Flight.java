@@ -15,17 +15,28 @@ import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.EnumProperty;
 import vip.allureclient.impl.property.ValueProperty;
 
-@ModuleData(moduleName = "Flight", keyBind = Keyboard.KEY_G, category = ModuleCategory.MOVEMENT)
+@ModuleData(moduleName = "Flight", moduleBind = Keyboard.KEY_G, moduleCategory = ModuleCategory.MOVEMENT)
 public class Flight extends Module {
 
+    private double watchdogFlightY;
+
     public Flight() {
+        onModuleEnabled = () -> {
+            watchdogFlightY = Wrapper.getPlayer().posY;
+        };
         onUpdatePositionEvent = (updatePositionEvent -> {
            switch (flightModeProperty.getPropertyValue()){
                case Vanilla:
+                   Wrapper.getPlayer().cameraYaw = 0.1f;
                    Wrapper.getPlayer().motionY = 0;
+                   if (Wrapper.getMinecraft().gameSettings.keyBindJump.isKeyDown())
+                       Wrapper.getPlayer().motionY = 0.5d;
+                   if (Wrapper.getMinecraft().gameSettings.keyBindSneak.isKeyDown())
+                       Wrapper.getPlayer().motionY = -0.5d;
                    break;
                case Watchdog:
-                   Wrapper.getPlayer().motionY = 0.1;
+                   updatePositionEvent.setY(watchdogFlightY);
+                   Wrapper.getPlayer().posY = watchdogFlightY;
                    break;
            }
            setModuleSuffix(flightModeProperty.getEnumValueAsString());

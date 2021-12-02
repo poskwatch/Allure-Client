@@ -43,6 +43,8 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import tv.twitch.chat.ChatUserInfo;
+import vip.allureclient.AllureClient;
+import vip.allureclient.visual.notification.NotificationType;
 
 public abstract class GuiScreen extends Gui implements GuiYesNoCallback
 {
@@ -59,10 +61,10 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
     protected RenderItem itemRender;
 
     /** The width of the screen object. */
-    public int width;
+    public static int width;
 
     /** The height of the screen object. */
-    public int height;
+    public static int height;
     protected List<GuiButton> buttonList = Lists.<GuiButton>newArrayList();
     protected List<GuiLabel> labelList = Lists.<GuiLabel>newArrayList();
     public boolean allowUserInput;
@@ -87,6 +89,7 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
      */
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
+
         for (int i = 0; i < this.buttonList.size(); ++i)
         {
             ((GuiButton)this.buttonList.get(i)).drawButton(this.mc, mouseX, mouseY);
@@ -113,6 +116,8 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
                 this.mc.setIngameFocus();
             }
         }
+        AllureClient.getInstance().getNotificationManager().createNotification("Key Pressed", String.format("Key %s was pressed", Keyboard.getKeyName(keyCode)), 2, NotificationType.INFO);
+
     }
 
     /**

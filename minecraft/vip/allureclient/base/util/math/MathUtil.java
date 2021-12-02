@@ -29,4 +29,8 @@ public class MathUtil {
         bd = bd.setScale(places, RoundingMode.HALF_UP);
         return bd.doubleValue();
     }
+
+    public static double getRandomNumber(double min, double max) {
+        return ((Math.random() * (min/max)) + min);
+    }
 }

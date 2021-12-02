@@ -20,6 +20,7 @@ import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.base.module.ModuleCategory;
 import vip.allureclient.base.module.ModuleData;
+import vip.allureclient.base.util.client.NetworkUtil;
 import vip.allureclient.base.util.client.TimerUtil;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.event.network.PacketSendEvent;
@@ -31,7 +32,7 @@ import vip.allureclient.impl.property.ValueProperty;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-@ModuleData(moduleName = "KillAura", keyBind = Keyboard.KEY_Y, category = ModuleCategory.COMBAT)
+@ModuleData(moduleName = "Kill Aura", moduleBind = Keyboard.KEY_Y, moduleCategory = ModuleCategory.COMBAT)
 public class KillAura extends Module {
 
     @EventListener
@@ -42,7 +43,7 @@ public class KillAura extends Module {
 
     private final TimerUtil apsTimerUtil = new TimerUtil();
 
-    private final ValueProperty<Integer> averageAPSProperty = new ValueProperty<>("Average APS", 13, 0, 20, this);
+    private final ValueProperty<Integer> averageAPSProperty = new ValueProperty<>("Average APS", 13, 1, 20, this);
 
     private final ValueProperty<Double> attackRangeProperty = new ValueProperty<>("Attack Range", 4.1D, 0.0D, 6.0D, this);
 
@@ -74,6 +75,7 @@ public class KillAura extends Module {
         };
 
         this.onUpdatePositionEvent = (updatePositionEvent -> {
+            attackInvisiblesProperty.setPropertyHidden(targetingModeProperty.getPropertyValue().equals(targetingModes.Distance));
             setModuleSuffix(targetingModeProperty.getEnumValueAsString());
             ArrayList<Entity> targetEntities = new ArrayList<>(Wrapper.getWorld().loadedEntityList);
             targetEntities.removeIf(entity -> !isEntityValid(entity));
@@ -141,14 +143,20 @@ public class KillAura extends Module {
             return false;
         if (!attackAnimalsProperty.getPropertyValue() && entity instanceof EntityAnimal)
             return false;
+        if (entity instanceof EntityPlayer) {
+            boolean antiBot = AntiBot.getInstance().isModuleToggled()
+                    && (AntiBot.getInstance().antiBotModeProperty.getPropertyValue().equals(AntiBot.AntiBotMode.Watchdog)
+                    || AntiBot.getInstance().antiBotModeProperty.getPropertyValue().equals(AntiBot.AntiBotMode.Watchdog));
+            if (antiBot && !NetworkUtil.isPlayerPingNull((EntityPlayer) entity))
+                return false;
+        }
         return attackInvisiblesProperty.getPropertyValue() || !entity.isInvisible();
     }
 
     public static float[] getRotationFromPosition(double x, double z, double y) {
         double xDiff = x - Minecraft.getMinecraft().thePlayer.posX;
         double zDiff = z - Minecraft.getMinecraft().thePlayer.posZ;
-        double yDiff = y - Minecraft.getMinecraft().thePlayer.posY - 1.2;
-
+        double yDiff = y - Minecraft.getMinecraft().thePlayer.posY - 0.5D;
         double dist = MathHelper.sqrt_double(xDiff * xDiff + zDiff * zDiff);
         float yaw = (float) (Math.atan2(zDiff, xDiff) * 180.0D / 3.141592653589793D) - 90.0F;
         float pitch = (float) -(Math.atan2(yDiff, dist) * 180.0D / 3.141592653589793D);

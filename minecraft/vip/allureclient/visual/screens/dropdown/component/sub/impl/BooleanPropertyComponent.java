@@ -60,6 +60,15 @@ public class BooleanPropertyComponent extends Component {
         return mouseX >= x && mouseX <= x + 115 && mouseY >= y && mouseY <= y + 14;
     }
 
+    public BooleanProperty getProperty() {
+        return property;
+    }
+
+    @Override
+    public boolean isHidden() {
+        return getProperty().isPropertyHidden();
+    }
+
     @Override
     public void onAnimationEvent() {
         checkboxAnimation = parent.getParentFrame().getX() + 115 - 27;

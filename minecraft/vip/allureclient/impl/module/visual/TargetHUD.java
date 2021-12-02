@@ -1,31 +1,34 @@
 package vip.allureclient.impl.module.visual;
 
+import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import org.lwjgl.opengl.GL11;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
+import vip.allureclient.base.font.MinecraftFontRenderer;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.base.module.ModuleCategory;
 import vip.allureclient.base.module.ModuleData;
 import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.base.util.math.MathUtil;
+import vip.allureclient.base.util.visual.ColorUtil;
 import vip.allureclient.base.util.visual.RenderUtil;
 import vip.allureclient.impl.event.visual.Render2DEvent;
 import vip.allureclient.impl.module.combat.KillAura;
-import vip.allureclient.impl.property.BooleanProperty;
 
-@ModuleData(moduleName = "TargetHUD", keyBind = 0, category = ModuleCategory.VISUAL)
+import static org.lwjgl.opengl.GL11.*;
+
+@ModuleData(moduleName = "Target HUD", moduleBind = 0, moduleCategory = ModuleCategory.VISUAL)
 public class TargetHUD extends Module {
 
     @EventListener
     EventConsumer<Render2DEvent> onRender2DEvent;
-
-    private final BooleanProperty animateBarProperty = new BooleanProperty("Animate Bar", false, this);
 
     public double xLocation = new ScaledResolution(Wrapper.getMinecraft()).getScaledWidth()/2.0D, yLocation = new ScaledResolution(Wrapper.getMinecraft()).getScaledHeight()/2.0D;
 
@@ -45,24 +48,41 @@ public class TargetHUD extends Module {
     public void drawTargetHUD(EntityLivingBase entity) {
         GL11.glPushMatrix();
         GL11.glTranslated(xLocation, yLocation, 0);
-        RenderUtil.glFilledQuad(5, 7, 125, 45, 0xff202020);
-        Gui.drawRectWithWidth(4, 7, 1, 45, 0xff101010);
-        Gui.drawRectWithWidth(130, 7, 1, 45, 0xff101010);
+        Gui.drawRectWithWidth(5, 7, 125, 32, 0x90202020);
+        Gui.drawRectWithWidth(4, 7, 1, 32, 0xff101010);
+        Gui.drawRectWithWidth(130, 7, 1, 32, 0xff101010);
         Gui.drawRectWithWidth(4, 6, 127, 1, 0xff101010);
-        Gui.drawRectWithWidth(4, 51, 127, 1, 0xff101010);
+        Gui.drawRectWithWidth(4, 39, 127, 1, 0xff101010);
+        if (entity instanceof EntityPlayer) {
+            AbstractClientPlayer abstractClientPlayer = (AbstractClientPlayer) entity;
+            Wrapper.getMinecraft().getTextureManager().bindTexture(abstractClientPlayer.getLocationSkin());
+            GlStateManager.color(1, 1, 1);
+            glBegin(GL_QUADS);
+            glTexCoord2f(1.0F/8, 1.0F/8);
+            glVertex2i(5, 7);
+            glTexCoord2f(1.0F/8, 1.0F/8 * 2);
+            glVertex2i(5, 39);
+            glTexCoord2f(1.0F/8 * 2, 1.0F/8 * 2);
+            glVertex2i(5 + 32, 39);
+            glTexCoord2f(1.0F/8 * 2, 1.0F/8);
+            glVertex2i(5 + 32, 7);
+            glEnd();
+        }
+        else {
+            Gui.drawRectWithWidth(5, 7, 32, 32, 0xff000000);
+            Wrapper.getMinecraft().fontRendererObj.drawStringWithShadow("?", 18F, 19.5F, -1);
+        }
+        AllureClient.getInstance().getFontManager().mediumFontRenderer.drawStringWithShadow(entity.getName(), 40, 12, -1);
         final double currentHealth = entity.getHealth();
         final double maxHealth = entity.getMaxHealth();
         final double percent = Math.min((currentHealth / maxHealth), 1);
-        double barWidth = percent * 113;
-        animationValue = MathUtil.animateDoubleValue(barWidth, animationValue, 0.009D);
-        if (animateBarProperty.getPropertyValue())
-            barWidth = animationValue;
-        Gui.drawRectWithWidth(10, 28, 115, 15, 0xff101010);
-        Gui.drawRectWithWidth(11, 29, barWidth, 13, ClientColor.getInstance().getColor().darker().darker().getRGB());
-        Gui.drawRectWithWidth(11, 29, percent * 113, 13, ClientColor.getInstance().getColor().darker().getRGB());
-        Wrapper.getMinecraft().fontRendererObj.drawCenteredStringWithShadow(entity.getName(), 67.5F, 13.5F, -1);
-        final double healthAsPercentage = Math.min(MathUtil.roundToPlace(100 * (entity.getHealth() / entity.getMaxHealth()), 2), 100.0D);
-        Wrapper.getMinecraft().fontRendererObj.drawCenteredStringWithShadow(healthAsPercentage + "%", 67.5F, 32, -1);
+        animationValue = RenderUtil.easeOutAnimation(87 * percent, animationValue, 0.02);
+        Gui.drawRectWithWidth(39, 24, 89, 12, 0x70101010);
+        Gui.drawRectWithWidth(40, 25, 87, 10, ColorUtil.getHealthColor(entity, 127).darker().getRGB());
+        Gui.drawRectWithWidth(40, 25, animationValue, 10, ColorUtil.getHealthColor(entity, 255).getRGB());
+        String percentage = String.format("%.1f%%", 100 * (currentHealth/maxHealth));
+        double percentageX = (38 + animationValue) - Wrapper.getMinecraft().fontRendererObj.getStringWidth(percentage);
+        AllureClient.getInstance().getFontManager().smallFontRenderer.drawStringWithShadow(percentage, Math.round(Math.max(percentageX, 43.0)), 26.5, -1);
         GlStateManager.color(1,1, 1);
         GL11.glPopMatrix();
     }

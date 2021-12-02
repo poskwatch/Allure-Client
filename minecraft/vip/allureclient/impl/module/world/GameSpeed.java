@@ -12,7 +12,7 @@ import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.ValueProperty;
 
-@ModuleData(moduleName = "GameSpeed", keyBind = 0, category = ModuleCategory.WORLD)
+@ModuleData(moduleName = "Game Speed", moduleBind = 0, moduleCategory = ModuleCategory.WORLD)
 public class GameSpeed extends Module {
 
     @EventListener

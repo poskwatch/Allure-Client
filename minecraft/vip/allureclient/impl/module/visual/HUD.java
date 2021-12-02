@@ -2,7 +2,6 @@ package vip.allureclient.impl.module.visual;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import vip.allureclient.AllureClient;
@@ -12,17 +11,21 @@ import vip.allureclient.base.font.MinecraftFontRenderer;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.base.module.ModuleCategory;
 import vip.allureclient.base.module.ModuleData;
+import vip.allureclient.base.util.client.NetworkUtil;
 import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.base.util.player.MovementUtil;
 import vip.allureclient.base.util.visual.ColorUtil;
 import vip.allureclient.base.util.visual.RenderUtil;
 import vip.allureclient.impl.event.visual.Render2DEvent;
+import vip.allureclient.impl.property.BooleanProperty;
+import vip.allureclient.impl.property.ColorProperty;
 import vip.allureclient.impl.property.EnumProperty;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@ModuleData(moduleName = "HUD", keyBind = 0, category = ModuleCategory.VISUAL)
+@ModuleData(moduleName = "HUD", moduleBind = 0, moduleCategory = ModuleCategory.VISUAL)
 public class HUD extends Module {
 
     @EventListener
@@ -32,22 +35,43 @@ public class HUD extends Module {
 
     private final EnumProperty<ListOutlineModes> listOutlineModeProperty = new EnumProperty<>("List Outline", ListOutlineModes.Right, this);
 
+    private final EnumProperty<WatermarkModes> waterMarkModeProperty = new EnumProperty<>("Watermark", WatermarkModes.New, this);
+
+    private final BooleanProperty playerInfoProperty = new BooleanProperty("Player Info", true, this);
+
     public HUD() {
-
         this.onRender2DEvent = (render2DEvent -> {
-
-            setModuleSuffix("Watermark");
-
             final int color = ClientColor.getInstance().getColorRGB();
 
-            final String watermark = String.format("%s v%s", AllureClient.getInstance().CLIENT_NAME, AllureClient.getInstance().CLIENT_VERSION);
-            AllureClient.getInstance().getFontManager().mediumFontRenderer.drawStringWithShadow(watermark, 6, 6, color);
+            final int height = render2DEvent.getScaledResolution().getScaledHeight(), width = render2DEvent.getScaledResolution().getScaledWidth();
 
-            AllureClient.getInstance().getFontManager().mediumFontRenderer.drawStringWithShadow("FPS: " + Minecraft.getDebugFPS(), 4,
-                    render2DEvent.getScaledResolution().getScaledHeight() - (Wrapper.getMinecraft().currentScreen instanceof GuiChat ? 24 : 12), -1);
+            final MinecraftFontRenderer fontRenderer = AllureClient.getInstance().getFontManager().mediumFontRenderer;
+
+            String watermark = String.format("%s v%s", AllureClient.getInstance().CLIENT_NAME, AllureClient.getInstance().CLIENT_VERSION);
+            if (waterMarkModeProperty.getPropertyValue().equals(WatermarkModes.New))
+                watermark = String.format("\247r%s\247f%s v%s", AllureClient.getInstance().CLIENT_NAME.charAt(0), AllureClient.getInstance().CLIENT_NAME.substring(1), AllureClient.getInstance().CLIENT_VERSION);
+
+            if (waterMarkModeProperty.getPropertyValue().equals(WatermarkModes.New) || waterMarkModeProperty.getPropertyValue().equals(WatermarkModes.Solid)) {
+                fontRenderer.drawStringWithShadow(watermark, 6, 6, color);
+            }
+            else {
+                final String csgoWatermark = String.format("allureclient.vip \2477|\247f FPS: %s \2477|\247f %s", Minecraft.getDebugFPS(),
+                        Wrapper.getMinecraft().getCurrentServerData() == null ? "Singleplayer" : Wrapper.getMinecraft().getCurrentServerData().serverIP);
+                RenderUtil.drawBorderedRect(5, 5, fontRenderer.getStringWidth(csgoWatermark) + 5, 15, 0x90000000, 0x20ffffff);
+                Gui.drawHorizontalGradient(5, 5, (float) (fontRenderer.getStringWidth(csgoWatermark) + 5), 1,
+                        ColorUtil.interpolateColorsDynamic(7, 1, Color.MAGENTA, Color.BLUE).getRGB(),
+                        ColorUtil.interpolateColorsDynamic(7, 1, Color.BLUE, Color.MAGENTA).getRGB());
+                fontRenderer.drawStringWithShadow(csgoWatermark, 7, 10, -1);
+            }
+
+            if (playerInfoProperty.getPropertyValue()) {
+                fontRenderer.drawStringWithShadow("Ping: \2477" + NetworkUtil.getPing(), 1, height - 29, -1);
+                fontRenderer.drawStringWithShadow("Block/s: \2477" + MovementUtil.getPlayerBPS(), 1, height - 19, -1);
+                fontRenderer.drawStringWithShadow(String.format("%.1f, %.1f, %.1f", Wrapper.getPlayer().posX, Wrapper.getPlayer().posY, Wrapper.getPlayer().posZ), 1, height - 9, -1);
+            }
+
 
             final ArrayList<Module> sortedDisplayModules = new ArrayList<>(AllureClient.getInstance().getModuleManager().getSortedDisplayModules.apply(AllureClient.getInstance().getFontManager().mediumFontRenderer));
-            final MinecraftFontRenderer fontRenderer = AllureClient.getInstance().getFontManager().mediumFontRenderer;
             final ScaledResolution sr = render2DEvent.getScaledResolution();
             final AtomicInteger moduleDrawCount = new AtomicInteger();
             sortedDisplayModules.forEach(module -> {
@@ -65,17 +89,17 @@ public class HUD extends Module {
                         listColor = color;
                         break;
                 }
-                RenderUtil.glFilledQuad((float) posX - 2, (float) posY - 4,
+                Gui.drawRectWithWidth((float) posX - 2, (float) posY - 4,
                         (float) fontRenderer.getStringWidth(module.getModuleDisplayName()) + 7, 13, 0x50000000);
                 fontRenderer.drawStringWithShadow(module.getModuleDisplayName(), posX, posY, listColor);
                 switch (listOutlineModeProperty.getPropertyValue()) {
                     case Left:
                         GlStateManager.color(1, 1, 1);
-                        RenderUtil.glFilledQuad((float) (posX - 3), (float) (posY - 4), 1, 13, listColor);
+                        Gui.drawRectWithWidth((float) (posX - 3), (float) (posY - 4), 1, 13, listColor);
                         break;
                     case Right:
                         GlStateManager.color(1, 1, 1);
-                        RenderUtil.glFilledQuad(render2DEvent.getScaledResolution().getScaledWidth() - 1, (float) (posY - 4), 1, 13, listColor);
+                        Gui.drawRectWithWidth(render2DEvent.getScaledResolution().getScaledWidth() - 1, (float) (posY - 4), 1, 13, listColor);
                         break;
                     case Outline:
                         GlStateManager.color(1, 1, 1);
@@ -112,5 +136,11 @@ public class HUD extends Module {
         Left,
         Right,
         Outline
+    }
+
+    private enum WatermarkModes {
+        Solid,
+        New,
+        CSGO
     }
 }

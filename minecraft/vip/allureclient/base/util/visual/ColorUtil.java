@@ -7,7 +7,7 @@ import java.awt.*;
 
 public class ColorUtil {
 
-    public static int getHealthColor(EntityLivingBase e){
+    public static Color getHealthColor(EntityLivingBase e, int alpha){
         final double health = e.getHealth();
         final double maxHealth = e.getMaxHealth();
         final double healthPercentage = health / maxHealth;
@@ -16,9 +16,9 @@ public class ColorUtil {
         final Color healthColor = new Color(
                 (int) (MathUtil.linearInterpolate(c1.getRed(), c2.getRed(), healthPercentage)),
                 (int) (MathUtil.linearInterpolate(c1.getGreen(), c2.getGreen(), healthPercentage)),
-                (int) (MathUtil.linearInterpolate(c1.getBlue(), c2.getBlue(), healthPercentage))
+                (int) (MathUtil.linearInterpolate(c1.getBlue(), c2.getBlue(), healthPercentage)), alpha
         );
-        return healthColor.darker().getRGB();
+        return healthColor.darker();
     }
 
     public static Color interpolateColors(Color color1, Color color2, float point) {
@@ -29,9 +29,20 @@ public class ColorUtil {
                 (int) ((color2.getBlue() - color1.getBlue()) * point + color1.getBlue()));
     }
 
-    public static Color interpolateColorsDynamic(int speed, int index, Color start, Color end) {
+    public static Color interpolateColorsDynamic(double speed, int index, Color start, Color end) {
         int angle = (int) (((System.currentTimeMillis()) / speed + index) % 360);
         angle = (angle >= 180 ? 360 - angle : angle) * 2;
         return interpolateColors(start, end, angle / 360f);
+    }
+
+    public static int overwriteAlphaComponent(final int colour, final int alphaComponent) {
+        final int red = colour >> 16 & 0xFF;
+        final int green = colour >> 8 & 0xFF;
+        final int blue = colour & 0xFF;
+
+        return ((alphaComponent & 0xFF) << 24) |
+                ((red & 0xFF) << 16) |
+                ((green & 0xFF) << 8) |
+                (blue & 0xFF);
     }
 }

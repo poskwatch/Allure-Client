@@ -6,13 +6,11 @@ import vip.allureclient.base.module.Module;
 import vip.allureclient.base.property.Property;
 import vip.allureclient.base.util.math.MathUtil;
 import vip.allureclient.impl.property.BooleanProperty;
+import vip.allureclient.impl.property.ColorProperty;
 import vip.allureclient.impl.property.EnumProperty;
 import vip.allureclient.impl.property.ValueProperty;
 import vip.allureclient.visual.screens.dropdown.component.Component;
-import vip.allureclient.visual.screens.dropdown.component.sub.impl.BooleanPropertyComponent;
-import vip.allureclient.visual.screens.dropdown.component.sub.impl.EnumPropertyComponent;
-import vip.allureclient.visual.screens.dropdown.component.sub.impl.KeybindingComponent;
-import vip.allureclient.visual.screens.dropdown.component.sub.impl.ValuePropertyComponent;
+import vip.allureclient.visual.screens.dropdown.component.sub.impl.*;
 
 import java.util.ArrayList;
 
@@ -33,17 +31,21 @@ public class CheatButtonComponent extends Component {
         this.module = module;
         this.offset = offset;
         int settingOffset = offset + 14;
-        for(Property<?> property : AllureClient.getInstance().getPropertyManager().getOptions(module)){
-            if(property instanceof BooleanProperty){
+        for (Property<?> property : AllureClient.getInstance().getPropertyManager().getPropertiesByModule(module)) {
+            if (property instanceof BooleanProperty){
                 subComponents.add(new BooleanPropertyComponent((BooleanProperty) property, this, settingOffset));
                 settingOffset += 14;
             }
-            if(property instanceof ValueProperty){
+            if (property instanceof ValueProperty) {
                 subComponents.add(new ValuePropertyComponent((ValueProperty<?>) property, this, settingOffset));
                 settingOffset += 14;
             }
-            if(property instanceof EnumProperty){
+            if (property instanceof EnumProperty) {
                 subComponents.add(new EnumPropertyComponent((EnumProperty<?>) property, this, settingOffset));
+                settingOffset += 14;
+            }
+            if (property instanceof ColorProperty) {
+                subComponents.add(new ColorPropertyComponent((ColorProperty) property, this, settingOffset));
                 settingOffset += 14;
             }
         }
@@ -89,7 +91,10 @@ public class CheatButtonComponent extends Component {
         }
 
         if(expanded){
-            subComponents.forEach(subComponent -> subComponent.onDrawScreen(mouseX, mouseY));
+            subComponents.forEach(subComponent -> {
+                if (!subComponent.isHidden())
+                    subComponent.onDrawScreen(mouseX, mouseY);
+            });
         }
     }
 
@@ -110,19 +115,27 @@ public class CheatButtonComponent extends Component {
             }
         }
         if(expanded)
-            subComponents.forEach(subComponent -> subComponent.onMouseClicked(mouseX, mouseY, mouseButton));
+            subComponents.forEach(subComponent -> {
+                if (!subComponent.isHidden())
+                    subComponent.onMouseClicked(mouseX, mouseY, mouseButton);
+            });
     }
 
     @Override
     public void onMouseReleased(int mouseX, int mouseY, int mouseButton) {
         if(expanded)
-            subComponents.forEach(subComponent -> subComponent.onMouseReleased(mouseX, mouseY, mouseButton));
+            subComponents.forEach(subComponent -> {
+                if (!subComponent.isHidden())
+                    subComponent.onMouseReleased(mouseX, mouseY, mouseButton);
+            });
     }
 
     @Override
     public void onKeyTyped(int typedKey) {
-        if(expanded)
-            subComponents.forEach(subComponent -> subComponent.onKeyTyped(typedKey));
+        subComponents.forEach(subComponent -> {
+            if (!subComponent.isHidden())
+                subComponent.onKeyTyped(typedKey);
+        });
         super.onKeyTyped(typedKey);
     }
 
@@ -148,23 +161,29 @@ public class CheatButtonComponent extends Component {
 
     @Override
     public double getHeight(){
+        ArrayList<Component> visibleComponents = new ArrayList<>(subComponents);
+        visibleComponents.removeIf(Component::isHidden);
         if(expanded){
-            return (subComponents.size() + 1) * 14;
+            double height = 14;
+            for (Component component : visibleComponents) {
+                height += component.getHeight();
+            }
+            return height;
         }
         else{
             return 14;
         }
     }
 
-
-
     @Override
     public void setOffset(int offset) {
         this.offset = offset;
         int subY = this.offset + 14;
         for(Component comp : subComponents) {
-            comp.setOffset(subY);
-            subY += 14;
+            if (!comp.isHidden()) {
+                comp.setOffset(subY);
+                subY += comp.getHeight();
+            }
         }
     }
 }

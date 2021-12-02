@@ -7,7 +7,7 @@ import vip.allureclient.base.module.ModuleCategory;
 import vip.allureclient.base.module.ModuleData;
 import vip.allureclient.impl.event.player.ChatMessageSendEvent;
 
-@ModuleData(moduleName = "Chat Bypass", keyBind = 0, category = ModuleCategory.WORLD)
+@ModuleData(moduleName = "Chat Bypass", moduleBind = 0, moduleCategory = ModuleCategory.WORLD)
 public class ChatBypass extends Module {
 
     @EventListener

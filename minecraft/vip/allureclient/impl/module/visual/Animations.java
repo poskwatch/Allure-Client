@@ -8,7 +8,7 @@ import vip.allureclient.base.util.visual.ChatUtil;
 import vip.allureclient.impl.property.EnumProperty;
 import vip.allureclient.impl.property.ValueProperty;
 
-@ModuleData(moduleName = "Animations", keyBind = 0, category = ModuleCategory.VISUAL)
+@ModuleData(moduleName = "Animations", moduleBind = 0, moduleCategory = ModuleCategory.VISUAL)
 public class Animations extends Module {
 
     public Animations() {

@@ -98,6 +98,21 @@ public class ValuePropertyComponent extends Component {
     }
 
     @Override
+    public boolean isHidden() {
+        return getProperty().isPropertyHidden();
+    }
+
+    public ValueProperty getProperty() {
+        return property;
+    }
+
+    @Override
+    public void onGuiClosed() {
+        isSliding = false;
+        super.onGuiClosed();
+    }
+
+    @Override
     public void onAnimationEvent() {
         sliderAnimation = 0;
     }

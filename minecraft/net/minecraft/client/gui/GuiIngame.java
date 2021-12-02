@@ -3,6 +3,8 @@ package net.minecraft.client.gui;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
@@ -45,6 +47,8 @@ import optifine.Config;
 import optifine.CustomColors;
 import org.lwjgl.opengl.GL11;
 import vip.allureclient.AllureClient;
+import vip.allureclient.base.util.visual.BlurUtil;
+import vip.allureclient.base.util.visual.ColorUtil;
 import vip.allureclient.impl.event.visual.Render2DEvent;
 import vip.allureclient.impl.module.visual.Crosshair;
 
@@ -123,7 +127,12 @@ public class GuiIngame extends Gui
         int i = scaledresolution.getScaledWidth();
         int j = scaledresolution.getScaledHeight();
         this.mc.entityRenderer.setupOverlayRendering();
+
+        BlurUtil.onRenderGameOverlay(mc.getFramebuffer(), scaledresolution);
+
         GlStateManager.enableBlend();
+
+
 
         if (Config.isVignetteEnabled())
         {
@@ -184,6 +193,10 @@ public class GuiIngame extends Gui
 
         Render2DEvent render2DEvent = new Render2DEvent(partialTicks, scaledresolution);
         AllureClient.getInstance().getEventManager().callEvent(render2DEvent);
+
+        AllureClient.getInstance().getNotificationManager().render();
+
+
 
         GlStateManager.disableBlend();
 
@@ -601,7 +614,11 @@ public class GuiIngame extends Gui
             int l = k1 - k * this.getFontRenderer().FONT_HEIGHT;
             int i1 = p_180475_2_.getScaledWidth() - b0 + 2;
             drawRect(j - 2, l, i1, l + this.getFontRenderer().FONT_HEIGHT, 1342177280);
-            this.getFontRenderer().drawString(s1, j, l, 553648127);
+            if (s1.contains("hypixel"))
+                this.getFontRenderer().drawString("allureclient.xyz", j, l, ColorUtil.interpolateColorsDynamic(3, 1,
+                        Color.MAGENTA, Color.MAGENTA.darker().darker().darker()).getRGB());
+            else
+                this.getFontRenderer().drawString(s1, j, l, 553648127);
             this.getFontRenderer().drawString(s2, i1 - this.getFontRenderer().getStringWidth(s2), l, 553648127);
 
             if (k == arraylist1.size())
@@ -609,6 +626,7 @@ public class GuiIngame extends Gui
                 String s3 = p_180475_1_.getDisplayName();
                 drawRect(j - 2, l - this.getFontRenderer().FONT_HEIGHT - 1, i1, l - 1, 1610612736);
                 drawRect(j - 2, l - 1, i1, l, 1342177280);
+
                 this.getFontRenderer().drawString(s3, j + i / 2 - this.getFontRenderer().getStringWidth(s3) / 2, l - this.getFontRenderer().FONT_HEIGHT, 553648127);
             }
         }

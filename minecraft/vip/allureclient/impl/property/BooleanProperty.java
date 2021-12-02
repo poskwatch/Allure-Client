@@ -17,5 +17,6 @@ public class BooleanProperty extends Property<Boolean> {
     @Override
     public void setPropertyValue(Boolean propertyValue) {
         super.setPropertyValue(propertyValue);
+        onValueChange.run();
     }
 }

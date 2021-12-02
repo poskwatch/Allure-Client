@@ -33,7 +33,7 @@ public class FontRenderer implements IResourceManagerReloadListener
     private static final ResourceLocation[] unicodePageLocations = new ResourceLocation[256];
 
     /** Array of width of all the characters in default.png */
-    private float[] charWidth = new float[256];
+    public float[] charWidth = new float[256];
 
     /** the height in pixels of default text */
     public int FONT_HEIGHT = 9;
@@ -376,9 +376,9 @@ public class FontRenderer implements IResourceManagerReloadListener
     /**
      * Draws the specified string.
      */
-    public int drawString(String text, int x, int y, int color)
+    public int drawString(String text, float x, float y, int color)
     {
-        return !this.enabled ? 0 : this.drawString(text, (float)x, (float)y, color, false);
+        return !this.enabled ? 0 : this.drawString(text, x, y, color, false);
     }
 
     /**

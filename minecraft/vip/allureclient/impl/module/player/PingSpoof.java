@@ -16,10 +16,10 @@ import vip.allureclient.impl.property.ValueProperty;
 
 import java.util.ArrayList;
 
-@ModuleData(moduleName = "Ping Spoof", keyBind = 0, category = ModuleCategory.PLAYER)
+@ModuleData(moduleName = "Ping Spoof", moduleBind = 0, moduleCategory = ModuleCategory.PLAYER)
 public class PingSpoof extends Module {
 
-    private final ArrayList<Packet> delayedPackets = new ArrayList<>();
+    private final ArrayList<Packet<?>> delayedPackets = new ArrayList<>();
 
     @EventListener
     EventConsumer<PacketSendEvent> onPacketSendEvent;
@@ -32,14 +32,10 @@ public class PingSpoof extends Module {
     private final TimerUtil packetDelayTimer = new TimerUtil();
 
     public PingSpoof() {
-
-        setModuleSuffix("Watchdog");
-
         onModuleEnabled = () -> {
             delayedPackets.clear();
             packetDelayTimer.reset();
         };
-
         onPacketSendEvent = (packetSendEvent -> {
             if (packetSendEvent.getPacket() instanceof C00PacketKeepAlive) {
                 delayedPackets.add(packetSendEvent.getPacket());
@@ -52,7 +48,6 @@ public class PingSpoof extends Module {
                 packetSendEvent.setCancelled(true);
             }
         });
-
         onUpdatePositionEvent = (updatePositionEvent -> {
            if (packetDelayTimer.hasReached(packetDelayProperty.getPropertyValue() * 1000)) {
                sendDelayedPackets();
@@ -65,5 +60,4 @@ public class PingSpoof extends Module {
         delayedPackets.forEach(Wrapper::sendPacketDirect);
         delayedPackets.clear();
     }
-
 }

@@ -7,6 +7,8 @@ import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
 import net.minecraft.util.Session;
+import vip.allureclient.AllureClient;
+import vip.allureclient.visual.notification.NotificationType;
 
 import java.io.IOException;
 import java.net.Proxy;
@@ -35,6 +37,7 @@ public class GuiAltLogin extends GuiScreen {
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         drawDefaultBackground();
+        AllureClient.getInstance().getNotificationManager().render();
         emailField.drawTextBox();
         passwordField.drawTextBox();
         Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(status, (float) (width/2.0 - (Minecraft.getMinecraft().fontRendererObj.getStringWidth(status) / 2)), 25, -1);
@@ -71,6 +74,7 @@ public class GuiAltLogin extends GuiScreen {
                 try {
                     loginToAccount(emailField.getText(), passwordField.getText());
                     status = "Logged in as: \247e" + mc.getSession().getUsername();
+                    AllureClient.getInstance().getNotificationManager().createNotification("Account Logged In", "Logged in as " + mc.getSession().getUsername(), 2, NotificationType.SUCCESS);
                 } catch (AuthenticationException e) {
                     status = "\2474Invalid details!";
                     e.printStackTrace();

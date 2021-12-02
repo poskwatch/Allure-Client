@@ -1,19 +1,14 @@
 package vip.allureclient.base.module;
 
+import vip.allureclient.AllureClient;
 import vip.allureclient.base.font.MinecraftFontRenderer;
 import vip.allureclient.impl.module.combat.AntiBot;
 import vip.allureclient.impl.module.combat.KillAura;
 import vip.allureclient.impl.module.combat.Velocity;
-import vip.allureclient.impl.module.movement.Flight;
-import vip.allureclient.impl.module.movement.Speed;
-import vip.allureclient.impl.module.movement.Sprint;
-import vip.allureclient.impl.module.movement.Step;
+import vip.allureclient.impl.module.movement.*;
 import vip.allureclient.impl.module.player.*;
 import vip.allureclient.impl.module.visual.*;
-import vip.allureclient.impl.module.world.Atmosphere;
-import vip.allureclient.impl.module.world.ChatBypass;
-import vip.allureclient.impl.module.world.ChestStealer;
-import vip.allureclient.impl.module.world.GameSpeed;
+import vip.allureclient.impl.module.world.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,9 +34,11 @@ public class ModuleManager {
                     new Disabler(),
                     new NoSlow(),
                     new GuiMove(),
+                    new AntiVoid(),
                     // Movement Modules
                     new Sprint(),
                     new Flight(),
+                    new LongJump(),
                     new Speed(),
                     new Step(),
                     // Visual Modules
@@ -50,13 +47,18 @@ public class ModuleManager {
                     new Animations(),
                     new Crosshair(),
                     new TargetHUD(),
+                    new PlayerESP(),
                     // World Modules
                     new Atmosphere(),
                     new ChestStealer(),
                     new GameSpeed(),
-                    new ChatBypass()
+                    new ChatBypass(),
+                    new AntiDeath(),
+                    new EntityDesync(),
+                    new AutoHypixel()
                 }
             );
+            modules.forEach(module -> AllureClient.getInstance().getPropertyManager().getPropertiesByModule(module).forEach(property -> property.onValueChange.run()));
             System.out.println("Module Manager Initiated...");
         };
         onModuleManagerStart.run();

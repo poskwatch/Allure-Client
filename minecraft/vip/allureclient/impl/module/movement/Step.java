@@ -12,7 +12,7 @@ import vip.allureclient.impl.event.player.PlayerStepEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.property.BooleanProperty;
 
-@ModuleData(moduleName = "Step", keyBind = 0, category = ModuleCategory.MOVEMENT)
+@ModuleData(moduleName = "Step", moduleBind = 0, moduleCategory = ModuleCategory.MOVEMENT)
 public class Step extends Module {
 
     @EventListener

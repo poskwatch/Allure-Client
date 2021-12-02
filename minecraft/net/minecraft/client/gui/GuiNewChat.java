@@ -11,6 +11,8 @@ import net.minecraft.util.IChatComponent;
 import net.minecraft.util.MathHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.opengl.GL11;
+import vip.allureclient.base.util.visual.RenderUtil;
 
 public class GuiNewChat extends Gui
 {
@@ -78,11 +80,15 @@ public class GuiNewChat extends Gui
                             if (l1 > 3)
                             {
                                 int i2 = 0;
-                                int j2 = -i1 * 9;
-                                drawRect(i2, j2 - 9, i2 + l + 4, j2, l1 / 2 << 24);
+                                int j2 = -i1 * 10;
+                                chatline.animation = RenderUtil.easeOutAnimation(j2 - 15, chatline.animation, 0.04);
+                                drawRect(i2, j2 - 16, i2 + l + 4, j2 - 6, l1 / 2 << 24);
                                 String s = chatline.getChatComponent().getFormattedText();
                                 GlStateManager.enableBlend();
-                                this.mc.fontRendererObj.drawStringWithShadow(s, (float)i2, (float)(j2 - 8), 16777215 + (l1 << 24));
+                                GL11.glEnable(GL11.GL_SCISSOR_TEST);
+                                GL11.glScissor(0, 68, GuiScreen.width, GuiScreen.height);
+                                this.mc.fontRendererObj.drawStringWithShadow(s, (float)i2 + 1, (float) chatline.animation, 16777215 + (l1 << 24));
+                                GL11.glDisable(GL11.GL_SCISSOR_TEST);
                                 GlStateManager.disableAlpha();
                                 GlStateManager.disableBlend();
                             }

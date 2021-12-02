@@ -15,7 +15,7 @@ import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.module.combat.KillAura;
 import vip.allureclient.impl.property.EnumProperty;
 
-@ModuleData(moduleName = "No Slow", keyBind = 0, category = ModuleCategory.PLAYER)
+@ModuleData(moduleName = "No Slow", moduleBind = 0, moduleCategory = ModuleCategory.PLAYER)
 public class NoSlow extends Module {
 
     @EventListener

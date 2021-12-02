@@ -57,7 +57,6 @@ public class ModuleCategoryFrame {
     }
 
     public void onMouseClicked(int mouseX, int mouseY, int mouseButton) {
-
         if(isHoveringFrame(mouseX, mouseY)){
             if(mouseButton == 0) {
                 distX = mouseX - x;
@@ -97,6 +96,10 @@ public class ModuleCategoryFrame {
         if(frameExpanded){
             childrenComponents.forEach(childComponent -> childComponent.onKeyTyped(typedKey));
         }
+    }
+
+    public void onGuiClosed() {
+        childrenComponents.forEach(Component::onGuiClosed);
     }
 
     public ArrayList<Component> getChildrenComponents() {
@@ -141,7 +144,10 @@ public class ModuleCategoryFrame {
         for(Component component : childrenComponents){
             if(component instanceof CheatButtonComponent){
                 if(((CheatButtonComponent) component).expanded){
-                    initialHeight += ((CheatButtonComponent) component).subComponents.size() * frameHeight;
+                    ArrayList<Component> visibleCheatSubs = new ArrayList<>(((CheatButtonComponent) component).subComponents);
+                    visibleCheatSubs.removeIf(Component::isHidden);
+                    for (Component sub : visibleCheatSubs)
+                        initialHeight += sub.getHeight();
                 }
             }
         }

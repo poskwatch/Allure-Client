@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
 public @interface ModuleData {
 
     String moduleName();
-    int keyBind();
-    ModuleCategory category();
+    int moduleBind();
+    ModuleCategory moduleCategory();
 
 }

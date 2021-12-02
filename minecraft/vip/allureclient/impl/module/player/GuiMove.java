@@ -14,7 +14,7 @@ import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.event.network.PacketSendEvent;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
 
-@ModuleData(moduleName = "Gui Move", keyBind = 0, category = ModuleCategory.PLAYER)
+@ModuleData(moduleName = "Gui Move", moduleBind = 0, moduleCategory = ModuleCategory.PLAYER)
 public class GuiMove extends Module {
 
     @EventListener

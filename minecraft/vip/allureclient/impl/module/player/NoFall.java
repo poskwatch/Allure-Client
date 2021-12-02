@@ -10,7 +10,7 @@ import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.property.EnumProperty;
 
-@ModuleData(moduleName = "No Fall", keyBind = 0, category = ModuleCategory.PLAYER)
+@ModuleData(moduleName = "No Fall", moduleBind = 0, moduleCategory = ModuleCategory.PLAYER)
 public class NoFall extends Module {
 
     @EventListener

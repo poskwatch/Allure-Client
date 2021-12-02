@@ -52,9 +52,11 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
 import vip.allureclient.AllureClient;
+import vip.allureclient.base.util.visual.ChatUtil;
 import vip.allureclient.impl.event.player.ChatMessageSendEvent;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
+import vip.allureclient.impl.module.player.Disabler;
 import vip.allureclient.impl.module.player.NoSlow;
 
 public class EntityPlayerSP extends AbstractClientPlayer

@@ -35,12 +35,8 @@ public class GuiDropDown extends GuiScreen {
             }
         });
         nekoAnimation = height;
+        this.mc.entityRenderer.loadShader(new ResourceLocation("shaders/post/blur.json"));
         super.initGui();
-    }
-
-    @Override
-    public void onGuiClosed() {
-        super.onGuiClosed();
     }
 
     @Override
@@ -79,6 +75,12 @@ public class GuiDropDown extends GuiScreen {
         }
         MODULE_CATEGORY_FRAMES.forEach(moduleCategoryFrame -> moduleCategoryFrame.onKeyTyped(keyCode));
         super.keyTyped(typedChar, keyCode);
+    }
+
+    @Override
+    public void onGuiClosed() {
+        MODULE_CATEGORY_FRAMES.forEach(ModuleCategoryFrame::onGuiClosed);
+        super.onGuiClosed();
     }
 
     @Override

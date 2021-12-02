@@ -7,7 +7,9 @@ public class Property<T> {
 
     private final String propertyLabel;
     private T propertyValue;
+    private boolean propertyHidden;
     private final Module parentModule;
+    private Boolean[] hideDependencies = {};
 
     public Property(String propertyLabel, T propertyValue, Module parentModule){
         this.propertyLabel = propertyLabel;
@@ -31,4 +33,14 @@ public class Property<T> {
     public String getPropertyLabel() {
         return propertyLabel;
     }
+
+    public boolean isPropertyHidden() {
+        return propertyHidden;
+    }
+
+    public void setPropertyHidden(boolean propertyHidden) {
+        this.propertyHidden = propertyHidden;
+    }
+
+    public Runnable onValueChange = () -> { };
 }

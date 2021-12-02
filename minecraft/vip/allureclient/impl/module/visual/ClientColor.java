@@ -9,7 +9,7 @@ import vip.allureclient.impl.property.ValueProperty;
 
 import java.awt.*;
 
-@ModuleData(moduleName = "Client Color", keyBind = 0, category = ModuleCategory.VISUAL)
+@ModuleData(moduleName = "Client Color", moduleBind = 0, moduleCategory = ModuleCategory.VISUAL)
 public class ClientColor extends Module {
 
     private final ValueProperty<Integer> redProperty = new ValueProperty<>("Red", 255, 0, 255, this);

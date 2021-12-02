@@ -9,14 +9,13 @@ import vip.allureclient.base.module.ModuleCategory;
 import vip.allureclient.base.module.ModuleData;
 import vip.allureclient.impl.event.network.PacketReceiveEvent;
 
-@ModuleData(moduleName = "Velocity", keyBind = 0, category = ModuleCategory.COMBAT)
+@ModuleData(moduleName = "Velocity", moduleBind = 0, moduleCategory = ModuleCategory.COMBAT)
 public class Velocity extends Module {
 
     @EventListener
     EventConsumer<PacketReceiveEvent> onPacketReceiveEvent;
 
     public Velocity() {
-        setModuleSuffix("Watchdog");
         onPacketReceiveEvent = (packetReceiveEvent -> {
            if(packetReceiveEvent.getPacket() instanceof S27PacketExplosion || packetReceiveEvent.getPacket() instanceof S12PacketEntityVelocity) {
                packetReceiveEvent.setCancelled(true);

@@ -1,4 +1,4 @@
-package vip.allureclient.impl.module.combat;
+package vip.allureclient.impl.module.combat.killaura;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -24,7 +24,9 @@ import vip.allureclient.base.util.client.NetworkUtil;
 import vip.allureclient.base.util.client.TimerUtil;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.event.network.PacketSendEvent;
+import vip.allureclient.impl.event.player.PlayerMoveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
+import vip.allureclient.impl.module.combat.AntiBot;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.EnumProperty;
 import vip.allureclient.impl.property.ValueProperty;
@@ -41,6 +43,9 @@ public class KillAura extends Module {
     @EventListener
     EventConsumer<PacketSendEvent> onPacketSendEvent;
 
+    @EventListener
+    EventConsumer<PlayerMoveEvent> onPlayerMoveEvent;
+
     private final TimerUtil apsTimerUtil = new TimerUtil();
 
     private final ValueProperty<Integer> averageAPSProperty = new ValueProperty<>("Average APS", 13, 1, 20, this);
@@ -54,7 +59,16 @@ public class KillAura extends Module {
                                   attackAnimalsProperty = new BooleanProperty("Animals", false, this),
                                   attackInvisiblesProperty = new BooleanProperty("Invisibles", false, this);
 
-    private final EnumProperty<targetingModes> targetingModeProperty = new EnumProperty<>("Target by", targetingModes.Distance, this);
+    private final EnumProperty<TargetingMode> targetingModeProperty = new EnumProperty<>("Target by", TargetingMode.Distance, this);
+
+    private final BooleanProperty movementFixProperty = new BooleanProperty("Move Fix", false, this);
+
+    private final EnumProperty<MovementFixMode> movementFixModeProperty = new EnumProperty<MovementFixMode>("Mode", MovementFixMode.Watchdog, this) {
+        @Override
+        public boolean isPropertyHidden() {
+            return !movementFixProperty.getPropertyValue();
+        }
+    };
 
     private Entity currentTarget;
     private boolean isBlocking;
@@ -75,7 +89,7 @@ public class KillAura extends Module {
         };
 
         this.onUpdatePositionEvent = (updatePositionEvent -> {
-            attackInvisiblesProperty.setPropertyHidden(targetingModeProperty.getPropertyValue().equals(targetingModes.Distance));
+            attackInvisiblesProperty.setPropertyHidden(targetingModeProperty.getPropertyValue().equals(TargetingMode.Distance));
             setModuleSuffix(targetingModeProperty.getEnumValueAsString());
             ArrayList<Entity> targetEntities = new ArrayList<>(Wrapper.getWorld().loadedEntityList);
             targetEntities.removeIf(entity -> !isEntityValid(entity));
@@ -129,6 +143,11 @@ public class KillAura extends Module {
            if (packetSendEvent.getPacket() instanceof C08PacketPlayerBlockPlacement) {
                isBlocking = true;
            }
+        });
+
+        this.onPlayerMoveEvent = (playerMoveEvent -> {
+           if (movementFixProperty.getPropertyValue() && movementFixModeProperty.getPropertyValue().equals(MovementFixMode.Watchdog))
+               KillAuraMoveFixImpl.watchdogMoveFix(playerMoveEvent);
         });
     }
 
@@ -189,8 +208,12 @@ public class KillAura extends Module {
         return (KillAura) AllureClient.getInstance().getModuleManager().getModuleByClass.apply(KillAura.class);
     }
 
-    private enum targetingModes {
+    private enum TargetingMode {
         Distance,
         Health
+    }
+
+    private enum MovementFixMode {
+        Watchdog
     }
 }

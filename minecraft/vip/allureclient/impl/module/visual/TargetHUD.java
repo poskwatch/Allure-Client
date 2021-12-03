@@ -1,7 +1,6 @@
 package vip.allureclient.impl.module.visual;
 
 import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.ScaledResolution;
@@ -12,7 +11,6 @@ import org.lwjgl.opengl.GL11;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
-import vip.allureclient.base.font.MinecraftFontRenderer;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.base.module.ModuleCategory;
 import vip.allureclient.base.module.ModuleData;
@@ -20,7 +18,7 @@ import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.visual.ColorUtil;
 import vip.allureclient.base.util.visual.RenderUtil;
 import vip.allureclient.impl.event.visual.Render2DEvent;
-import vip.allureclient.impl.module.combat.KillAura;
+import vip.allureclient.impl.module.combat.killaura.KillAura;
 
 import static org.lwjgl.opengl.GL11.*;
 

@@ -12,7 +12,7 @@ import vip.allureclient.base.module.ModuleData;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.player.MovementUtil;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
-import vip.allureclient.impl.module.combat.KillAura;
+import vip.allureclient.impl.module.combat.killaura.KillAura;
 import vip.allureclient.impl.property.EnumProperty;
 
 @ModuleData(moduleName = "No Slow", moduleBind = 0, moduleCategory = ModuleCategory.PLAYER)

@@ -174,7 +174,7 @@ public class ColorPropertyComponent extends Component {
     public void onMouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (isMouseHovering(mouseX, mouseY) && mouseButton == 1) {
             expanded = !expanded;
-            closeOtherPickers();
+            //closeOtherPickers();
         }
     }
 

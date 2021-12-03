@@ -20,6 +20,7 @@ import vip.allureclient.impl.event.visual.Render2DEvent;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.ColorProperty;
 import vip.allureclient.impl.property.EnumProperty;
+import vip.allureclient.impl.property.ValueProperty;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -32,6 +33,41 @@ public class HUD extends Module {
     EventConsumer<Render2DEvent> onRender2DEvent;
 
     private final EnumProperty<ListColorModes> listColorProperty = new EnumProperty<>("List Color", ListColorModes.Client, this);
+
+    private final ColorProperty gradientStartColorProperty = new ColorProperty("Gradient Start", Color.RED, this) {
+        @Override
+        public boolean isPropertyHidden() {
+            return !listColorProperty.getPropertyValue().equals(ListColorModes.Gradient);
+        }
+    };
+
+    private final ColorProperty gradientsEndColorProperty = new ColorProperty("Gradient End", Color.BLUE, this) {
+        @Override
+        public boolean isPropertyHidden() {
+            return !listColorProperty.getPropertyValue().equals(ListColorModes.Gradient);
+        }
+    };
+
+    private final ValueProperty<Double> gradientSpeedProperty = new ValueProperty<Double>("Gradient Seconds", 3D, 1D, 10D, this) {
+        @Override
+        public boolean isPropertyHidden() {
+            return !listColorProperty.getPropertyValue().equals(ListColorModes.Gradient);
+        }
+    };
+
+    private final ValueProperty<Integer> gradientOffsetProperty = new ValueProperty<Integer>("Gradient Offset", 10, 1, 50, this) {
+        @Override
+        public boolean isPropertyHidden() {
+            return !listColorProperty.getPropertyValue().equals(ListColorModes.Gradient);
+        }
+    };
+
+    private final ColorProperty staticColorProperty = new ColorProperty("Color", Color.MAGENTA, this) {
+        @Override
+        public boolean isPropertyHidden() {
+            return !listColorProperty.getPropertyValue().equals(ListColorModes.Solid);
+        }
+    };
 
     private final EnumProperty<ListOutlineModes> listOutlineModeProperty = new EnumProperty<>("List Outline", ListOutlineModes.Right, this);
 
@@ -70,7 +106,6 @@ public class HUD extends Module {
                 fontRenderer.drawStringWithShadow(String.format("%.1f, %.1f, %.1f", Wrapper.getPlayer().posX, Wrapper.getPlayer().posY, Wrapper.getPlayer().posZ), 1, height - 9, -1);
             }
 
-
             final ArrayList<Module> sortedDisplayModules = new ArrayList<>(AllureClient.getInstance().getModuleManager().getSortedDisplayModules.apply(AllureClient.getInstance().getFontManager().mediumFontRenderer));
             final ScaledResolution sr = render2DEvent.getScaledResolution();
             final AtomicInteger moduleDrawCount = new AtomicInteger();
@@ -79,11 +114,15 @@ public class HUD extends Module {
                 final double posY = 3 + moduleDrawCount.get() * 13;
                 int listColor;
                 switch (listColorProperty.getPropertyValue()) {
-                    case Dynamic:
-                        listColor = ColorUtil.interpolateColorsDynamic(5, moduleDrawCount.get() * 25, new Color(color), new Color(color).darker().darker().darker()).getRGB();
-                        break;
                     case Client:
                         listColor = ColorUtil.interpolateColorsDynamic(5, moduleDrawCount.get() * 25, new Color(0x6042cef5), new Color(0xffd742f5)).getRGB();
+                        break;
+                    case Gradient:
+                        listColor = ColorUtil.interpolateColorsDynamic(gradientSpeedProperty.getPropertyValue(), gradientOffsetProperty.getPropertyValue() * moduleDrawCount.get(),
+                                gradientStartColorProperty.getPropertyValue(), gradientsEndColorProperty.getPropertyValue()).getRGB();
+                        break;
+                    case Solid:
+                        listColor = staticColorProperty.getPropertyValueRGB();
                         break;
                     default:
                         listColor = color;
@@ -127,9 +166,9 @@ public class HUD extends Module {
     }
 
     private enum ListColorModes {
+        Client,
+        Gradient,
         Solid,
-        Dynamic,
-        Client
     }
 
     private enum ListOutlineModes {

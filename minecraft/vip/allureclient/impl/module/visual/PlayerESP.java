@@ -3,6 +3,7 @@ package vip.allureclient.impl.module.visual;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import org.lwjgl.opengl.Display;
@@ -15,10 +16,14 @@ import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.base.module.ModuleCategory;
 import vip.allureclient.base.module.ModuleData;
+import vip.allureclient.base.util.client.NetworkUtil;
 import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.base.util.visual.ColorUtil;
 import vip.allureclient.impl.event.visual.Render2DEvent;
+import vip.allureclient.impl.module.combat.AntiBot;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.ColorProperty;
+import vip.allureclient.impl.property.EnumProperty;
 
 import java.awt.*;
 import java.nio.FloatBuffer;
@@ -44,6 +49,20 @@ public class PlayerESP extends Module {
         }
     };
 
+    private final BooleanProperty healthBarProperty = new BooleanProperty("Health Bar", true, this);
+    private final EnumProperty<HealthBarMode> healthBarModeProperty = new EnumProperty<HealthBarMode>("Bar Mode", HealthBarMode.Health, this) {
+        @Override
+        public boolean isPropertyHidden() {
+            return !healthBarProperty.getPropertyValue();
+        }
+    };
+    private final ColorProperty solidHealthBarProperty = new ColorProperty("Health Bar Color", Color.MAGENTA, this) {
+        @Override
+        public boolean isPropertyHidden() {
+            return !healthBarProperty.getPropertyValue() && !healthBarModeProperty.getPropertyValue().equals(HealthBarMode.Solid);
+        }
+    };
+
     @EventListener
     EventConsumer<Render2DEvent> onRender2D;
 
@@ -55,7 +74,7 @@ public class PlayerESP extends Module {
         onRender2D = (event -> {
             updateEntities();
             GL11.glPushMatrix();
-            double scaling = event.getScaledResolution().getScaleFactor() / Math.pow(event.getScaledResolution().getScaleFactor(), 2.0D);
+            //double scaling = event.getScaledResolution().getScaleFactor() / Math.pow(event.getScaledResolution().getScaleFactor(), 2.0D);
             listedEntities.forEach(entity -> {
                 double x = interpolateScale(entity.posX, entity.lastTickPosX, event.getPartialTicks());
                 double y = interpolateScale(entity.posY, entity.lastTickPosY, event.getPartialTicks());
@@ -102,7 +121,7 @@ public class PlayerESP extends Module {
                         final int outlineColor = 0xff000000;
                         final int color = boxColorProperty.getPropertyValueRGB();
 
-                        Gui.drawRect(posX - 0.5D, posY, posX + 0.5D - 0.5D, endPosY, color);
+                        Gui.drawRect(posX - 0.5D, posY + 0.5D, posX + 0.5D - 0.5D, endPosY - 0.5D, color);
                         Gui.drawRect(posX, endPosY - 0.5D, endPosX, endPosY, color);
                         Gui.drawRect(posX - 0.5D, posY, endPosX, posY + 0.5D, color);
                         Gui.drawRect(endPosX - 0.5D, posY, endPosX, endPosY, color);
@@ -115,6 +134,20 @@ public class PlayerESP extends Module {
                         Gui.drawRect(posX - 1D, posY - 0.5D, posX - 0.5D, endPosY, outlineColor);
                         Gui.drawRect(endPosX, posY - 0.5D, endPosX + 0.5D, endPosY, outlineColor);
                         Gui.drawRect(posX - 1D, endPosY, endPosX + 0.5D, endPosY + 0.5D, outlineColor);
+                    }
+
+                    if (entity instanceof EntityLivingBase) {
+                        EntityLivingBase livingEntity = (EntityLivingBase) entity;
+                        if (healthBarProperty.getPropertyValue()) {
+                            int healthBarColor = healthBarModeProperty.getPropertyValue().equals(HealthBarMode.Solid) ?
+                                    solidHealthBarProperty.getPropertyValueRGB() : ColorUtil.getHealthColor(livingEntity, 255).getRGB();
+
+                            Gui.drawRect(posX - 3.5D, posY, posX - 1.5D, endPosY, 0x80000000);
+
+                            if (healthBarModeProperty.getPropertyValue().equals(HealthBarMode.Health) || healthBarModeProperty.getPropertyValue().equals(HealthBarMode.Solid)) {
+                                Gui.drawRect(posX - 3D, endPosY + 0.5D - ((endPosY - posY) * (livingEntity.getHealth() / livingEntity.getMaxHealth())), posX - 2D, endPosY - 0.5D, healthBarColor);
+                            }
+                        }
                     }
                 }
             });
@@ -138,10 +171,20 @@ public class PlayerESP extends Module {
     private void updateEntities(){
         listedEntities.clear();
         Wrapper.getWorld().loadedEntityList.forEach(entity -> {
-            if(entity == Wrapper.getPlayer() && Wrapper.getMinecraft().gameSettings.thirdPersonView == 0 || !(entity instanceof EntityPlayer)){
+            final boolean antiBot = AntiBot.getInstance().isModuleToggled() &&
+                    AntiBot.getInstance().antiBotModeProperty.getPropertyValue().equals(AntiBot.AntiBotMode.Watchdog)
+                    || AntiBot.getInstance().antiBotModeProperty.getPropertyValue().equals(AntiBot.AntiBotMode.Advanced)
+                    && entity instanceof EntityPlayer;
+            if(entity == Wrapper.getPlayer() && Wrapper.getMinecraft().gameSettings.thirdPersonView == 0 || !(entity instanceof EntityPlayer) || (antiBot && !NetworkUtil.isPlayerPingNull((EntityPlayer) entity))){
                 return;
             }
             listedEntities.add(entity);
         });
+    }
+
+    private enum HealthBarMode {
+        Health,
+        Solid,
+        Gradient
     }
 }

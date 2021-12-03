@@ -3,7 +3,7 @@ package vip.allureclient.base.module;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.font.MinecraftFontRenderer;
 import vip.allureclient.impl.module.combat.AntiBot;
-import vip.allureclient.impl.module.combat.KillAura;
+import vip.allureclient.impl.module.combat.killaura.KillAura;
 import vip.allureclient.impl.module.combat.Velocity;
 import vip.allureclient.impl.module.movement.*;
 import vip.allureclient.impl.module.player.*;

@@ -47,7 +47,7 @@ public class GuiDropDown extends GuiScreen {
         mc.getTextureManager().bindTexture(new ResourceLocation("Allure/Images/anime.png"));
         GL11.glColor4f(1, 1, 1, 1);
         nekoAnimation = MathUtil.animateDoubleValue(height - 330, nekoAnimation, 0.05);
-        Gui.drawModalRectWithCustomSizedTexture(width - 175, Math.round((float) nekoAnimation), 0, 0, 175, 330, 175, 330);
+       // Gui.drawModalRectWithCustomSizedTexture(width - 175, Math.round((float) nekoAnimation), 0, 0, 175, 330, 175, 330);
         GL11.glPopMatrix();
         MODULE_CATEGORY_FRAMES.forEach(moduleCategoryFrame -> {
             moduleCategoryFrame.onDrawScreen(mouseX, mouseY);

@@ -21,9 +21,9 @@ import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.visual.ColorUtil;
 import vip.allureclient.impl.event.visual.Render2DEvent;
 import vip.allureclient.impl.module.combat.AntiBot;
-import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.ColorProperty;
 import vip.allureclient.impl.property.EnumProperty;
+import vip.allureclient.impl.property.MultiSelectEnumProperty;
 
 import java.awt.*;
 import java.nio.FloatBuffer;
@@ -41,25 +41,37 @@ public class PlayerESP extends Module {
     private final FloatBuffer projection;
     private final FloatBuffer vector;
 
-    private final BooleanProperty boxProperty = new BooleanProperty("Box", true, this);
+    private final MultiSelectEnumProperty<ESPComponents> espComponentsProperty = new MultiSelectEnumProperty<>("Components", this, ESPComponents.Box, ESPComponents.Health);
+
     private final ColorProperty boxColorProperty = new ColorProperty("Box Color", Color.WHITE, this) {
         @Override
         public boolean isPropertyHidden() {
-            return !boxProperty.getPropertyValue();
+            return !espComponentsProperty.isSelected(ESPComponents.Box);
         }
     };
 
-    private final BooleanProperty healthBarProperty = new BooleanProperty("Health Bar", true, this);
     private final EnumProperty<HealthBarMode> healthBarModeProperty = new EnumProperty<HealthBarMode>("Bar Mode", HealthBarMode.Health, this) {
         @Override
         public boolean isPropertyHidden() {
-            return !healthBarProperty.getPropertyValue();
+            return !espComponentsProperty.isSelected(ESPComponents.Health);
         }
     };
     private final ColorProperty solidHealthBarProperty = new ColorProperty("Health Bar Color", Color.MAGENTA, this) {
         @Override
         public boolean isPropertyHidden() {
-            return !healthBarProperty.getPropertyValue() && !healthBarModeProperty.getPropertyValue().equals(HealthBarMode.Solid);
+            return !espComponentsProperty.isSelected(ESPComponents.Health) || !healthBarModeProperty.getPropertyValue().equals(HealthBarMode.Solid);
+        }
+    };
+    private final ColorProperty gradientBarStartProperty = new ColorProperty("Gradient Start", Color.GREEN, this) {
+        @Override
+        public boolean isPropertyHidden() {
+            return !espComponentsProperty.isSelected(ESPComponents.Health) || !healthBarModeProperty.getPropertyValue().equals(HealthBarMode.Gradient);
+        }
+    };
+    private final ColorProperty gradientBarEndProperty = new ColorProperty("Gradient Start", Color.MAGENTA, this) {
+        @Override
+        public boolean isPropertyHidden() {
+            return !espComponentsProperty.isSelected(ESPComponents.Health) || !healthBarModeProperty.getPropertyValue().equals(HealthBarMode.Gradient);
         }
     };
 
@@ -79,7 +91,7 @@ public class PlayerESP extends Module {
                 double x = interpolateScale(entity.posX, entity.lastTickPosX, event.getPartialTicks());
                 double y = interpolateScale(entity.posY, entity.lastTickPosY, event.getPartialTicks());
                 double z = interpolateScale(entity.posZ, entity.lastTickPosZ, event.getPartialTicks());
-                double width = entity.width / 1.5D;
+                double width = entity.width / 2;
                 double height = entity.height + (entity.isSneaking() ? -0.3D : 0.2D);
                 AxisAlignedBB aabb = new AxisAlignedBB(x - width, y, z - width, x + width, y + height, z + width);
                 List<Vector3f> vectors = Arrays.asList(new Vector3f((float) aabb.minX, (float) aabb.minY, (float) aabb.minZ),
@@ -117,7 +129,7 @@ public class PlayerESP extends Module {
                     double endPosX = position.z;
                     double endPosY = position.w;
 
-                    if (boxProperty.getPropertyValue()) {
+                    if (espComponentsProperty.isSelected(ESPComponents.Box)) {
                         final int outlineColor = 0xff000000;
                         final int color = boxColorProperty.getPropertyValueRGB();
 
@@ -138,7 +150,7 @@ public class PlayerESP extends Module {
 
                     if (entity instanceof EntityLivingBase) {
                         EntityLivingBase livingEntity = (EntityLivingBase) entity;
-                        if (healthBarProperty.getPropertyValue()) {
+                        if (espComponentsProperty.isSelected(ESPComponents.Health)) {
                             int healthBarColor = healthBarModeProperty.getPropertyValue().equals(HealthBarMode.Solid) ?
                                     solidHealthBarProperty.getPropertyValueRGB() : ColorUtil.getHealthColor(livingEntity, 255).getRGB();
 
@@ -146,6 +158,10 @@ public class PlayerESP extends Module {
 
                             if (healthBarModeProperty.getPropertyValue().equals(HealthBarMode.Health) || healthBarModeProperty.getPropertyValue().equals(HealthBarMode.Solid)) {
                                 Gui.drawRect(posX - 3D, endPosY + 0.5D - ((endPosY - posY) * (livingEntity.getHealth() / livingEntity.getMaxHealth())), posX - 2D, endPosY - 0.5D, healthBarColor);
+                            }
+                            else {
+                                Gui.drawGradientRect(posX - 3D, endPosY + 0.5D - ((endPosY - posY) * (livingEntity.getHealth() / livingEntity.getMaxHealth())), posX - 2D, endPosY - 0.5D,
+                                        gradientBarStartProperty.getPropertyValueRGB(), gradientBarEndProperty.getPropertyValueRGB());
                             }
                         }
                     }
@@ -186,5 +202,12 @@ public class PlayerESP extends Module {
         Health,
         Solid,
         Gradient
+    }
+
+    private enum ESPComponents {
+        Box,
+        Health,
+        Armor,
+        Skeletons
     }
 }

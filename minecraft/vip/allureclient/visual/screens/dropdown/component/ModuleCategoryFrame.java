@@ -1,11 +1,16 @@
 package vip.allureclient.visual.screens.dropdown.component;
 
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.ScaledResolution;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL14;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.base.module.ModuleCategory;
-import vip.allureclient.base.util.math.MathUtil;
-import vip.allureclient.visual.screens.dropdown.component.sub.CheatButtonComponent;
+import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.base.util.visual.AnimationUtil;
+import vip.allureclient.base.util.visual.GLUtil;
+import vip.allureclient.visual.screens.dropdown.component.sub.ModuleComponent;
 
 import java.util.ArrayList;
 
@@ -27,7 +32,7 @@ public class ModuleCategoryFrame {
 
         int buttonOffset = 14;
         for(Module module : AllureClient.getInstance().getModuleManager().getModulesByCategory.apply(category)){
-            addChildComponent(new CheatButtonComponent(module, buttonOffset));
+            addChildComponent(new ModuleComponent(module, buttonOffset));
             buttonOffset += 14;
         }
     }
@@ -38,7 +43,7 @@ public class ModuleCategoryFrame {
         AllureClient.getInstance().getFontManager().smallFontRenderer.drawStringWithShadow(category.categoryName, x + 17, y + 4, -1);
         AllureClient.getInstance().getFontManager().iconFontRenderer.drawString(category.iconCode, x + 4, y + 5, -1);
 
-        outlineAnimation = MathUtil.animateDoubleValue(getFrameHeight() + 1, outlineAnimation, 0.03);
+        outlineAnimation = AnimationUtil.linearAnimation(getFrameHeight() + 1, outlineAnimation, 2);
         if(frameExpanded)
             Gui.drawRectWithWidth(x - 1, y + 14, frameWidth + 2, completedOutlineAnimation ? getFrameHeight() + 1 : outlineAnimation, 0xff101010);
         if(isDraggingFrame){
@@ -70,8 +75,8 @@ public class ModuleCategoryFrame {
                     completedOutlineAnimation = false;
                 }
                 for (Component childrenComponent : childrenComponents) {
-                    if(childrenComponent instanceof CheatButtonComponent){
-                        ((CheatButtonComponent) childrenComponent).expanded = false;
+                    if(childrenComponent instanceof ModuleComponent){
+                        ((ModuleComponent) childrenComponent).expanded = false;
                     }
                 }
                 childrenComponents.forEach(Component::onAnimationEvent);
@@ -142,9 +147,9 @@ public class ModuleCategoryFrame {
     private int getFrameHeight(){
         int initialHeight = childrenComponents.size() * frameHeight;
         for(Component component : childrenComponents){
-            if(component instanceof CheatButtonComponent){
-                if(((CheatButtonComponent) component).expanded){
-                    ArrayList<Component> visibleCheatSubs = new ArrayList<>(((CheatButtonComponent) component).subComponents);
+            if(component instanceof ModuleComponent){
+                if(((ModuleComponent) component).expanded){
+                    ArrayList<Component> visibleCheatSubs = new ArrayList<>(((ModuleComponent) component).subComponents);
                     visibleCheatSubs.removeIf(Component::isHidden);
                     for (Component sub : visibleCheatSubs)
                         initialHeight += sub.getHeight();

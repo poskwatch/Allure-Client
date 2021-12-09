@@ -15,6 +15,7 @@ import vip.allureclient.base.module.Module;
 import vip.allureclient.base.module.ModuleCategory;
 import vip.allureclient.base.module.ModuleData;
 import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.base.util.visual.AnimationUtil;
 import vip.allureclient.base.util.visual.ColorUtil;
 import vip.allureclient.base.util.visual.RenderUtil;
 import vip.allureclient.impl.event.visual.Render2DEvent;
@@ -74,7 +75,7 @@ public class TargetHUD extends Module {
         final double currentHealth = entity.getHealth();
         final double maxHealth = entity.getMaxHealth();
         final double percent = Math.min((currentHealth / maxHealth), 1);
-        animationValue = RenderUtil.easeOutAnimation(87 * percent, animationValue, 0.02);
+        animationValue = AnimationUtil.linearAnimation(87 * percent, animationValue, 0.7);
         Gui.drawRectWithWidth(39, 24, 89, 12, 0x70101010);
         Gui.drawRectWithWidth(40, 25, 87, 10, ColorUtil.getHealthColor(entity, 127).darker().getRGB());
         Gui.drawRectWithWidth(40, 25, animationValue, 10, ColorUtil.getHealthColor(entity, 255).getRGB());

@@ -7,6 +7,8 @@ public class Component {
 
     private ModuleCategoryFrame parentFrame;
 
+    public final MinecraftFontRenderer fontRenderer = AllureClient.getInstance().getFontManager().smallFontRenderer;
+
     public final MinecraftFontRenderer getFontRenderer() {
         return AllureClient.getInstance().getFontManager().smallFontRenderer;
     }

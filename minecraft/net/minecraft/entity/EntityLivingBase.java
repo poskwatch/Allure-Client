@@ -50,6 +50,8 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import vip.allureclient.base.util.visual.SoundUtil;
+import vip.allureclient.impl.module.combat.killaura.KillAura;
 import vip.allureclient.impl.module.visual.Animations;
 
 public abstract class EntityLivingBase extends Entity
@@ -994,6 +996,8 @@ public abstract class EntityLivingBase extends Entity
                     if (flag && s1 != null)
                     {
                         this.playSound(s1, this.getSoundVolume(), this.getSoundPitch());
+                        if (KillAura.getInstance().getCurrentTarget() == this)
+                            SoundUtil.playSound("hitmarker.wav");
                     }
                 }
 
@@ -1364,6 +1368,8 @@ public abstract class EntityLivingBase extends Entity
             if (s != null)
             {
                 this.playSound(this.getHurtSound(), this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
+                if (KillAura.getInstance().getCurrentTarget() == this)
+                    SoundUtil.playSound("hitmarker.wav");
             }
 
             this.attackEntityFrom(DamageSource.generic, 0.0F);

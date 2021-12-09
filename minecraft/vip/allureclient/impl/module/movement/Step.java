@@ -33,7 +33,7 @@ public class Step extends Module {
 
     public Step() {
         onPlayerStepEvent = (playerStepEvent -> {
-           if (playerStepEvent.isPre()) {
+           if (playerStepEvent.isPre() && Wrapper.getPlayer().onGround) {
                playerStepEvent.setStepHeight(1.0F);
            }
            else {

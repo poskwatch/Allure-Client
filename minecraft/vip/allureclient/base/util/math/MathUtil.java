@@ -9,18 +9,6 @@ public class MathUtil {
         return (max - min) * norm + min;
     }
 
-    public static double animateDoubleValue(double target, double current, double speed){
-        boolean larger = (target > current);
-        double dif = Math.max(target, current) - Math.min(target, current);
-        double factor = dif * speed;
-        if (larger) {
-            current += factor;
-        } else {
-            current -= factor;
-        }
-        return current;
-    }
-
     public static double roundToPlace(double value, int places) {
         if (places < 0) {
             throw new IllegalArgumentException();

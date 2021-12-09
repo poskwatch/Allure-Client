@@ -5,21 +5,22 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.util.visual.ColorUtil;
+import vip.allureclient.base.util.visual.GLUtil;
 import vip.allureclient.base.util.visual.RenderUtil;
 import vip.allureclient.impl.property.ColorProperty;
 import vip.allureclient.visual.screens.dropdown.component.Component;
-import vip.allureclient.visual.screens.dropdown.component.sub.CheatButtonComponent;
+import vip.allureclient.visual.screens.dropdown.component.sub.ModuleComponent;
 
 import java.awt.*;
 
 public class ColorPropertyComponent extends Component {
 
-    private final CheatButtonComponent parent;
+    private final ModuleComponent parent;
     ColorProperty colorProperty;
     private int offset;
     private boolean expanded;
 
-    public ColorPropertyComponent(ColorProperty colorProperty, CheatButtonComponent parent, int offset){
+    public ColorPropertyComponent(ColorProperty colorProperty, ModuleComponent parent, int offset){
         this.parent = parent;
         this.colorProperty = colorProperty;
         this.offset = offset;
@@ -92,15 +93,17 @@ public class ColorPropertyComponent extends Component {
         super.onDrawScreen(mouseX, mouseY);
     }
 
+    @SuppressWarnings("SameParameterValue")
     private static void drawColourPicker(final double x,
                                          final double y,
                                          final double width,
                                          final double height,
                                          final float hue) {
-        Gui.drawHorizontalGradient(x, y, width, height, 0xFFFFFFFF, Color.HSBtoRGB(hue, 1.0F, 1.0F));
+        GLUtil.glHorizontalGradientQuad(x, y, width, height, 0xFFFFFFFF, Color.HSBtoRGB(hue, 1.0F, 1.0F));
         Gui.drawGradientRect(x, y, x + width, y + height, 0, 0xFF000000);
     }
 
+    @SuppressWarnings("SameParameterValue")
     private static void drawHueSlider(final double x,
                                       final double y,
                                       final double width,
@@ -126,26 +129,18 @@ public class ColorPropertyComponent extends Component {
         GL11.glTranslated(-x, -y, 0);
     }
 
+    @SuppressWarnings("all")
     private void drawCheckeredBackground(final double x, final double y, final double sqWidth, final int sqsWide, final int sqsHigh) {
-
         Gui.drawRectWithWidth(x, y, sqWidth * sqsWide, sqWidth * sqsHigh, 0xFFFFFFFF);
-
-        // Enable blending
         GL11.glEnable(GL11.GL_BLEND);
         GL11.glBlendFunc(770, 771);
-        // Disable texture drawing
         GL11.glDisable(GL11.GL_TEXTURE_2D);
-        // Translate matrix to top-left of rect
         GL11.glTranslated(x, y, 0);
-        // Set color
-        RenderUtil.glColor(0xFFBFBFBF);
-
-        // Begin rect
+        GLUtil.glColor(0xFFBFBFBF);
         GL11.glBegin(GL11.GL_QUADS);
         {
             double sqX = 0;
             double sqY = 0;
-
             for (int j = 0; j < sqsHigh; j++) {
                 for (int i = 0; i < sqsWide / 2; i++) {
                     GL11.glVertex2d(sqX, sqY);
@@ -160,13 +155,9 @@ public class ColorPropertyComponent extends Component {
                 sqY += sqWidth;
             }
         }
-        // Draw the rect
         GL11.glEnd();
-        // Translate matrix back (instead of creating a new matrix with glPush/glPop)
         GL11.glTranslated(-x, -y, 0);
-        // Disable blending
         GL11.glDisable(GL11.GL_BLEND);
-        // Re-enable texture drawing
         GL11.glEnable(GL11.GL_TEXTURE_2D);
     }
 
@@ -174,7 +165,6 @@ public class ColorPropertyComponent extends Component {
     public void onMouseClicked(int mouseX, int mouseY, int mouseButton) {
         if (isMouseHovering(mouseX, mouseY) && mouseButton == 1) {
             expanded = !expanded;
-            //closeOtherPickers();
         }
     }
 
@@ -192,16 +182,6 @@ public class ColorPropertyComponent extends Component {
     @Override
     public boolean isHidden() {
         return colorProperty.isPropertyHidden();
-    }
-
-    private void closeOtherPickers() {
-        for (Component component : parent.subComponents) {
-            if (component instanceof ColorPropertyComponent) {
-                if (component == this)
-                    continue;
-                ((ColorPropertyComponent) component).expanded = false;
-            }
-        }
     }
 
     @Override

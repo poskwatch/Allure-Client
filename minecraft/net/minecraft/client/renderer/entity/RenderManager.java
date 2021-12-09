@@ -250,6 +250,18 @@ public class RenderManager
         }
     }
 
+    public double getRenderPosX() {
+        return renderPosX;
+    }
+
+    public double getRenderPosY() {
+        return renderPosY;
+    }
+
+    public double getRenderPosZ() {
+        return renderPosZ;
+    }
+
     public void cacheActiveRenderInfo(World worldIn, FontRenderer textRendererIn, Entity livingPlayerIn, Entity pointedEntityIn, GameSettings optionsIn, float partialTicks)
     {
         this.worldObj = worldIn;

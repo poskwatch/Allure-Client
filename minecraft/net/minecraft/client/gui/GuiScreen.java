@@ -44,7 +44,6 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import tv.twitch.chat.ChatUserInfo;
 import vip.allureclient.AllureClient;
-import vip.allureclient.visual.notification.NotificationType;
 
 public abstract class GuiScreen extends Gui implements GuiYesNoCallback
 {
@@ -116,8 +115,6 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
                 this.mc.setIngameFocus();
             }
         }
-        AllureClient.getInstance().getNotificationManager().createNotification("Key Pressed", String.format("Key %s was pressed", Keyboard.getKeyName(keyCode)), 2, NotificationType.INFO);
-
     }
 
     /**

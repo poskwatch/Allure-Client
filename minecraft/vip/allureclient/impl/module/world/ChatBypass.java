@@ -16,10 +16,12 @@ public class ChatBypass extends Module {
     public ChatBypass() {
         onChatMessageSendEvent = (chatMessageSendEvent -> {
             StringBuilder stringBuilder = new StringBuilder();
-            for (char character : chatMessageSendEvent.getMessage().toCharArray()) {
-                stringBuilder.append(character).append(".");
+            if (!chatMessageSendEvent.getMessage().startsWith("/")) {
+                for (char character : chatMessageSendEvent.getMessage().toCharArray()) {
+                    stringBuilder.append(character).append(".");
+                }
+                chatMessageSendEvent.setMessage(stringBuilder.toString());
             }
-            chatMessageSendEvent.setMessage(stringBuilder.toString());
         });
     }
 

@@ -1,12 +1,15 @@
 package vip.allureclient;
 
+import net.minecraft.util.ResourceLocation;
 import vip.allureclient.base.event.Event;
 import vip.allureclient.base.event.EventManager;
 import vip.allureclient.base.font.FontManager;
 import vip.allureclient.base.module.ModuleManager;
 import vip.allureclient.base.property.PropertyManager;
-import vip.allureclient.visual.notification.NotificationManager;
+import vip.allureclient.base.util.visual.SoundUtil;
 import vip.allureclient.visual.screens.dropdown.GuiDropDown;
+
+import java.util.function.Consumer;
 
 public class AllureClient {
 
@@ -18,21 +21,21 @@ public class AllureClient {
     private EventManager<Event> eventManager;
     private FontManager fontManager;
     private PropertyManager propertyManager;
-    private final NotificationManager notificationManager = new NotificationManager();
 
-    public Runnable onClientStart = () -> {
-        System.out.printf("Starting %s Client. Version %s%n", CLIENT_NAME, CLIENT_VERSION);
+    public Consumer<AllureClient> onClientStart = (allureClient -> {
+        System.out.printf("Starting %s Client. Version %s%n", allureClient.CLIENT_NAME, allureClient.CLIENT_VERSION);
         eventManager = new EventManager<>();
         fontManager = new FontManager();
         propertyManager = new PropertyManager();
         moduleManager = new ModuleManager();
-        GuiDropDown.onStartTask.run();
-    };
 
-    public Runnable onClientExit = () -> {
-        System.out.printf("Exiting %s Client. Version %s%n", CLIENT_NAME, CLIENT_VERSION);
+        GuiDropDown.onStartTask.run();
+    });
+
+    public Consumer<AllureClient> onClientExit = (allureClient -> {
+        System.out.printf("Exiting %s Client. Version %s%n", allureClient.CLIENT_NAME, allureClient.CLIENT_VERSION);
         System.out.println("Exited Safely!");
-    };
+    });
 
     public ModuleManager getModuleManager(){
         return moduleManager;
@@ -48,10 +51,6 @@ public class AllureClient {
 
     public PropertyManager getPropertyManager() {
         return propertyManager;
-    }
-
-    public NotificationManager getNotificationManager() {
-        return notificationManager;
     }
 
     public static AllureClient getInstance(){

@@ -193,11 +193,6 @@ public class GuiIngame extends Gui
 
         Render2DEvent render2DEvent = new Render2DEvent(partialTicks, scaledresolution);
         AllureClient.getInstance().getEventManager().callEvent(render2DEvent);
-
-        AllureClient.getInstance().getNotificationManager().render();
-
-
-
         GlStateManager.disableBlend();
 
         if (this.mc.thePlayer.getSleepTimer() > 0)

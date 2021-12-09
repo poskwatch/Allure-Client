@@ -564,7 +564,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         this.checkGLError("Post startup");
         this.ingameGUI = new GuiIngame(this);
 
-        AllureClient.getInstance().onClientStart.run();
+        AllureClient.getInstance().onClientStart.accept(AllureClient.getInstance());
 
         if (this.serverName != null)
         {
@@ -1032,7 +1032,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
      */
     public void shutdownMinecraftApplet()
     {
-        AllureClient.getInstance().onClientExit.run();
+        AllureClient.getInstance().onClientExit.accept(AllureClient.getInstance());
         try
         {
             this.stream.shutdownStream();

@@ -5,7 +5,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
 
-public class EntityHugeExplodeFX extends EntityFX
+public class
+EntityHugeExplodeFX extends EntityFX
 {
     private int timeSinceStart;
 

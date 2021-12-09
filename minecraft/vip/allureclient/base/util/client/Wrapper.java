@@ -3,6 +3,7 @@ package vip.allureclient.base.util.client;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.network.Packet;
 
 public class Wrapper {
@@ -19,7 +20,11 @@ public class Wrapper {
         return getMinecraft().theWorld;
     }
 
-    public static void sendPacketDirect(Packet packet) {
+    public static RenderManager getRenderManager() {
+        return getMinecraft().getRenderManager();
+    }
+
+    public static void sendPacketDirect(Packet<?> packet) {
         getMinecraft().getNetHandler().getNetworkManager().sendPacket(packet);
     }
 }

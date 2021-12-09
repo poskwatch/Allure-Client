@@ -6,10 +6,10 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 import vip.allureclient.base.module.ModuleCategory;
-import vip.allureclient.base.util.math.MathUtil;
+import vip.allureclient.base.util.visual.AnimationUtil;
 import vip.allureclient.visual.screens.dropdown.component.ModuleCategoryFrame;
 import vip.allureclient.visual.screens.dropdown.component.Component;
-import vip.allureclient.visual.screens.dropdown.component.sub.CheatButtonComponent;
+import vip.allureclient.visual.screens.dropdown.component.sub.ModuleComponent;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,8 +29,8 @@ public class GuiDropDown extends GuiScreen {
     public void initGui() {
         MODULE_CATEGORY_FRAMES.forEach(moduleCategoryFrame -> {
             for(Component component : moduleCategoryFrame.getChildrenComponents()){
-                if(component instanceof CheatButtonComponent){
-                    ((CheatButtonComponent) component).subComponents.forEach(Component::onAnimationEvent);
+                if(component instanceof ModuleComponent){
+                    ((ModuleComponent) component).subComponents.forEach(Component::onAnimationEvent);
                 }
             }
         });
@@ -46,8 +46,8 @@ public class GuiDropDown extends GuiScreen {
         GL11.glPushMatrix();
         mc.getTextureManager().bindTexture(new ResourceLocation("Allure/Images/anime.png"));
         GL11.glColor4f(1, 1, 1, 1);
-        nekoAnimation = MathUtil.animateDoubleValue(height - 330, nekoAnimation, 0.05);
-       // Gui.drawModalRectWithCustomSizedTexture(width - 175, Math.round((float) nekoAnimation), 0, 0, 175, 330, 175, 330);
+        nekoAnimation = AnimationUtil.easeOutAnimation(height - 330, nekoAnimation, 0.05);
+        Gui.drawModalRectWithCustomSizedTexture(width - 175, Math.round((float) nekoAnimation), 0, 0, 175, 330, 175, 330);
         GL11.glPopMatrix();
         MODULE_CATEGORY_FRAMES.forEach(moduleCategoryFrame -> {
             moduleCategoryFrame.onDrawScreen(mouseX, mouseY);

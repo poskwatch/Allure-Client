@@ -1,40 +1,43 @@
 package vip.allureclient.visual.screens.dropdown.component.sub.impl;
 
-import net.minecraft.client.gui.Gui;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.util.math.MathUtil;
+import vip.allureclient.base.util.visual.AnimationUtil;
+import vip.allureclient.base.util.visual.GLUtil;
 import vip.allureclient.impl.property.ValueProperty;
 import vip.allureclient.visual.screens.dropdown.component.Component;
-import vip.allureclient.visual.screens.dropdown.component.sub.CheatButtonComponent;
+import vip.allureclient.visual.screens.dropdown.component.sub.ModuleComponent;
 
 
 public class ValuePropertyComponent extends Component {
 
+    @SuppressWarnings("rawtypes")
     private final ValueProperty property;
-    private final CheatButtonComponent parent;
+    private final ModuleComponent parent;
     private int offset;
 
     private boolean isSliding;
     private double sliderAnimation;
 
-    public ValuePropertyComponent(ValueProperty property, CheatButtonComponent parent, int offset){
+    @SuppressWarnings("rawtypes")
+    public ValuePropertyComponent(ValueProperty property, ModuleComponent parent, int offset){
         this.property = property;
         this.parent = parent;
         this.offset = offset;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onDrawScreen(int mouseX, int mouseY) {
         double x = parent.getParentFrame().getX();
         double y = parent.getParentFrame().getY() + offset;
 
-        Gui.drawRectWithWidth(x, y, 115, 14, isMouseOverSlider(mouseX, mouseY) ? 0xff101010 : 0xff151515);
-
+        GLUtil.glFilledQuad(x, y, 115, 23, isMouseOverSlider(mouseX, mouseY) ? 0xff101010 : 0xff151515);
 
         if (isSliding && isMouseOverSlider(mouseX, mouseY)) {
             double max = property.getMaximumValue().doubleValue();
             double min = property.getMinimumValue().doubleValue();
-            double mousePercent = (mouseX - (x)) / (115);
+            double mousePercent = (mouseX - (x + 5)) / (106);
             double valueToSet = MathUtil.linearInterpolate(min, max, mousePercent);
             if (property.getPropertyValue() instanceof Double) {
                 property.setPropertyValue(MathUtil.roundToPlace(valueToSet, 2));
@@ -53,12 +56,14 @@ public class ValuePropertyComponent extends Component {
             }
         }
 
-        double sliderRectPercentage = ((property.getPropertyValue().doubleValue() - property.getMinimumValue().doubleValue()) / (property.getMaximumValue().doubleValue() - property.getMinimumValue().doubleValue())) *
-                (parent.getParentFrame().frameWidth - 2);
+        double sliderRectPercentage = (106 *
+                ((property.getPropertyValue().doubleValue() - property.getMinimumValue().doubleValue())
+                        / (property.getMaximumValue().doubleValue() - property.getMinimumValue().doubleValue())));
 
-        sliderAnimation = MathUtil.animateDoubleValue(sliderRectPercentage, sliderAnimation, 0.03);
+        sliderAnimation = AnimationUtil.linearAnimation(sliderRectPercentage, sliderAnimation, 3);
 
-        Gui.drawHorizontalGradient((float) x + 1, (float) y + 1, Math.round(sliderAnimation), 12, 0xffd742f5, 0xff42cef5);
+        GLUtil.glHorizontalGradientQuad(x + 2, y + 17, 111, 1, 0xffd742f5, 0xff42cef5);
+        GLUtil.glFilledEllipse(x + 5 + sliderAnimation, y + 17, 15, 0xff999999);
 
         String currentValue = null;
         if (property.getPropertyValue() instanceof Integer || property.getPropertyValue() instanceof Long) {
@@ -93,8 +98,8 @@ public class ValuePropertyComponent extends Component {
     private boolean isMouseOverSlider(int mouseX, int mouseY){
         double x = parent.getParentFrame().getX();
         double y = parent.getParentFrame().getY() + offset;
-        return mouseX >= x && mouseX <= x + 115
-                && mouseY >= y && mouseY <= y + 14;
+        return mouseX >= x + 5 && mouseX <= x + 111
+                && mouseY >= y && mouseY <= y + 22;
     }
 
     @Override
@@ -102,6 +107,7 @@ public class ValuePropertyComponent extends Component {
         return getProperty().isPropertyHidden();
     }
 
+    @SuppressWarnings("rawtypes")
     public ValueProperty getProperty() {
         return property;
     }
@@ -110,6 +116,11 @@ public class ValuePropertyComponent extends Component {
     public void onGuiClosed() {
         isSliding = false;
         super.onGuiClosed();
+    }
+
+    @Override
+    public double getHeight() {
+        return 23;
     }
 
     @Override

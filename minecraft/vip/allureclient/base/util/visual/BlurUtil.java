@@ -18,24 +18,23 @@ import static org.lwjgl.opengl.GL14.*;
 public final class BlurUtil {
 
     private static final String BLUR_FRAG_SHADER =
-            "#version 120\n" +
-                    "\n" +
-                    "uniform sampler2D texture;\n" +
-                    "uniform sampler2D texture2;\n" +
-                    "uniform vec2 texelSize;\n" +
-                    "uniform vec2 direction;\n" +
-                    "uniform float radius;\n" +
-                    "uniform float weights[256];\n" +
-                    "\n" +
-                    "void main() {\n" +
-                    "    vec4 color = vec4(0.0);\n" +
-                    "    vec2 texCoord = gl_TexCoord[0].st;\n" +
-                    "    if (direction.y == 0)\n" +
-                    "        if (texture2D(texture2, texCoord).a == 0.0) return;\n" +
-                    "    for (float f = -radius; f <= radius; f++) {\n" +
-                    "        color += texture2D(texture, texCoord + f * texelSize * direction) * (weights[int(abs(f))]);\n" +
+            "uniform sampler2D image;\n" +
+                    " \n" +
+                    "out vec4 FragmentColor;\n" +
+                    " \n" +
+                    "uniform float offset[3] = float[](0.0, 1.3846153846, 3.2307692308);\n" +
+                    "uniform float weight[3] = float[](0.2270270270, 0.3162162162, 0.0702702703);\n" +
+                    " \n" +
+                    "void main(void) {\n" +
+                    "    FragmentColor = texture2D(image, vec2(gl_FragCoord) / 1024.0) * weight[0];\n" +
+                    "    for (int i=1; i<3; i++) {\n" +
+                    "        FragmentColor +=\n" +
+                    "            texture2D(image, (vec2(gl_FragCoord) + vec2(0.0, offset[i])) / 1024.0)\n" +
+                    "                * weight[i];\n" +
+                    "        FragmentColor +=\n" +
+                    "            texture2D(image, (vec2(gl_FragCoord) - vec2(0.0, offset[i])) / 1024.0)\n" +
+                    "                * weight[i];\n" +
                     "    }\n" +
-                    "    gl_FragColor = vec4(color.rgb, 1.0);\n" +
                     "}";
 
     public static final String VERTEX_SHADER =

@@ -35,8 +35,7 @@ public class Flight extends Module {
                        Wrapper.getPlayer().motionY = -0.5d;
                    break;
                case Watchdog:
-                   updatePositionEvent.setY(watchdogFlightY);
-                   Wrapper.getPlayer().posY = watchdogFlightY;
+
                    break;
            }
            setModuleSuffix(flightModeProperty.getEnumValueAsString());

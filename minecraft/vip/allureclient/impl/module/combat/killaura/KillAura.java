@@ -23,12 +23,14 @@ import vip.allureclient.base.module.ModuleData;
 import vip.allureclient.base.util.client.NetworkUtil;
 import vip.allureclient.base.util.client.TimerUtil;
 import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.base.util.visual.SoundUtil;
 import vip.allureclient.impl.event.network.PacketSendEvent;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.module.combat.AntiBot;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.EnumProperty;
+import vip.allureclient.impl.property.MultiSelectEnumProperty;
 import vip.allureclient.impl.property.ValueProperty;
 
 import java.util.ArrayList;
@@ -54,10 +56,7 @@ public class KillAura extends Module {
 
     private final BooleanProperty autoBlockProperty = new BooleanProperty("Auto Block", true, this);
 
-    private final BooleanProperty attackPlayersProperty = new BooleanProperty("Players", true, this),
-                                  attackMobsProperty = new BooleanProperty("Monsters", false, this),
-                                  attackAnimalsProperty = new BooleanProperty("Animals", false, this),
-                                  attackInvisiblesProperty = new BooleanProperty("Invisibles", false, this);
+    private final MultiSelectEnumProperty<Targets> targetsProperty = new MultiSelectEnumProperty<>("Targets", this, Targets.Players);
 
     private final EnumProperty<TargetingMode> targetingModeProperty = new EnumProperty<>("Target by", TargetingMode.Distance, this);
 
@@ -69,6 +68,7 @@ public class KillAura extends Module {
             return !movementFixProperty.getPropertyValue();
         }
     };
+
 
     private Entity currentTarget;
     private boolean isBlocking;
@@ -82,14 +82,14 @@ public class KillAura extends Module {
         this.onModuleDisabled = () -> {
             if (isBlocking) {
                 isBlocking = false;
-                Wrapper.sendPacketDirect(new C08PacketPlayerBlockPlacement( new BlockPos(-1, -1, -1), 255, null, 0.0F, 0.0F, 0.0F));
+                //Wrapper.sendPacketDirect(new C08PacketPlayerBlockPlacement( new BlockPos(-1, -1, -1), 255, null, 0.0F, 0.0F, 0.0F));
             }
             currentTarget = null;
             apsTimerUtil.reset();
+            Wrapper.getMinecraft().timer.timerSpeed = 1;
         };
 
         this.onUpdatePositionEvent = (updatePositionEvent -> {
-            attackInvisiblesProperty.setPropertyHidden(targetingModeProperty.getPropertyValue().equals(TargetingMode.Distance));
             setModuleSuffix(targetingModeProperty.getEnumValueAsString());
             ArrayList<Entity> targetEntities = new ArrayList<>(Wrapper.getWorld().loadedEntityList);
             targetEntities.removeIf(entity -> !isEntityValid(entity));
@@ -108,7 +108,7 @@ public class KillAura extends Module {
                         if (isBlocking) {
                             isBlocking = false;
                             if (isHoldingSword()) {
-                                Wrapper.sendPacketDirect(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+                                //Wrapper.sendPacketDirect(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
                             }
                         }
                         updatePositionEvent.setYaw(getRotations((EntityLivingBase) currentTarget)[0]);
@@ -126,9 +126,14 @@ public class KillAura extends Module {
             }
             else {
                 if(autoBlockProperty.getPropertyValue() && currentTarget != null && isHoldingSword()){
-                    Wrapper.getPlayer().setItemInUse(Wrapper.getPlayer().getCurrentEquippedItem(), Wrapper.getPlayer().getCurrentEquippedItem().getMaxItemUseDuration());
+                    {
+                        Wrapper.getPlayer().setItemInUse(Wrapper.getPlayer().getCurrentEquippedItem(), Wrapper.getPlayer().getCurrentEquippedItem().getMaxItemUseDuration());
+                        Wrapper.sendPacketDirect(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+                    }
+
+
                     if (!isBlocking) {
-                        Wrapper.sendPacketDirect(new C08PacketPlayerBlockPlacement( new BlockPos(-1, -1, -1), 255, null, 0.0F, 0.0F, 0.0F));
+                        //Wrapper.sendPacketDirect(new C08PacketPlayerBlockPlacement( new BlockPos(-1, -1, -1), 255, null, 0.0F, 0.0F, 0.0F));
                         isBlocking = true;
                     }
                 }
@@ -148,6 +153,9 @@ public class KillAura extends Module {
         this.onPlayerMoveEvent = (playerMoveEvent -> {
            if (movementFixProperty.getPropertyValue() && movementFixModeProperty.getPropertyValue().equals(MovementFixMode.Watchdog))
                KillAuraMoveFixImpl.watchdogMoveFix(playerMoveEvent);
+           if (!playerMoveEvent.isMoving()) {
+               Wrapper.getMinecraft().timer.timerSpeed = 1;
+           }
         });
     }
 
@@ -156,11 +164,14 @@ public class KillAura extends Module {
             return false;
         if (entity.isDead || Wrapper.getPlayer().getDistanceToEntity(entity) > attackRangeProperty.getPropertyValue() || entity == Wrapper.getPlayer() || !(((EntityLivingBase) (entity)).getHealth() > 0))
             return false;
-        if (!attackMobsProperty.getPropertyValue() && entity instanceof EntityMob)
+        boolean mobs = targetsProperty.isSelected(Targets.Monsters);
+        if (!mobs && entity instanceof EntityMob)
             return false;
-        if (!attackPlayersProperty.getPropertyValue() && entity instanceof EntityPlayer)
+        boolean players = targetsProperty.isSelected(Targets.Players);
+        if (!players && entity instanceof EntityPlayer)
             return false;
-        if (!attackAnimalsProperty.getPropertyValue() && entity instanceof EntityAnimal)
+        boolean animals = targetsProperty.isSelected(Targets.Animals);
+        if (!animals && entity instanceof EntityAnimal)
             return false;
         if (entity instanceof EntityPlayer) {
             boolean antiBot = AntiBot.getInstance().isModuleToggled()
@@ -169,7 +180,7 @@ public class KillAura extends Module {
             if (antiBot && !NetworkUtil.isPlayerPingNull((EntityPlayer) entity))
                 return false;
         }
-        return attackInvisiblesProperty.getPropertyValue() || !entity.isInvisible();
+        return targetsProperty.isSelected(Targets.Invisibles) || !entity.isInvisible();
     }
 
     public static float[] getRotationFromPosition(double x, double z, double y) {
@@ -215,5 +226,12 @@ public class KillAura extends Module {
 
     private enum MovementFixMode {
         Watchdog
+    }
+
+    private enum Targets {
+        Players,
+        Monsters,
+        Animals,
+        Invisibles
     }
 }

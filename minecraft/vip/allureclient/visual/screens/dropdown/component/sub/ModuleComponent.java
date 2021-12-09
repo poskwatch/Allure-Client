@@ -4,17 +4,15 @@ import net.minecraft.client.gui.Gui;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.base.property.Property;
-import vip.allureclient.base.util.math.MathUtil;
-import vip.allureclient.impl.property.BooleanProperty;
-import vip.allureclient.impl.property.ColorProperty;
-import vip.allureclient.impl.property.EnumProperty;
-import vip.allureclient.impl.property.ValueProperty;
+import vip.allureclient.base.util.visual.AnimationUtil;
+import vip.allureclient.base.util.visual.GLUtil;
+import vip.allureclient.impl.property.*;
 import vip.allureclient.visual.screens.dropdown.component.Component;
 import vip.allureclient.visual.screens.dropdown.component.sub.impl.*;
 
 import java.util.ArrayList;
 
-public class CheatButtonComponent extends Component {
+public class ModuleComponent extends Component {
 
     private final Module module;
     public int offset;
@@ -27,7 +25,7 @@ public class CheatButtonComponent extends Component {
     private double animationFlowYTarget;
     private boolean flowAnimationCompleted;
 
-    public CheatButtonComponent(Module module, int offset){
+    public ModuleComponent(Module module, int offset){
         this.module = module;
         this.offset = offset;
         int settingOffset = offset + 14;
@@ -48,6 +46,10 @@ public class CheatButtonComponent extends Component {
                 subComponents.add(new ColorPropertyComponent((ColorProperty) property, this, settingOffset));
                 settingOffset += 14;
             }
+            if (property instanceof MultiSelectEnumProperty) {
+                subComponents.add(new MultiSelectEnumPropertyComponent((MultiSelectEnumProperty<?>) property, this, settingOffset));
+                settingOffset += 14;
+            }
         }
         subComponents.add(new KeybindingComponent(module::getModuleKeyBind, module::setModuleKeyBind, this, settingOffset));
     }
@@ -65,15 +67,15 @@ public class CheatButtonComponent extends Component {
         Gui.drawRectWithWidth(getParentFrame().getX(), y, getParentFrame().frameWidth, getParentFrame().frameHeight,
                 isHoveringButton(mouseX, mouseY) ? 0xff303030 : 0xff202020);
 
-        Gui.drawHorizontalGradient(getParentFrame().getX(), (float) y, Math.round(animationToggleBar), getParentFrame().frameHeight,
+        GLUtil.glHorizontalGradientQuad(getParentFrame().getX(), y, Math.round(animationToggleBar), getParentFrame().frameHeight,
                 0xffd742f5, 0xff42cef5);
 
         AllureClient.getInstance().getFontManager().smallFontRenderer.drawStringWithShadow(module.getModuleName(), getParentFrame().getX() + 4, y + 4, -1);
         final String ARROW_UP = "F";
         final String ARROW_DOWN = "G";
         AllureClient.getInstance().getFontManager().iconFontRenderer.drawString(expanded ? ARROW_DOWN : ARROW_UP, getParentFrame().getX() + getParentFrame().frameWidth - 10, y + 5, -1);
-        animationToggleBar = MathUtil.animateDoubleValue(animationToggleBarTarget, animationToggleBar, 0.03);
-        animationFlowY = MathUtil.animateDoubleValue(animationFlowYTarget, animationFlowY, 0.03);
+        animationToggleBar = AnimationUtil.easeOutAnimation(animationToggleBarTarget, animationToggleBar, 0.03);
+        animationFlowY = AnimationUtil.linearAnimation(animationFlowYTarget, animationFlowY, 2);
         if(module.isModuleToggled()) {
             animationToggleBarTarget = getParentFrame().frameWidth;
         }

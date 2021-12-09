@@ -2,20 +2,21 @@ package vip.allureclient.visual.screens.dropdown.component.sub.impl;
 
 import net.minecraft.client.gui.Gui;
 import vip.allureclient.AllureClient;
-import vip.allureclient.base.util.math.MathUtil;
+import vip.allureclient.base.util.visual.AnimationUtil;
+import vip.allureclient.base.util.visual.GLUtil;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.visual.screens.dropdown.component.Component;
-import vip.allureclient.visual.screens.dropdown.component.sub.CheatButtonComponent;
+import vip.allureclient.visual.screens.dropdown.component.sub.ModuleComponent;
 
 public class BooleanPropertyComponent extends Component {
 
-    private final CheatButtonComponent parent;
+    private final ModuleComponent parent;
     private final BooleanProperty property;
     private int offset;
     private double checkboxAnimation;
     private boolean completedAnimation;
 
-    public BooleanPropertyComponent(BooleanProperty property, CheatButtonComponent parent, int offset){
+    public BooleanPropertyComponent(BooleanProperty property, ModuleComponent parent, int offset){
         this.parent = parent;
         this.property = property;
         this.offset = offset;
@@ -29,12 +30,15 @@ public class BooleanPropertyComponent extends Component {
         Gui.drawRectWithWidth(x, y, 115, 14, isMouseHovering(mouseX, mouseY) ? 0xff101010 : 0xff151515);
 
         AllureClient.getInstance().getFontManager().smallFontRenderer.drawStringWithShadow(property.getPropertyLabel(), x + 3, y + 4, -1);
-        Gui.drawRectWithWidth(x + 115 - 28, y + 2, 26, 10, 0x99000000);
 
-        checkboxAnimation = MathUtil.animateDoubleValue(x + 115 - 27 + (property.getPropertyValue() ? 12 : 0), checkboxAnimation, 0.03);
+        checkboxAnimation = AnimationUtil.linearAnimation(x + 115 - 19 + (property.getPropertyValue() ? 10 : 0), checkboxAnimation, 0.5);
 
-        Gui.drawRectWithWidth(completedAnimation ? x + 115 - 27 + (property.getPropertyValue() ? 12 : 0) : Math.round(checkboxAnimation), y + 3, 12, 8,
-                property.getPropertyValue() ? 0xff42cef5 : 0xff202020);
+        final int backgroundBox = 0xff222222;
+        GLUtil.glFilledEllipse(x + 115 - 8, y + 7, 23, backgroundBox);
+        GLUtil.glFilledEllipse(x + 115 - 20, y + 7, 23, backgroundBox);
+        GLUtil.glFilledQuad(x + 115 - 20, y + 1.5, 13, 11, backgroundBox);
+
+        GLUtil.glFilledEllipse(checkboxAnimation, y + 7, 20, property.getPropertyValue() ? 0xff42cef5 : 0xffe1e1e1);
 
         if(Math.round(checkboxAnimation) == x + 115 - 27 + (property.getPropertyValue() ? 12 : 0)){
             completedAnimation = true;

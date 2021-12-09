@@ -121,38 +121,6 @@ public class Gui
         GlStateManager.enableTexture2D();
     }
 
-    public static void drawHorizontalGradient(final double x, final double y, final double width, final double height,
-                                              final int leftColor, final int rightColor) {
-        GL11.glPushMatrix();
-        GL11.glEnable(3042);
-        GL11.glDisable(3553);
-        GL11.glBlendFunc(770, 771);
-        GL11.glEnable(2848);
-        GL11.glShadeModel(7425);
-
-        GL11.glPushMatrix();
-        GL11.glBegin(7);
-
-        glColor(leftColor);
-
-        GL11.glVertex2d(x, y);
-        GL11.glVertex2d(x, y + height);
-
-        glColor(rightColor);
-
-        GL11.glVertex2d(x + width, y + height);
-        GL11.glVertex2d(x + width, y);
-
-        GL11.glEnd();
-        GL11.glPopMatrix();
-
-        GL11.glEnable(3553);
-        GL11.glDisable(3042);
-        GL11.glDisable(2848);
-        GL11.glShadeModel(7424);
-        GL11.glPopMatrix();
-    }
-
     public static void glColor(int hex) {
         float alpha = (float)(hex >> 24 & 255) / 255.0F;
 

@@ -48,7 +48,7 @@ public class LongJump extends Module {
             }
             if (Wrapper.getPlayer().onGround) {
                 Wrapper.getPlayer().jump();
-                playerMoveEvent.setY(Wrapper.getPlayer().motionY += 0.2121775f);
+                playerMoveEvent.setY(Wrapper.getPlayer().motionY += 0.2321775f);
             }
             if (playerMoveEvent.isMoving()) {
                 playerMoveEvent.setSpeed(Wrapper.getPlayer().motionY < 0 ? 0.45 : 0.6);
@@ -57,6 +57,7 @@ public class LongJump extends Module {
             }
         });
         onUpdatePositionEvent = (updatePositionEvent -> {
+            Wrapper.getPlayer().cameraYaw = 0.1f;
             if (hideJumpsProperty.getPropertyValue()) {
                 Wrapper.getPlayer().posY -= Wrapper.getPlayer().posY - Wrapper.getPlayer().lastTickPosY;
                 Wrapper.getPlayer().lastTickPosY -= Wrapper.getPlayer().posY - Wrapper.getPlayer().lastTickPosY;

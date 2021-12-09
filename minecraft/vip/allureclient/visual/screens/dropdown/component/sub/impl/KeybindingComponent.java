@@ -3,7 +3,7 @@ package vip.allureclient.visual.screens.dropdown.component.sub.impl;
 import net.minecraft.client.gui.Gui;
 import org.lwjgl.input.Keyboard;
 import vip.allureclient.visual.screens.dropdown.component.Component;
-import vip.allureclient.visual.screens.dropdown.component.sub.CheatButtonComponent;
+import vip.allureclient.visual.screens.dropdown.component.sub.ModuleComponent;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -15,11 +15,11 @@ public class KeybindingComponent extends Component {
 
     private boolean active;
 
-    private final CheatButtonComponent parent;
+    private final ModuleComponent parent;
 
     private int offset;
 
-    public KeybindingComponent(Supplier<Integer> keyBindSupplier, Consumer<Integer> keyBindConsumer, CheatButtonComponent parent, int offset) {
+    public KeybindingComponent(Supplier<Integer> keyBindSupplier, Consumer<Integer> keyBindConsumer, ModuleComponent parent, int offset) {
         this.keyBindSupplier = keyBindSupplier;
         this.keyBindConsumer = keyBindConsumer;
         this.parent = parent;

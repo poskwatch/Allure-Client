@@ -1,5 +1,7 @@
 package vip.allureclient.impl.module.movement;
 
+import net.minecraft.network.play.client.C03PacketPlayer;
+import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import org.lwjgl.input.Keyboard;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
@@ -8,6 +10,9 @@ import vip.allureclient.base.module.ModuleCategory;
 import vip.allureclient.base.module.ModuleData;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.player.MovementUtil;
+import vip.allureclient.base.util.visual.ChatUtil;
+import vip.allureclient.impl.event.network.PacketReceiveEvent;
+import vip.allureclient.impl.event.network.PacketSendEvent;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.property.BooleanProperty;
@@ -30,6 +35,12 @@ public class Speed extends Module {
     @EventListener
     EventConsumer<UpdatePositionEvent> onUpdatePositionEvent;
 
+    @EventListener
+    EventConsumer<PacketSendEvent> onPacketSendEvent;
+
+    @EventListener
+    EventConsumer<PacketReceiveEvent> onPacketReceiveEvent;
+
     public Speed() {
         setModuleSuffix("Watchdog");
         this.onModuleEnabled = () -> moveSpeed = 0;
@@ -39,20 +50,18 @@ public class Speed extends Module {
         };
         this.onPlayerMoveEvent = (playerMoveEvent -> {
             if(speedModesProperty.getPropertyValue().equals(SpeedModes.Strafe)) {
+                final double MOVE_SPEED_MULTIPLIER = Wrapper.getPlayer().movementInput.moveStrafe > 0 ? 0.4 : 0.6;
                 if (MovementUtil.isMoving() && Wrapper.getPlayer().onGround && hopStage == 1) {
-                    moveSpeed = 1.12 * MovementUtil.getBaseMoveSpeed();
+                    moveSpeed = MOVE_SPEED_MULTIPLIER * MovementUtil.getBaseMoveSpeed();
                 } else if (MovementUtil.isMoving() && Wrapper.getPlayer().onGround && hopStage == 2) {
-                    moveSpeed = 1.12 * MovementUtil.getBaseMoveSpeed();
+                    moveSpeed = MOVE_SPEED_MULTIPLIER * MovementUtil.getBaseMoveSpeed();
                 } else if (hopStage == 3) {
-                    final double difference = 0.45 * (lastDist - MovementUtil.getBaseMoveSpeed()) - 1.0E-5;
-                    moveSpeed = lastDist - difference;
+                    moveSpeed = MovementUtil.getBaseMoveSpeed() * MOVE_SPEED_MULTIPLIER * 1.3;
                 } else {
                     if (MovementUtil.isOnGround(-Wrapper.getPlayer().motionY) || Wrapper.getPlayer().isCollidedVertically && Wrapper.getPlayer().onGround) {
                         hopStage = 1;
                     }
-                    moveSpeed = lastDist - lastDist / 90.0;
                 }
-                moveSpeed = Math.max(moveSpeed, MovementUtil.getBaseMoveSpeed());
                 playerMoveEvent.setSpeed(moveSpeed);
                 hopStage++;
             }
@@ -65,16 +74,14 @@ public class Speed extends Module {
         this.onUpdatePositionEvent = (updatePositionEvent -> {
             if (updatePositionEvent.isPre()) {
                 if (speedModesProperty.getPropertyValue().equals(SpeedModes.Strafe)) {
-                    if (updatePositionEvent.isOnGround())
-                        updatePositionEvent.setY(updatePositionEvent.getY() + 0.015625D);
                     final double xDist = Wrapper.getPlayer().posX - Wrapper.getPlayer().prevPosX;
                     final double zDist = Wrapper.getPlayer().posZ - Wrapper.getPlayer().prevPosZ;
                     lastDist = Math.sqrt(xDist * xDist + zDist * zDist);
-                    if (hopStage == 2 && MovementUtil.isMoving() && Wrapper.getPlayer().onGround) {
+                    if (hopStage == 4 && MovementUtil.isMoving() && Wrapper.getPlayer().onGround) {
                         Wrapper.getPlayer().jump();
                     }
                     if (glideProperty.getPropertyValue() && Wrapper.getPlayer().motionY < 0) {
-                        Wrapper.getPlayer().motionY += 0.005D;
+                        Wrapper.getPlayer().motionY += 0.015D;
                     }
                 }
                 else {
@@ -85,11 +92,25 @@ public class Speed extends Module {
                 }
             }
         });
+        this.onPacketSendEvent = (packetSendEvent -> {
+           if ((packetSendEvent.getPacket() instanceof C03PacketPlayer.C06PacketPlayerPosLook ||
+                   packetSendEvent.getPacket() instanceof C03PacketPlayer.C04PacketPlayerPosition) && speedModesProperty.getPropertyValue().equals(SpeedModes.Strafe)
+                    && !Wrapper.getPlayer().onGround && Wrapper.getPlayer().ticksExisted % 5 == 0) {
+               ChatUtil.sendMessageToPlayer("\2474\247lC03 Balling");
+               Wrapper.sendPacketDirect(new C03PacketPlayer.C04PacketPlayerPosition(Wrapper.getPlayer().posX, Wrapper.getPlayer().posY, Wrapper.getPlayer().posZ, true));
+               packetSendEvent.setCancelled(true);
+           }
+        });
+        this.onPacketReceiveEvent = (packetReceiveEvent -> {
+            if (packetReceiveEvent.getPacket() instanceof S08PacketPlayerPosLook && speedModesProperty.getPropertyValue().equals(SpeedModes.Strafe)
+                    && !Wrapper.getPlayer().onGround && Wrapper.getPlayer().ticksExisted % 2 == 0) {
+                packetReceiveEvent.setCancelled(true);
+            }
+        });
     }
 
     private enum SpeedModes {
         Strafe,
         YPort
     }
-
 }

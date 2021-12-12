@@ -63,7 +63,7 @@ public class ValuePropertyComponent extends Component {
         sliderAnimation = AnimationUtil.linearAnimation(sliderRectPercentage, sliderAnimation, 3);
 
         GLUtil.glHorizontalGradientQuad(x + 2, y + 17, 111, 1, 0xffd742f5, 0xff42cef5);
-        GLUtil.glFilledEllipse(x + 5 + sliderAnimation, y + 17, 15, 0xff999999);
+        GLUtil.glFilledEllipse(x + 5 + sliderAnimation, y + 17, 15, 0xffe1e1e1);
 
         String currentValue = null;
         if (property.getPropertyValue() instanceof Integer || property.getPropertyValue() instanceof Long) {

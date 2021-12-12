@@ -23,10 +23,11 @@ import vip.allureclient.base.module.ModuleData;
 import vip.allureclient.base.util.client.NetworkUtil;
 import vip.allureclient.base.util.client.TimerUtil;
 import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.base.util.visual.SoundUtil;
+import vip.allureclient.base.util.visual.GLUtil;
 import vip.allureclient.impl.event.network.PacketSendEvent;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
+import vip.allureclient.impl.event.visual.Render3DEvent;
 import vip.allureclient.impl.module.combat.AntiBot;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.EnumProperty;
@@ -47,6 +48,9 @@ public class KillAura extends Module {
 
     @EventListener
     EventConsumer<PlayerMoveEvent> onPlayerMoveEvent;
+
+    @EventListener
+    EventConsumer<Render3DEvent> onRender3DEvent;
 
     private final TimerUtil apsTimerUtil = new TimerUtil();
 
@@ -69,6 +73,7 @@ public class KillAura extends Module {
         }
     };
 
+    private final BooleanProperty renderRangeProperty = new BooleanProperty("Render Range", true, this);
 
     private Entity currentTarget;
     private boolean isBlocking;
@@ -82,7 +87,7 @@ public class KillAura extends Module {
         this.onModuleDisabled = () -> {
             if (isBlocking) {
                 isBlocking = false;
-                //Wrapper.sendPacketDirect(new C08PacketPlayerBlockPlacement( new BlockPos(-1, -1, -1), 255, null, 0.0F, 0.0F, 0.0F));
+                Wrapper.sendPacketDirect(new C08PacketPlayerBlockPlacement( new BlockPos(-1, -1, -1), 255, null, 0.0F, 0.0F, 0.0F));
             }
             currentTarget = null;
             apsTimerUtil.reset();
@@ -108,7 +113,7 @@ public class KillAura extends Module {
                         if (isBlocking) {
                             isBlocking = false;
                             if (isHoldingSword()) {
-                                //Wrapper.sendPacketDirect(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+                                Wrapper.sendPacketDirect(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
                             }
                         }
                         updatePositionEvent.setYaw(getRotations((EntityLivingBase) currentTarget)[0]);
@@ -131,9 +136,8 @@ public class KillAura extends Module {
                         Wrapper.sendPacketDirect(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
                     }
 
-
                     if (!isBlocking) {
-                        //Wrapper.sendPacketDirect(new C08PacketPlayerBlockPlacement( new BlockPos(-1, -1, -1), 255, null, 0.0F, 0.0F, 0.0F));
+                        Wrapper.sendPacketDirect(new C08PacketPlayerBlockPlacement( new BlockPos(-1, -1, -1), 255, null, 0.0F, 0.0F, 0.0F));
                         isBlocking = true;
                     }
                 }
@@ -156,6 +160,11 @@ public class KillAura extends Module {
            if (!playerMoveEvent.isMoving()) {
                Wrapper.getMinecraft().timer.timerSpeed = 1;
            }
+        });
+
+        this.onRender3DEvent = (render3DEvent -> {
+            if (renderRangeProperty.getPropertyValue())
+                GLUtil.gl3DEllipse(Wrapper.getPlayer(), render3DEvent.getPartialTicks(), 100, attackRangeProperty.getPropertyValue().floatValue(), -1);
         });
     }
 

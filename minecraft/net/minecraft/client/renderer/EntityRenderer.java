@@ -59,6 +59,8 @@ import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.glu.Project;
 import shadersmod.client.Shaders;
 import shadersmod.client.ShadersRender;
+import vip.allureclient.AllureClient;
+import vip.allureclient.impl.event.visual.Render3DEvent;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -1570,6 +1572,8 @@ public class EntityRenderer implements IResourceManagerReloadListener
             frustum.setPosition(d0, d1, d2);
         }
 
+
+
         if ((Config.isSkyEnabled() || Config.isSunMoonEnabled() || Config.isStarsEnabled()) && !Shaders.isShadowPass)
         {
             this.setupFog(-1, partialTicks);
@@ -1858,6 +1862,8 @@ public class EntityRenderer implements IResourceManagerReloadListener
 
         this.mc.mcProfiler.endStartSection("hand");
         boolean flag2 = ReflectorForge.renderFirstPersonHand(this.mc.renderGlobal, partialTicks, pass);
+
+        AllureClient.getInstance().getEventManager().callEvent(new Render3DEvent(partialTicks));
 
         if (!flag2 && this.renderHand && !Shaders.isShadowPass)
         {

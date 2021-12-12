@@ -48,10 +48,10 @@ public class LongJump extends Module {
             }
             if (Wrapper.getPlayer().onGround) {
                 Wrapper.getPlayer().jump();
-                playerMoveEvent.setY(Wrapper.getPlayer().motionY += 0.2321775f);
+                playerMoveEvent.setY(Wrapper.getPlayer().motionY += 0.2621775f);
             }
             if (playerMoveEvent.isMoving()) {
-                playerMoveEvent.setSpeed(Wrapper.getPlayer().motionY < 0 ? 0.45 : 0.6);
+                playerMoveEvent.setSpeed(Wrapper.getPlayer().motionY < 0 ? 0.45 : 0.65);
                 if (Wrapper.getPlayer().motionY < 0)
                     Wrapper.getPlayer().motionY += 0.05d;
             }

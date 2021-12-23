@@ -12,12 +12,12 @@ import vip.allureclient.AllureClient;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.module.Module;
-import vip.allureclient.base.module.ModuleCategory;
-import vip.allureclient.base.module.ModuleData;
+import vip.allureclient.base.module.enums.ModuleCategory;
+import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.visual.AnimationUtil;
+import vip.allureclient.base.util.visual.BlurUtil;
 import vip.allureclient.base.util.visual.ColorUtil;
-import vip.allureclient.base.util.visual.RenderUtil;
 import vip.allureclient.impl.event.visual.Render2DEvent;
 import vip.allureclient.impl.module.combat.killaura.KillAura;
 
@@ -47,6 +47,7 @@ public class TargetHUD extends Module {
     public void drawTargetHUD(EntityLivingBase entity) {
         GL11.glPushMatrix();
         GL11.glTranslated(xLocation, yLocation, 0);
+        BlurUtil.blurArea(xLocation + 5, yLocation + 7, 125, 32);
         Gui.drawRectWithWidth(5, 7, 125, 32, 0x90202020);
         Gui.drawRectWithWidth(4, 7, 1, 32, 0xff101010);
         Gui.drawRectWithWidth(130, 7, 1, 32, 0xff101010);

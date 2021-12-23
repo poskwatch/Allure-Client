@@ -174,7 +174,7 @@ public class GuiIngame extends Gui
         this.mc.getTextureManager().bindTexture(icons);
         GlStateManager.enableBlend();
 
-        if (this.showCrosshair() && this.mc.gameSettings.thirdPersonView < 1 && !AllureClient.getInstance().getModuleManager().getModuleByClass.apply(Crosshair.class).isModuleToggled())
+        if (this.showCrosshair() && this.mc.gameSettings.thirdPersonView < 1 && !AllureClient.getInstance().getModuleManager().getModuleByClass.apply(Crosshair.class).isToggled())
         {
             GlStateManager.tryBlendFuncSeparate(775, 769, 1, 0);
             GlStateManager.enableAlpha();
@@ -619,6 +619,7 @@ public class GuiIngame extends Gui
             if (k == arraylist1.size())
             {
                 String s3 = p_180475_1_.getDisplayName();
+                BlurUtil.blurArea(j - 2, l - 1, i1 - j - 2, k * this.getFontRenderer().FONT_HEIGHT);
                 drawRect(j - 2, l - this.getFontRenderer().FONT_HEIGHT - 1, i1, l - 1, 1610612736);
                 drawRect(j - 2, l - 1, i1, l, 1342177280);
 

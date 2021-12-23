@@ -1,6 +1,8 @@
 package net.minecraft.client.gui;
 
 import com.google.common.collect.Lists;
+
+import java.awt.*;
 import java.util.Iterator;
 import java.util.List;
 import net.minecraft.client.Minecraft;
@@ -13,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL11;
 import vip.allureclient.base.util.visual.AnimationUtil;
+import vip.allureclient.base.util.visual.BlurUtil;
 import vip.allureclient.base.util.visual.RenderUtil;
 
 public class GuiNewChat extends Gui
@@ -53,6 +56,8 @@ public class GuiNewChat extends Gui
                 GlStateManager.translate(2.0F, 20.0F, 0.0F);
                 GlStateManager.scale(f1, f1, 1.0F);
 
+
+
                 for (int i1 = 0; i1 + this.scrollPos < this.field_146253_i.size() && i1 < i; ++i1)
                 {
                     ChatLine chatline = (ChatLine)this.field_146253_i.get(i1 + this.scrollPos);
@@ -83,7 +88,7 @@ public class GuiNewChat extends Gui
                                 int i2 = 0;
                                 int j2 = -i1 * 10;
                                 chatline.animation = AnimationUtil.easeOutAnimation(j2 - 15, chatline.animation, 0.04);
-                                drawRect(i2, j2 - 16, i2 + l + 4, j2 - 6, l1 / 2 << 24);
+                                drawRect(i2, j2 - 16, i2 + l + 4, j2 - 6, new Color(0, 0, 0, 127).getRGB());
                                 String s = chatline.getChatComponent().getFormattedText();
                                 GlStateManager.enableBlend();
                                 GL11.glEnable(GL11.GL_SCISSOR_TEST);

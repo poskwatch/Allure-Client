@@ -4,6 +4,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.shader.Framebuffer;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -18,23 +19,24 @@ import static org.lwjgl.opengl.GL14.*;
 public final class BlurUtil {
 
     private static final String BLUR_FRAG_SHADER =
-            "uniform sampler2D image;\n" +
-                    " \n" +
-                    "out vec4 FragmentColor;\n" +
-                    " \n" +
-                    "uniform float offset[3] = float[](0.0, 1.3846153846, 3.2307692308);\n" +
-                    "uniform float weight[3] = float[](0.2270270270, 0.3162162162, 0.0702702703);\n" +
-                    " \n" +
-                    "void main(void) {\n" +
-                    "    FragmentColor = texture2D(image, vec2(gl_FragCoord) / 1024.0) * weight[0];\n" +
-                    "    for (int i=1; i<3; i++) {\n" +
-                    "        FragmentColor +=\n" +
-                    "            texture2D(image, (vec2(gl_FragCoord) + vec2(0.0, offset[i])) / 1024.0)\n" +
-                    "                * weight[i];\n" +
-                    "        FragmentColor +=\n" +
-                    "            texture2D(image, (vec2(gl_FragCoord) - vec2(0.0, offset[i])) / 1024.0)\n" +
-                    "                * weight[i];\n" +
+            "#version 120\n" +
+                    "\n" +
+                    "uniform sampler2D texture;\n" +
+                    "uniform sampler2D texture2;\n" +
+                    "uniform vec2 texelSize;\n" +
+                    "uniform vec2 direction;\n" +
+                    "uniform float radius;\n" +
+                    "uniform float weights[256];\n" +
+                    "\n" +
+                    "void main() {\n" +
+                    "    vec4 color = vec4(0.0);\n" +
+                    "    vec2 texCoord = gl_TexCoord[0].st;\n" +
+                    "    if (direction.y == 0)\n" +
+                    "        if (texture2D(texture2, texCoord).a == 0.0) return;\n" +
+                    "    for (float f = -radius; f <= radius; f++) {\n" +
+                    "        color += texture2D(texture, texCoord + f * texelSize * direction) * (weights[int(abs(f))]);\n" +
                     "    }\n" +
+                    "    gl_FragColor = vec4(color.rgb, 1.0);\n" +
                     "}";
 
     public static final String VERTEX_SHADER =
@@ -100,14 +102,14 @@ public final class BlurUtil {
         framebufferRender.bindFramebuffer(false);
         // Draw the areas to be blurred
         for (final double[] area : blurAreas) {
-            Gui.drawRectWithWidth(area[0], area[1], area[2], area[3], 0xFF << 24);
+            GLUtil.glFilledQuad(area[0], area[1], area[2], area[3], 0xFF << 24);
         }
 
         blurAreas.clear();
 
         // Enable blending and using glBlendFuncSeparate
         glEnable(GL_BLEND);
-        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        glBlendFunc(770, 771);
 
         // Draw the first pass
 
@@ -133,6 +135,7 @@ public final class BlurUtil {
 
         // Restore the blend state
         glDisable(GL_BLEND);
+        glColor4f(1, 1, 1, 1);
     }
 
     private static void onPass(final int pass) {

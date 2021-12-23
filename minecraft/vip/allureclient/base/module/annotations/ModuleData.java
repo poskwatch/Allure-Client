@@ -1,4 +1,6 @@
-package vip.allureclient.base.module;
+package vip.allureclient.base.module.annotations;
+
+import vip.allureclient.base.module.enums.ModuleCategory;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

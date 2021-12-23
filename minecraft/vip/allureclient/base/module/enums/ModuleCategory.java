@@ -1,4 +1,4 @@
-package vip.allureclient.base.module;
+package vip.allureclient.base.module.enums;
 
 public enum ModuleCategory {
     COMBAT("Combat", "A"),

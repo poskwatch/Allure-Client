@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.base.util.visual.BlurUtil;
 import vip.allureclient.impl.module.visual.TargetHUD;
 
 public class GuiChat extends GuiScreen
@@ -321,7 +322,8 @@ public class GuiChat extends GuiScreen
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
         double chatBoxWidth = Math.max(GuiNewChat.calculateChatboxWidth(Wrapper.getMinecraft().gameSettings.chatWidth) + 6, fontRendererObj.getStringWidth(inputField.getText()) + 11);
-        drawRect(2, this.height - 14, chatBoxWidth, this.height - 2, Integer.MIN_VALUE);
+        BlurUtil.blurArea(2, this.height - 14, chatBoxWidth - 2, 12);
+        drawRect(2, this.height - 14, chatBoxWidth, this.height - 2, 0x40000000);
         this.inputField.drawTextBox();
         IChatComponent ichatcomponent = this.mc.ingameGUI.getChatGUI().getChatComponent(Mouse.getX(), Mouse.getY());
 

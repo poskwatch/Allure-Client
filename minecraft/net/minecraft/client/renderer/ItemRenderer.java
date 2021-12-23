@@ -374,7 +374,7 @@ public class ItemRenderer
                                 this.transformFirstPersonItem(f/2, 0);
                                 GlStateManager.translate(0F, 0.3F, 0);
                                 GL11.glRotated(-scalableProg * 25.0F, scalableProg / 4.9, 0, 2.0F);
-                                GL11.glRotated(-scalableProg * 50.0F, 4.0F, scalableProg * 1.7, 0F);
+                                GL11.glRotated(-scalableProg * 55.0F, 4.0F, scalableProg * 1.7, 0F);
                                 this.func_178103_d();
                                 break;
                             case Swang:

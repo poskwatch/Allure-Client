@@ -1,5 +1,6 @@
 package vip.allureclient.base.util.player;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.potion.Potion;
@@ -65,18 +66,57 @@ public class MovementUtil {
         return true;
     }
 
-    public static void damagePlayer(){
-        double x = Wrapper.getPlayer().posX;
-        double y = Wrapper.getPlayer().posY;
-        double z = Wrapper.getPlayer().posZ;
-        float minValue = 3.1F;
-        if (Wrapper.getPlayer().isPotionActive(Potion.jump)) {
-            minValue += Wrapper.getPlayer().getActivePotionEffect(Potion.jump).getAmplifier() + 1.0F;
+    public static void setSpeed(double speed) {
+        double forward = Minecraft.getMinecraft().thePlayer.movementInput.moveForward;
+        double strafe = Minecraft.getMinecraft().thePlayer.movementInput.moveStrafe;
+        float yaw = Minecraft.getMinecraft().thePlayer.rotationYaw;
+        if (forward == 0 && strafe == 0) {
+            Wrapper.getPlayer().motionX = 0;
+            Wrapper.getPlayer().motionZ = 0;
+        } else {
+            if (forward != 0) {
+                if (strafe > 0) {
+                    yaw += (forward > 0 ? -45 : 45);
+                } else if (strafe < 0) {
+                    yaw += (forward > 0 ? 45 : -45);
+                }
+                strafe = 0;
+                if (forward > 0) {
+                    forward = 1;
+                } else {
+                    forward = -1;
+                }
+            }
+            double cos = Math.cos(Math.toRadians(yaw + 90));
+            double sin = Math.sin(Math.toRadians(yaw + 90));
+            Wrapper.getPlayer().motionX = forward * speed * cos + strafe * speed * sin;
+            Wrapper.getPlayer().motionZ = forward * speed * sin - strafe * speed * cos;
         }
-        for (int i = 0; i < (int) ((minValue / (MathUtil.getRandomNumber(0.0890D, 0.0849D) - 1.0E-3D - Math.random() * 0.0002F - Math.random() * 0.0002F)) + 5); i++) {
-            Wrapper.getMinecraft().getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(x, y + MathUtil.getRandomNumber(0.0655D, 0.0625D) - MathUtil.getRandomNumber(1.0E-3D, 1.0E-2D) - Math.random() * 0.0002F, z, false));
-            Wrapper.getMinecraft().getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(x, y + Math.random() * 0.0002F, z, false));
+    }
+
+    public static float getMovementDirection() {
+        EntityPlayerSP player = Wrapper.getPlayer();
+        float forward = player.moveForward;
+        float strafe = player.moveStrafing;
+        float direction = player.rotationYaw;
+        if (forward < 0.0F) {
+            direction += 180.0F;
+            if (strafe > 0.0F) {
+                direction += 45.0F;
+            } else if (strafe < 0.0F) {
+                direction -= 45.0F;
+            }
+        } else if (forward > 0.0F) {
+            if (strafe > 0.0F) {
+                direction -= 45.0F;
+            } else if (strafe < 0.0F) {
+                direction += 45.0F;
+            }
+        } else if (strafe > 0.0F) {
+            direction -= 90.0F;
+        } else if (strafe < 0.0F) {
+            direction += 90.0F;
         }
-        Wrapper.getMinecraft().getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer(true));
+        return direction;
     }
 }

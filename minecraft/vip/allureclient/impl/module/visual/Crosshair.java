@@ -4,8 +4,8 @@ import net.minecraft.client.gui.Gui;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.module.Module;
-import vip.allureclient.base.module.ModuleCategory;
-import vip.allureclient.base.module.ModuleData;
+import vip.allureclient.base.module.enums.ModuleCategory;
+import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.player.MovementUtil;
 import vip.allureclient.impl.event.visual.Render2DEvent;
@@ -57,11 +57,8 @@ public class Crosshair extends Module {
 
                 //Dot
                 if (centerDotProperty.getPropertyValue()) {
-                    Gui.drawRect(centerX - 1.5D, centerY - 1.5D, centerX + 1.5D, centerY - 1D, outlineColor);
-                    Gui.drawRect(centerX - 1.5D, centerY + 1D, centerX + 1.5D, centerY + 1.5D, outlineColor);
-                    Gui.drawRect(centerX - 1.5D, centerY - 1D, centerX - 1D, centerY + 1D, outlineColor);
-                    Gui.drawRect(centerX + 1D, centerY - 1D, centerX + 1.5D, centerY + 1D, outlineColor);
-                    Gui.drawRect(centerX - 1D, centerY - 1D, centerX + 1D, centerY + 1D, crosshairColor);
+                    Gui.drawRect(centerX - 1, centerY - 1, centerX + 1, centerY + 1, outlineColor);
+                    Gui.drawRect(centerX - 0.5D, centerY - 0.5D, centerX + 0.5D, centerY + 0.5D, crosshairColor);
                 }
 
                 //Left

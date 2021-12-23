@@ -257,7 +257,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
                 }
                 else
                 {
-                    this.sendQueue.addToSendQueue(new C03PacketPlayer(updatePositionEvent.isOnGround()));
+                   // this.sendQueue.addToSendQueue(new C03PacketPlayer(updatePositionEvent.isOnGround()));
                 }
             }
             else
@@ -834,7 +834,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
         boolean flag2 = this.movementInput.moveForward >= f;
         this.movementInput.updatePlayerMoveState();
 
-        if (this.isUsingItem() && !this.isRiding() && !AllureClient.getInstance().getModuleManager().getModuleByClass.apply(NoSlow.class).isModuleToggled())
+        if (this.isUsingItem() && !this.isRiding() && !AllureClient.getInstance().getModuleManager().getModuleByClass.apply(NoSlow.class).isToggled())
         {
             this.movementInput.moveStrafe *= 0.2F;
             this.movementInput.moveForward *= 0.2F;

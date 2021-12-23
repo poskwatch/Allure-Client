@@ -4,14 +4,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
-import org.lwjgl.util.glu.GLU;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.font.MinecraftFontRenderer;
 import vip.allureclient.base.module.Module;
-import vip.allureclient.base.module.ModuleCategory;
-import vip.allureclient.base.module.ModuleData;
+import vip.allureclient.base.module.enums.ModuleCategory;
+import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.NetworkUtil;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.player.MovementUtil;
@@ -80,7 +79,6 @@ public class HUD extends Module {
 
     public HUD() {
         this.onRender2DEvent = (render2DEvent -> {
-            final int color = ClientColor.getInstance().getColorRGB();
 
             final int height = render2DEvent.getScaledResolution().getScaledHeight(), width = render2DEvent.getScaledResolution().getScaledWidth();
             ScaledResolution sr = render2DEvent.getScaledResolution();
@@ -92,7 +90,7 @@ public class HUD extends Module {
                 watermark = String.format("\247r%s\247f%s v%s", AllureClient.getInstance().CLIENT_NAME.charAt(0), AllureClient.getInstance().CLIENT_NAME.substring(1), AllureClient.getInstance().CLIENT_VERSION);
 
             if (waterMarkModeProperty.getPropertyValue().equals(WatermarkModes.New) || waterMarkModeProperty.getPropertyValue().equals(WatermarkModes.Solid)) {
-                fontRenderer.drawStringWithShadow(watermark, 6, 6, color);
+                fontRenderer.drawStringWithShadow(watermark, 6, 6, -1);
             }
             else {
                 final String csgoWatermark = String.format("allureclient.vip \2477|\247f FPS: %s \2477|\247f %s", Minecraft.getDebugFPS(),
@@ -125,15 +123,15 @@ public class HUD extends Module {
                         listColor = ColorUtil.interpolateColorsDynamic(gradientSpeedProperty.getPropertyValue(), gradientOffsetProperty.getPropertyValue() * moduleDrawCount.get(),
                                 gradientStartColorProperty.getPropertyValue(), gradientsEndColorProperty.getPropertyValue()).getRGB();
                         break;
-                    case Solid:
+                    default:
                         listColor = staticColorProperty.getPropertyValueRGB();
                         break;
-                    default:
-                        listColor = color;
-                        break;
                 }
+                BlurUtil.blurArea((float) posX - 2, (float) posY - 4,
+                        (float) fontRenderer.getStringWidth(module.getModuleDisplayName()) + 7, 13);
+
                 GLUtil.glFilledQuad((float) posX - 2, (float) posY - 4,
-                        (float) fontRenderer.getStringWidth(module.getModuleDisplayName()) + 7, 13, 0x50000000);
+                        (float) fontRenderer.getStringWidth(module.getModuleDisplayName()) + 7, 13, 0x10000000);
                 fontRenderer.drawStringWithShadow(module.getModuleDisplayName(), posX, posY, listColor);
                 switch (listOutlineModeProperty.getPropertyValue()) {
                     case Left:
@@ -166,7 +164,7 @@ public class HUD extends Module {
                 moduleDrawCount.getAndIncrement();
             });
         });
-        setModuleToggled(true);
+        setToggled(true);
     }
 
     private enum ListColorModes {

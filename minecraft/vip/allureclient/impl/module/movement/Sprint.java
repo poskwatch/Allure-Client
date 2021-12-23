@@ -3,8 +3,8 @@ package vip.allureclient.impl.module.movement;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.module.Module;
-import vip.allureclient.base.module.ModuleCategory;
-import vip.allureclient.base.module.ModuleData;
+import vip.allureclient.base.module.enums.ModuleCategory;
+import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
 

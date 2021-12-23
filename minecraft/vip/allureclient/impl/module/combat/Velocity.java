@@ -5,8 +5,8 @@ import net.minecraft.network.play.server.S27PacketExplosion;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.module.Module;
-import vip.allureclient.base.module.ModuleCategory;
-import vip.allureclient.base.module.ModuleData;
+import vip.allureclient.base.module.enums.ModuleCategory;
+import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.impl.event.network.PacketReceiveEvent;
 
 @ModuleData(moduleName = "Velocity", moduleBind = 0, moduleCategory = ModuleCategory.COMBAT)

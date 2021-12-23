@@ -5,8 +5,9 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
-import vip.allureclient.base.module.ModuleCategory;
+import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.util.visual.AnimationUtil;
+import vip.allureclient.base.util.visual.BlurUtil;
 import vip.allureclient.visual.screens.dropdown.component.ModuleCategoryFrame;
 import vip.allureclient.visual.screens.dropdown.component.Component;
 import vip.allureclient.visual.screens.dropdown.component.sub.ModuleComponent;
@@ -35,7 +36,6 @@ public class GuiDropDown extends GuiScreen {
             }
         });
         nekoAnimation = height;
-        this.mc.entityRenderer.loadShader(new ResourceLocation("shaders/post/blur.json"));
         super.initGui();
     }
 
@@ -43,6 +43,7 @@ public class GuiDropDown extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         Gui.drawGradientRect(0, 0, width, height, 0x6042cef5, 0xffd742f5);
         Gui.drawRectWithWidth(0, 0, width, height, 0x70000000);
+        BlurUtil.blurArea(0, 0, width, height);
         GL11.glPushMatrix();
         mc.getTextureManager().bindTexture(new ResourceLocation("Allure/Images/anime.png"));
         GL11.glColor4f(1, 1, 1, 1);

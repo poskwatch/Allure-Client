@@ -76,7 +76,7 @@ public class ModuleComponent extends Component {
         AllureClient.getInstance().getFontManager().iconFontRenderer.drawString(expanded ? ARROW_DOWN : ARROW_UP, getParentFrame().getX() + getParentFrame().frameWidth - 10, y + 5, -1);
         animationToggleBar = AnimationUtil.easeOutAnimation(animationToggleBarTarget, animationToggleBar, 0.03);
         animationFlowY = AnimationUtil.linearAnimation(animationFlowYTarget, animationFlowY, 2);
-        if(module.isModuleToggled()) {
+        if(module.isToggled()) {
             animationToggleBarTarget = getParentFrame().frameWidth;
         }
         else{
@@ -104,8 +104,8 @@ public class ModuleComponent extends Component {
     public void onMouseClicked(int mouseX, int mouseY, int mouseButton) {
         if(isHoveringButton(mouseX, mouseY)){
             if(mouseButton == 0) {
-                module.setModuleToggled(!module.isModuleToggled());
-                if (module.isModuleToggled()) {
+                module.toggle();
+                if (module.isToggled()) {
                     animationToggleBarTarget = getParentFrame().frameWidth;
                 } else {
                     animationToggleBarTarget = 0;

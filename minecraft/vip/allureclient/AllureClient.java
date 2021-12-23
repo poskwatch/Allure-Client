@@ -1,12 +1,12 @@
 package vip.allureclient;
 
-import net.minecraft.util.ResourceLocation;
+import vip.allureclient.base.bind.BindManager;
+import vip.allureclient.base.bind.Bindable;
 import vip.allureclient.base.event.Event;
 import vip.allureclient.base.event.EventManager;
 import vip.allureclient.base.font.FontManager;
 import vip.allureclient.base.module.ModuleManager;
 import vip.allureclient.base.property.PropertyManager;
-import vip.allureclient.base.util.visual.SoundUtil;
 import vip.allureclient.visual.screens.dropdown.GuiDropDown;
 
 import java.util.function.Consumer;
@@ -21,12 +21,14 @@ public class AllureClient {
     private EventManager<Event> eventManager;
     private FontManager fontManager;
     private PropertyManager propertyManager;
+    private BindManager<Bindable> bindManager;
 
     public Consumer<AllureClient> onClientStart = (allureClient -> {
         System.out.printf("Starting %s Client. Version %s%n", allureClient.CLIENT_NAME, allureClient.CLIENT_VERSION);
         eventManager = new EventManager<>();
         fontManager = new FontManager();
         propertyManager = new PropertyManager();
+        bindManager = new BindManager<>();
         moduleManager = new ModuleManager();
 
         GuiDropDown.onStartTask.run();
@@ -51,6 +53,10 @@ public class AllureClient {
 
     public PropertyManager getPropertyManager() {
         return propertyManager;
+    }
+
+    public BindManager<Bindable> getBindManager() {
+        return bindManager;
     }
 
     public static AllureClient getInstance(){

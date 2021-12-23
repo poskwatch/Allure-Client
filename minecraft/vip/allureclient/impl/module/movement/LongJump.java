@@ -12,8 +12,8 @@ import net.minecraft.util.EnumFacing;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.module.Module;
-import vip.allureclient.base.module.ModuleCategory;
-import vip.allureclient.base.module.ModuleData;
+import vip.allureclient.base.module.enums.ModuleCategory;
+import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.visual.ChatUtil;
 import vip.allureclient.impl.event.network.PacketReceiveEvent;
@@ -48,10 +48,10 @@ public class LongJump extends Module {
             }
             if (Wrapper.getPlayer().onGround) {
                 Wrapper.getPlayer().jump();
-                playerMoveEvent.setY(Wrapper.getPlayer().motionY += 0.2621775f);
+                playerMoveEvent.setY(Wrapper.getPlayer().motionY += 0.2121775f);
             }
             if (playerMoveEvent.isMoving()) {
-                playerMoveEvent.setSpeed(Wrapper.getPlayer().motionY < 0 ? 0.45 : 0.65);
+                playerMoveEvent.setSpeed(Wrapper.getPlayer().motionY < 0 ? 0.35 : 0.55);
                 if (Wrapper.getPlayer().motionY < 0)
                     Wrapper.getPlayer().motionY += 0.05d;
             }
@@ -71,7 +71,7 @@ public class LongJump extends Module {
                         chargingTicks = 0;
                     } else {
                         ChatUtil.sendMessageToPlayer("You must have a bow in your hot-bar.");
-                        setModuleToggled(false);
+                        setToggled(false);
                     }
                 } else {
                     chargingTicks++;
@@ -101,14 +101,20 @@ public class LongJump extends Module {
                }
            }
         });
-        onModuleEnabled = () -> {
-            hasDamaged = false;
-            bowCharging = false;
-            bowFinished = false;
-            chargingTicks = 0;
-            oldSlot = Wrapper.getPlayer().inventory.currentItem;
-        };
-        onModuleDisabled = () -> Wrapper.sendPacketDirect(new C09PacketHeldItemChange(oldSlot));
+    }
+
+    @Override
+    public void onEnable() {
+        hasDamaged = false;
+        bowCharging = false;
+        bowFinished = false;
+        chargingTicks = 0;
+        oldSlot = Wrapper.getPlayer().inventory.currentItem;
+    }
+
+    @Override
+    public void onDisable() {
+        Wrapper.sendPacketDirect(new C09PacketHeldItemChange(oldSlot));
     }
 
     private int getBowSlot() {

@@ -99,8 +99,8 @@ public class GLUtil {
                     y = MathUtil.linearInterpolate(entity.lastTickPosY, entity.posY, partialTicks) - Wrapper.getRenderManager().viewerPosY,
                     z = MathUtil.linearInterpolate(entity.lastTickPosZ, entity.posZ, partialTicks) - Wrapper.getRenderManager().viewerPosZ;
             for (int i = 0; i <= points; i++) {
-                glColor(ColorUtil.interpolateColorsDynamic(3, i * 15, Color.MAGENTA, Color.MAGENTA.darker().darker().darker().darker().darker()).getRGB());
-                glVertex3d(x + radius * Math.cos(i * Math.PI / (points/2)), y + 0.5, z + radius * Math.sin(i * Math.PI / (points/2)));
+                    glColor(ColorUtil.interpolateColorsDynamic(3, i * 15, Color.MAGENTA, Color.MAGENTA.darker().darker().darker().darker().darker()).getRGB());
+                    glVertex3d(x + radius * Math.cos(i * Math.PI / (points / 2)), y + 0.5, z + radius * Math.sin(i * Math.PI / (points / 2)));
             }
         }
         glEnd();

@@ -8,7 +8,7 @@ public class KillAuraMoveFixImpl {
 
     public static void watchdogMoveFix(PlayerMoveEvent playerMoveEvent) {
         if (playerMoveEvent.isMoving()) {
-            playerMoveEvent.setSpeed(MovementUtil.getBaseMoveSpeed() * 0.6);
+            playerMoveEvent.setSpeed(MovementUtil.getBaseMoveSpeed() * 0.5);
             Wrapper.getMinecraft().timer.timerSpeed = 0.87f;
         }
     }

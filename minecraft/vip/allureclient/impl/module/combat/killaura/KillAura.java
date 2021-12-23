@@ -11,15 +11,14 @@ import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.module.Module;
-import vip.allureclient.base.module.ModuleCategory;
-import vip.allureclient.base.module.ModuleData;
+import vip.allureclient.base.module.enums.ModuleCategory;
+import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.NetworkUtil;
 import vip.allureclient.base.util.client.TimerUtil;
 import vip.allureclient.base.util.client.Wrapper;
@@ -79,21 +78,6 @@ public class KillAura extends Module {
     private boolean isBlocking;
 
     public KillAura(){
-        this.onModuleEnabled = () -> {
-            currentTarget = null;
-            apsTimerUtil.reset();
-        };
-
-        this.onModuleDisabled = () -> {
-            if (isBlocking) {
-                isBlocking = false;
-                Wrapper.sendPacketDirect(new C08PacketPlayerBlockPlacement( new BlockPos(-1, -1, -1), 255, null, 0.0F, 0.0F, 0.0F));
-            }
-            currentTarget = null;
-            apsTimerUtil.reset();
-            Wrapper.getMinecraft().timer.timerSpeed = 1;
-        };
-
         this.onUpdatePositionEvent = (updatePositionEvent -> {
             setModuleSuffix(targetingModeProperty.getEnumValueAsString());
             ArrayList<Entity> targetEntities = new ArrayList<>(Wrapper.getWorld().loadedEntityList);
@@ -112,12 +96,11 @@ public class KillAura extends Module {
                     if (currentTarget != null) {
                         if (isBlocking) {
                             isBlocking = false;
-                            if (isHoldingSword()) {
-                                Wrapper.sendPacketDirect(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
-                            }
                         }
                         updatePositionEvent.setYaw(getRotations((EntityLivingBase) currentTarget)[0]);
                         updatePositionEvent.setPitch(getRotations((EntityLivingBase) currentTarget)[1]);
+                        Wrapper.getPlayer().setItemInUse(Wrapper.getPlayer().getCurrentEquippedItem(), Wrapper.getPlayer().getCurrentEquippedItem().getMaxItemUseDuration());
+                        Wrapper.getMinecraft().playerController.interactWithEntitySendPacket(Wrapper.getPlayer(), currentTarget);
                         if (apsTimerUtil.hasReached(1000 / averageAPSProperty.getPropertyValue())) {
                             Wrapper.getPlayer().swingItem();
                             Wrapper.sendPacketDirect(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));
@@ -132,14 +115,10 @@ public class KillAura extends Module {
             else {
                 if(autoBlockProperty.getPropertyValue() && currentTarget != null && isHoldingSword()){
                     {
-                        Wrapper.getPlayer().setItemInUse(Wrapper.getPlayer().getCurrentEquippedItem(), Wrapper.getPlayer().getCurrentEquippedItem().getMaxItemUseDuration());
-                        Wrapper.sendPacketDirect(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
-                    }
 
-                    if (!isBlocking) {
-                        Wrapper.sendPacketDirect(new C08PacketPlayerBlockPlacement( new BlockPos(-1, -1, -1), 255, null, 0.0F, 0.0F, 0.0F));
-                        isBlocking = true;
                     }
+                    Wrapper.sendPacketDirect(new C08PacketPlayerBlockPlacement(new BlockPos(-Double.MIN_VALUE, -Double.MIN_VALUE, -Double.MIN_VALUE), 255, Wrapper.getPlayer().getCurrentEquippedItem(), 0.0f, 0.0f, 0.0f));
+
                 }
             }
         });
@@ -168,6 +147,23 @@ public class KillAura extends Module {
         });
     }
 
+    @Override
+    public void onEnable() {
+        currentTarget = null;
+        apsTimerUtil.reset();
+    }
+
+    @Override
+    public void onDisable() {
+        if (isBlocking) {
+            isBlocking = false;
+            Wrapper.sendPacketDirect(new C08PacketPlayerBlockPlacement( new BlockPos(-1, -1, -1), 255, null, 0.0F, 0.0F, 0.0F));
+        }
+        currentTarget = null;
+        apsTimerUtil.reset();
+        Wrapper.getMinecraft().timer.timerSpeed = 1;
+    }
+
     private boolean isEntityValid(Entity entity) {
         if(!(entity instanceof EntityLivingBase))
             return false;
@@ -183,7 +179,7 @@ public class KillAura extends Module {
         if (!animals && entity instanceof EntityAnimal)
             return false;
         if (entity instanceof EntityPlayer) {
-            boolean antiBot = AntiBot.getInstance().isModuleToggled()
+            boolean antiBot = AntiBot.getInstance().isToggled()
                     && (AntiBot.getInstance().antiBotModeProperty.getPropertyValue().equals(AntiBot.AntiBotMode.Watchdog)
                     || AntiBot.getInstance().antiBotModeProperty.getPropertyValue().equals(AntiBot.AntiBotMode.Watchdog));
             if (antiBot && !NetworkUtil.isPlayerPingNull((EntityPlayer) entity))

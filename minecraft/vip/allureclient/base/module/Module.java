@@ -1,8 +1,12 @@
 package vip.allureclient.base.module;
 
 import vip.allureclient.AllureClient;
+import vip.allureclient.base.bind.Bindable;
+import vip.allureclient.base.module.annotations.ModuleData;
+import vip.allureclient.base.module.enums.ModuleCategory;
+import vip.allureclient.base.module.interfaces.Toggleable;
 
-public class Module {
+public class Module implements Toggleable, Bindable {
 
     private final String moduleName;
     private int moduleKeyBind;
@@ -21,44 +25,7 @@ public class Module {
             this.moduleKeyBind = 0;
             this.moduleCategory = ModuleCategory.COMBAT;
         }
-    }
-
-    public Runnable onModuleEnabled = () -> {};
-
-    public Runnable onModuleDisabled = () -> {};
-
-    public void toggleModule(){
-        isModuleToggled = !isModuleToggled;
-        if (isModuleToggled) {
-            onModuleEnabled.run();
-            AllureClient.getInstance().getEventManager().subscribe(this);
-        }
-        else {
-            AllureClient.getInstance().getEventManager().unsubscribe(this);
-            onModuleDisabled.run();
-        }
-    }
-
-    public void setModuleToggled(boolean moduleToggled){
-        this.isModuleToggled = moduleToggled;
-        if (isModuleToggled) {
-            onModuleEnabled.run();
-            AllureClient.getInstance().getEventManager().subscribe(this);
-        }
-        else {
-            AllureClient.getInstance().getEventManager().unsubscribe(this);
-            onModuleDisabled.run();
-        }
-    }
-
-    public boolean isModuleToggled() {
-        return isModuleToggled;
-    }
-
-    public void onKeyPressed(int key){
-        if(key == moduleKeyBind){
-            toggleModule();
-        }
+        AllureClient.getInstance().getBindManager().registerBind(moduleKeyBind, this);
     }
 
     public String getModuleName(){
@@ -91,5 +58,56 @@ public class Module {
 
     private boolean isIdentified() {
         return getClass().isAnnotationPresent(ModuleData.class);
+    }
+
+    @Override
+    public boolean isToggled() {
+        return isModuleToggled;
+    }
+
+    @Override
+    public void setToggled(boolean toggled) {
+        isModuleToggled = toggled;
+        if (isModuleToggled) {
+            onEnable();
+            AllureClient.getInstance().getEventManager().subscribe(this);
+        }
+        else {
+            AllureClient.getInstance().getEventManager().unsubscribe(this);
+            onDisable();
+        }
+    }
+
+    @Override
+    public void toggle() {
+        isModuleToggled = !isModuleToggled;
+        if (isModuleToggled) {
+            onEnable();
+            AllureClient.getInstance().getEventManager().subscribe(this);
+        }
+        else {
+            AllureClient.getInstance().getEventManager().unsubscribe(this);
+            onDisable();
+        }
+    }
+
+    @Override
+    public void onEnable() {
+
+    }
+
+    @Override
+    public void onDisable() {
+
+    }
+
+    @Override
+    public int getBind() {
+        return moduleKeyBind;
+    }
+
+    @Override
+    public void onPressed() {
+        toggle();
     }
 }

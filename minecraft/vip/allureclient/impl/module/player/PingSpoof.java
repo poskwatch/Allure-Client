@@ -6,8 +6,8 @@ import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.module.Module;
-import vip.allureclient.base.module.ModuleCategory;
-import vip.allureclient.base.module.ModuleData;
+import vip.allureclient.base.module.enums.ModuleCategory;
+import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.TimerUtil;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.event.network.PacketSendEvent;
@@ -32,10 +32,6 @@ public class PingSpoof extends Module {
     private final TimerUtil packetDelayTimer = new TimerUtil();
 
     public PingSpoof() {
-        onModuleEnabled = () -> {
-            delayedPackets.clear();
-            packetDelayTimer.reset();
-        };
         onPacketSendEvent = (packetSendEvent -> {
             if (packetSendEvent.getPacket() instanceof C00PacketKeepAlive) {
                 delayedPackets.add(packetSendEvent.getPacket());
@@ -54,6 +50,12 @@ public class PingSpoof extends Module {
                packetDelayTimer.reset();
            }
         });
+    }
+
+    @Override
+    public void onEnable() {
+        delayedPackets.clear();
+        packetDelayTimer.reset();
     }
 
     private void sendDelayedPackets() {

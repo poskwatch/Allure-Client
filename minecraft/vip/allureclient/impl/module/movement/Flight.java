@@ -5,9 +5,10 @@ import org.lwjgl.input.Keyboard;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.module.Module;
-import vip.allureclient.base.module.ModuleCategory;
-import vip.allureclient.base.module.ModuleData;
+import vip.allureclient.base.module.enums.ModuleCategory;
+import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.base.util.player.MovementUtil;
 import vip.allureclient.impl.event.network.PacketSendEvent;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
@@ -18,12 +19,7 @@ import vip.allureclient.impl.property.ValueProperty;
 @ModuleData(moduleName = "Flight", moduleBind = Keyboard.KEY_G, moduleCategory = ModuleCategory.MOVEMENT)
 public class Flight extends Module {
 
-    private double watchdogFlightY;
-
     public Flight() {
-        onModuleEnabled = () -> {
-            watchdogFlightY = Wrapper.getPlayer().posY;
-        };
         onUpdatePositionEvent = (updatePositionEvent -> {
            switch (flightModeProperty.getPropertyValue()){
                case Vanilla:
@@ -35,6 +31,16 @@ public class Flight extends Module {
                        Wrapper.getPlayer().motionY = -0.5d;
                    break;
                case Watchdog:
+                   Wrapper.getPlayer().motionY = 0.0D;
+                   if(MovementUtil.isMoving()) {
+                       float yaw = Wrapper.getPlayer().rotationYaw;
+                       double dist = 7.9;
+                       double x = Wrapper.getPlayer().posX;
+                       double y = Wrapper.getPlayer().posY;
+                       double z = Wrapper.getPlayer().posZ;
+                       if (Wrapper.getPlayer().ticksExisted % 7 == 0)
+                       Wrapper.sendPacketDirect(new C03PacketPlayer.C04PacketPlayerPosition(x + (-Math.sin(Math.toRadians(yaw)) * dist), y - 1.75, z + (Math.cos(Math.toRadians(yaw)) * dist), Wrapper.getPlayer().onGround));
+                   }
 
                    break;
            }
@@ -48,9 +54,12 @@ public class Flight extends Module {
             }
         });
         onPlayerMoveEvent = (playerMoveEvent -> {
-            playerMoveEvent.setSpeed(flightSpeedProperty.getPropertyValue());
+
             if(!playerMoveEvent.isMoving())
                 playerMoveEvent.setSpeed(0);
+            if (flightModeProperty.getPropertyValue().equals(flightModes.Watchdog) && Wrapper.getPlayer().ticksExisted % 4 != 0) {
+               // playerMoveEvent.setCancelled(true);
+            }
         });
     }
 

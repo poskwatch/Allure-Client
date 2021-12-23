@@ -14,11 +14,12 @@ import org.lwjgl.util.vector.Vector4f;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.module.Module;
-import vip.allureclient.base.module.ModuleCategory;
-import vip.allureclient.base.module.ModuleData;
+import vip.allureclient.base.module.enums.ModuleCategory;
+import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.NetworkUtil;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.visual.ColorUtil;
+import vip.allureclient.base.util.visual.GLUtil;
 import vip.allureclient.impl.event.visual.Render2DEvent;
 import vip.allureclient.impl.module.combat.AntiBot;
 import vip.allureclient.impl.property.ColorProperty;
@@ -129,6 +130,7 @@ public class PlayerESP extends Module {
                     double endPosX = position.z;
                     double endPosY = position.w;
 
+                    GLUtil.glColor(boxColorProperty.getPropertyValueRGB());
                     if (espComponentsProperty.isSelected(ESPComponents.Box)) {
                         final int outlineColor = 0xff000000;
                         final int color = boxColorProperty.getPropertyValueRGB();
@@ -187,7 +189,7 @@ public class PlayerESP extends Module {
     private void updateEntities(){
         listedEntities.clear();
         Wrapper.getWorld().loadedEntityList.forEach(entity -> {
-            final boolean antiBot = AntiBot.getInstance().isModuleToggled() &&
+            final boolean antiBot = AntiBot.getInstance().isToggled() &&
                     AntiBot.getInstance().antiBotModeProperty.getPropertyValue().equals(AntiBot.AntiBotMode.Watchdog)
                     || AntiBot.getInstance().antiBotModeProperty.getPropertyValue().equals(AntiBot.AntiBotMode.Advanced)
                     && entity instanceof EntityPlayer;

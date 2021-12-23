@@ -6,6 +6,7 @@ import net.minecraft.client.gui.achievement.GuiStats;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.realms.RealmsBridge;
+import vip.allureclient.base.util.visual.BlurUtil;
 
 public class GuiIngameMenu extends GuiScreen
 {
@@ -107,7 +108,7 @@ public class GuiIngameMenu extends GuiScreen
      */
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
-        Gui.drawRectWithWidth(0, 0, width, height, 0x99000000);
+        BlurUtil.blurArea(0, 0, width, height);
         this.drawCenteredString(this.fontRendererObj, I18n.format("menu.game", new Object[0]), this.width / 2, 40, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }

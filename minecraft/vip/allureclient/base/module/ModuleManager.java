@@ -2,6 +2,7 @@ package vip.allureclient.base.module;
 
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.font.MinecraftFontRenderer;
+import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.impl.module.combat.AntiBot;
 import vip.allureclient.impl.module.combat.killaura.KillAura;
 import vip.allureclient.impl.module.combat.Velocity;
@@ -43,7 +44,6 @@ public class ModuleManager {
                     new Step(),
                     // Visual Modules
                     new HUD(),
-                    new ClientColor(),
                     new Animations(),
                     new Crosshair(),
                     new TargetHUD(),
@@ -76,7 +76,7 @@ public class ModuleManager {
 
     public Function<MinecraftFontRenderer, ArrayList<Module>> getSortedDisplayModules = (fontRenderer -> {
         ArrayList<Module> sortedDisplayModules = new ArrayList<>(getModules.get());
-        sortedDisplayModules.removeIf(module -> (!module.isModuleToggled()));
+        sortedDisplayModules.removeIf(module -> (!module.isToggled()));
         sortedDisplayModules.sort(Comparator.comparingDouble(module -> fontRenderer.getStringWidth(((Module) module).getModuleDisplayName())).reversed());
         return sortedDisplayModules;
     });
@@ -87,5 +87,4 @@ public class ModuleManager {
     public Function<Class<? extends Module>, Module> getModuleByClass =
             (moduleClass -> getModules.get().stream().filter(module -> module.getClass() == moduleClass).findFirst().orElse(null));
 
-    public Consumer<Integer> onKeyPressed = (key -> modules.forEach(module -> module.onKeyPressed(key)));
 }

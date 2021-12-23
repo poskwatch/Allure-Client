@@ -1,15 +1,10 @@
 package vip.allureclient.visual.screens.dropdown.component;
 
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.ScaledResolution;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL14;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.module.Module;
-import vip.allureclient.base.module.ModuleCategory;
-import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.util.visual.AnimationUtil;
-import vip.allureclient.base.util.visual.GLUtil;
 import vip.allureclient.visual.screens.dropdown.component.sub.ModuleComponent;
 
 import java.util.ArrayList;

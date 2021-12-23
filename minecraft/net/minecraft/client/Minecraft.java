@@ -185,7 +185,9 @@ import org.lwjgl.opengl.OpenGLException;
 import org.lwjgl.opengl.PixelFormat;
 import org.lwjgl.util.glu.GLU;
 import vip.allureclient.AllureClient;
+import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.visual.BlurUtil;
+import vip.allureclient.impl.event.client.KeyPressedEvent;
 import vip.allureclient.impl.event.world.WorldLoadEvent;
 import vip.allureclient.visual.screens.dropdown.GuiDropDown;
 
@@ -1698,6 +1700,8 @@ public class Minecraft implements IThreadListener, IPlayerUsage
             this.currentScreen.onResize(this, scaledresolution.getScaledWidth(), scaledresolution.getScaledHeight());
         }
 
+        BlurUtil.onFrameBufferResize(width, height);
+
         this.loadingScreen = new LoadingScreenRenderer(this);
         this.updateFramebufferSize();
     }
@@ -1711,7 +1715,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
             this.entityRenderer.updateShaderGroupSize(this.displayWidth, this.displayHeight);
         }
 
-        BlurUtil.onFrameBufferResize(displayWidth, displayHeight);
+        //BlurUtil.onFrameBufferResize(displayWidth, displayHeight);
     }
 
     public MusicTicker func_181535_r()
@@ -1928,7 +1932,8 @@ public class Minecraft implements IThreadListener, IPlayerUsage
                     else
                     {
 
-                        AllureClient.getInstance().getModuleManager().onKeyPressed.accept(k);
+                        KeyPressedEvent keyPressedEvent = new KeyPressedEvent(k);
+                        AllureClient.getInstance().getEventManager().callEvent(keyPressedEvent);
 
                         if(k == 54){
                             displayGuiScreen(new GuiDropDown());

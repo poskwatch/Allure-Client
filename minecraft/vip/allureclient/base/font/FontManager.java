@@ -18,6 +18,8 @@ public class FontManager {
     private Font mediumFontRendererFont;
     public MinecraftFontRenderer largeFontRenderer;
     private Font largeFontRendererFont;
+    public MinecraftFontRenderer csgoFontRenderer;
+    private Font csgoFontRendererFont;
 
     public MinecraftFontRenderer iconFontRenderer;
     private Font iconFontRendererFont;
@@ -58,6 +60,7 @@ public class FontManager {
             smallFontRendererFont = getFont(locationMap, "font.ttf", 19);
             mediumFontRendererFont = getFont(locationMap, "font.ttf", 20);
             largeFontRendererFont = getFont(locationMap, "font.ttf", 21);
+            csgoFontRendererFont = new Font("tahoma", Font.PLAIN, 15);
             iconFontRendererFont = getFont(locationMap, "icon.ttf", 19);
 
             completed++;
@@ -76,5 +79,6 @@ public class FontManager {
         mediumFontRenderer = new MinecraftFontRenderer(mediumFontRendererFont, true, true);
         largeFontRenderer = new MinecraftFontRenderer(largeFontRendererFont, true, true);
         iconFontRenderer = new MinecraftFontRenderer(iconFontRendererFont, true, true);
+        csgoFontRenderer = new MinecraftFontRenderer(csgoFontRendererFont, false, true);
     }
 }

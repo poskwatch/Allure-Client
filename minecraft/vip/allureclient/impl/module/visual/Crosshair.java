@@ -21,7 +21,7 @@ public class Crosshair extends Module {
     @EventListener
     EventConsumer<Render2DEvent> onRender2DEvent;
 
-    private final ColorProperty colorProperty = new ColorProperty("Color", Color.CYAN, this);
+    private final ColorProperty colorProperty = new ColorProperty("Cross Hair Color", Color.CYAN, this);
 
     private final ValueProperty<Double> gapProperty = new ValueProperty<>("Gap", 3.0D, 0.0D, 20.0D, this);
 

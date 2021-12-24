@@ -57,7 +57,6 @@ public class LongJump extends Module {
             }
         });
         onUpdatePositionEvent = (updatePositionEvent -> {
-            Wrapper.getPlayer().cameraYaw = 0.1f;
             if (hideJumpsProperty.getPropertyValue()) {
                 Wrapper.getPlayer().posY -= Wrapper.getPlayer().posY - Wrapper.getPlayer().lastTickPosY;
                 Wrapper.getPlayer().lastTickPosY -= Wrapper.getPlayer().posY - Wrapper.getPlayer().lastTickPosY;

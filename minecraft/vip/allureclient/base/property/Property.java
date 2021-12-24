@@ -9,12 +9,13 @@ public class Property<T> {
     private T propertyValue;
     private boolean propertyHidden;
     private final Module parentModule;
-    private Boolean[] hideDependencies = {};
+    private boolean[] hideDependencies = {};
 
-    public Property(String propertyLabel, T propertyValue, Module parentModule){
+    public Property(String propertyLabel, T propertyValue, Module parentModule, boolean... hideDependencies){
         this.propertyLabel = propertyLabel;
         this.propertyValue = propertyValue;
         this.parentModule = parentModule;
+        this.hideDependencies = hideDependencies;
         AllureClient.getInstance().getPropertyManager().getProperties().add(this);
     }
 
@@ -35,11 +36,19 @@ public class Property<T> {
     }
 
     public boolean isPropertyHidden() {
-        return propertyHidden;
+        for (boolean dependency : hideDependencies) {
+            if (!dependency)
+                return true;
+        }
+        return false;
     }
 
     public void setPropertyHidden(boolean propertyHidden) {
         this.propertyHidden = propertyHidden;
+    }
+
+    public Class<?> getPropertyType() {
+        return propertyValue.getClass();
     }
 
     public Runnable onValueChange = () -> { };

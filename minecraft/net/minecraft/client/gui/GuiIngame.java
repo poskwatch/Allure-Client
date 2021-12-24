@@ -47,6 +47,7 @@ import optifine.Config;
 import optifine.CustomColors;
 import org.lwjgl.opengl.GL11;
 import vip.allureclient.AllureClient;
+import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.visual.BlurUtil;
 import vip.allureclient.base.util.visual.ColorUtil;
 import vip.allureclient.impl.event.visual.Render2DEvent;
@@ -192,7 +193,7 @@ public class GuiIngame extends Gui
         }
 
         Render2DEvent render2DEvent = new Render2DEvent(partialTicks, scaledresolution);
-        AllureClient.getInstance().getEventManager().callEvent(render2DEvent);
+        Wrapper.getEventManager().callEvent(render2DEvent);
         GlStateManager.disableBlend();
 
         if (this.mc.thePlayer.getSleepTimer() > 0)

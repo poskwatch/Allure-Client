@@ -49,6 +49,7 @@ import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import vip.allureclient.AllureClient;
+import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.event.player.PlayerStepEvent;
 
 public abstract class Entity implements ICommandSender
@@ -716,7 +717,7 @@ public abstract class Entity implements ICommandSender
             {
                 PlayerStepEvent playerStepEvent = new PlayerStepEvent(this.stepHeight);
                 if (this instanceof EntityPlayerSP)
-                    AllureClient.getInstance().getEventManager().callEvent(playerStepEvent);
+                    Wrapper.getEventManager().callEvent(playerStepEvent);
 
                 double d11 = x;
                 double d7 = y;
@@ -807,7 +808,7 @@ public abstract class Entity implements ICommandSender
                     if (blockHeight % 0.5D == 0.0D || blockHeights.contains(blockHeight)) {
                         playerStepEvent.setHeightStepped(blockHeight);
                         playerStepEvent.setPre(false);
-                        AllureClient.getInstance().getEventManager().callEvent(playerStepEvent);
+                        Wrapper.getEventManager().callEvent(playerStepEvent);
                     }
                 }
 

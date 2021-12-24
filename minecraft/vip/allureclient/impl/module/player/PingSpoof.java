@@ -33,13 +33,8 @@ public class PingSpoof extends Module {
 
     public PingSpoof() {
         onPacketSendEvent = (packetSendEvent -> {
-            if (packetSendEvent.getPacket() instanceof C00PacketKeepAlive) {
-                delayedPackets.add(packetSendEvent.getPacket());
-                packetSendEvent.setCancelled(true);
-            }
             if (packetSendEvent.getPacket() instanceof C0FPacketConfirmTransaction) {
                 C0FPacketConfirmTransaction c0f = (C0FPacketConfirmTransaction) packetSendEvent.getPacket();
-                packetSendEvent.setPacket(new C0FPacketConfirmTransaction(c0f.getWindowId(), c0f.getUid(), false));
                 delayedPackets.add(packetSendEvent.getPacket());
                 packetSendEvent.setCancelled(true);
             }

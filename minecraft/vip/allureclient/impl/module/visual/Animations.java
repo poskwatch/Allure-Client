@@ -29,7 +29,8 @@ public class Animations extends Module {
         Swong,
         Swang,
         Swank,
-        Slide
+        Slide,
+        Flux
     }
 
     public static Animations getInstance() {

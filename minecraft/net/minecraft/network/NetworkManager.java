@@ -49,6 +49,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import vip.allureclient.AllureClient;
+import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.event.network.PacketReceiveEvent;
 
 public class NetworkManager extends SimpleChannelInboundHandler<Packet>
@@ -155,7 +156,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet>
             try
             {
                 PacketReceiveEvent packetReceiveEvent = new PacketReceiveEvent(p_channelRead0_2_);
-                AllureClient.getInstance().getEventManager().callEvent(packetReceiveEvent);
+                Wrapper.getEventManager().callEvent(packetReceiveEvent);
                 if(packetReceiveEvent.isCancelled())
                     return;
                 p_channelRead0_2_.processPacket(this.packetListener);

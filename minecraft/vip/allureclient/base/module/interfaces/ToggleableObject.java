@@ -1,6 +1,6 @@
 package vip.allureclient.base.module.interfaces;
 
-public interface Toggleable {
+public interface ToggleableObject {
     boolean isToggled();
     void setToggled(boolean toggled);
     void toggle();

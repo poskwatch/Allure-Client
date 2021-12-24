@@ -6,4 +6,7 @@ import vip.allureclient.base.module.annotations.ModuleData;
 
 @ModuleData(moduleName = "Scaffold", moduleBind = 0, moduleCategory = ModuleCategory.WORLD)
 public class Scaffold extends Module {
+
+
+
 }

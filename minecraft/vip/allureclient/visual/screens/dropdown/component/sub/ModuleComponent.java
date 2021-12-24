@@ -51,7 +51,10 @@ public class ModuleComponent extends Component {
                 settingOffset += 14;
             }
         }
-        subComponents.add(new KeybindingComponent(module::getModuleKeyBind, module::setModuleKeyBind, this, settingOffset));
+        subComponents.add(new KeybindingComponent(
+                module::getBind,
+                module::setBind,
+                module::unbind, this, settingOffset));
     }
 
     @Override

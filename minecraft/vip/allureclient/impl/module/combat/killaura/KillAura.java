@@ -22,12 +22,14 @@ import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.NetworkUtil;
 import vip.allureclient.base.util.client.TimerUtil;
 import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.base.util.visual.ChatUtil;
 import vip.allureclient.base.util.visual.GLUtil;
 import vip.allureclient.impl.event.network.PacketSendEvent;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.event.visual.Render3DEvent;
 import vip.allureclient.impl.module.combat.AntiBot;
+import vip.allureclient.impl.module.visual.TargetHUD;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.EnumProperty;
 import vip.allureclient.impl.property.MultiSelectEnumProperty;
@@ -94,13 +96,9 @@ public class KillAura extends Module {
                 if (!targetEntities.isEmpty()) {
                     currentTarget = targetEntities.get(0);
                     if (currentTarget != null) {
-                        if (isBlocking) {
-                            isBlocking = false;
-                        }
+                        TargetHUD.getInstance().scaleAnimationTarget = 1.0;
                         updatePositionEvent.setYaw(getRotations((EntityLivingBase) currentTarget)[0]);
                         updatePositionEvent.setPitch(getRotations((EntityLivingBase) currentTarget)[1]);
-                        Wrapper.getPlayer().setItemInUse(Wrapper.getPlayer().getCurrentEquippedItem(), Wrapper.getPlayer().getCurrentEquippedItem().getMaxItemUseDuration());
-                        Wrapper.getMinecraft().playerController.interactWithEntitySendPacket(Wrapper.getPlayer(), currentTarget);
                         if (apsTimerUtil.hasReached(1000 / averageAPSProperty.getPropertyValue())) {
                             Wrapper.getPlayer().swingItem();
                             Wrapper.sendPacketDirect(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));
@@ -110,16 +108,17 @@ public class KillAura extends Module {
                 }
                 else {
                     currentTarget = null;
+                    TargetHUD.getInstance().scaleAnimationTarget = 0;
                 }
             }
             else {
-                if(autoBlockProperty.getPropertyValue() && currentTarget != null && isHoldingSword()){
-                    {
-
-                    }
-                    Wrapper.sendPacketDirect(new C08PacketPlayerBlockPlacement(new BlockPos(-Double.MIN_VALUE, -Double.MIN_VALUE, -Double.MIN_VALUE), 255, Wrapper.getPlayer().getCurrentEquippedItem(), 0.0f, 0.0f, 0.0f));
-
+                if (autoBlockProperty.getPropertyValue() && currentTarget != null && isHoldingSword()){
+                    Wrapper.sendPacketDirect(new C08PacketPlayerBlockPlacement(new BlockPos(-Double.MIN_VALUE, -Double.MIN_VALUE, -Double.MIN_VALUE),
+                            255, Wrapper.getPlayer().getCurrentEquippedItem(), 0.0f, 0.0f, 0.0f));
+                    isBlocking = true;
                 }
+                else
+                    isBlocking = false;
             }
         });
 

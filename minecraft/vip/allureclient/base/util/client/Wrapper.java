@@ -5,8 +5,12 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.network.Packet;
+import vip.allureclient.base.event.Event;
+import vip.allureclient.base.event.EventManager;
 
 public class Wrapper {
+
+    private static EventManager<Event> eventManager;
 
     public static Minecraft getMinecraft(){
         return Minecraft.getMinecraft();
@@ -22,6 +26,14 @@ public class Wrapper {
 
     public static RenderManager getRenderManager() {
         return getMinecraft().getRenderManager();
+    }
+
+    public static void initEventManager() {
+        eventManager = new EventManager<>();
+    }
+
+    public static EventManager<Event> getEventManager() {
+        return eventManager;
     }
 
     public static void sendPacketDirect(Packet<?> packet) {

@@ -88,12 +88,14 @@ public class GuiNewChat extends Gui
                                 int i2 = 0;
                                 int j2 = -i1 * 10;
                                 chatline.animation = AnimationUtil.easeOutAnimation(j2 - 15, chatline.animation, 0.04);
-                                drawRect(i2, j2 - 16, i2 + l + 4, j2 - 6, new Color(0, 0, 0, 127).getRGB());
+                                BlurUtil.blurArea(i2, GuiScreen.height - i1 * 10 - 45, l + 6, 10);
+                                drawRect(i2, j2 - 16, i2 + l + 4, j2 - 6, new Color(0, 0, 0, 27).getRGB());
                                 String s = chatline.getChatComponent().getFormattedText();
                                 GlStateManager.enableBlend();
                                 GL11.glEnable(GL11.GL_SCISSOR_TEST);
                                 GL11.glScissor(0, 68, GuiScreen.width, GuiScreen.height);
-                                this.mc.fontRendererObj.drawStringWithShadow(s, (float)i2 + 1, (float) chatline.animation, 16777215 + (l1 << 24));
+                                final boolean completedAnimation = Math.round(j2 - 15) == Math.round(chatline.animation);
+                                this.mc.fontRendererObj.drawStringWithShadow(s, (float)i2 + 1, completedAnimation ? j2 - 15 : (float) chatline.animation, 16777215 + (l1 << 24));
                                 GL11.glDisable(GL11.GL_SCISSOR_TEST);
                                 GlStateManager.disableAlpha();
                                 GlStateManager.disableBlend();

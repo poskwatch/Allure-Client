@@ -60,6 +60,7 @@ import org.lwjgl.util.glu.Project;
 import shadersmod.client.Shaders;
 import shadersmod.client.ShadersRender;
 import vip.allureclient.AllureClient;
+import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.event.visual.Render3DEvent;
 
 import java.io.IOException;
@@ -1863,7 +1864,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
         this.mc.mcProfiler.endStartSection("hand");
         boolean flag2 = ReflectorForge.renderFirstPersonHand(this.mc.renderGlobal, partialTicks, pass);
 
-        AllureClient.getInstance().getEventManager().callEvent(new Render3DEvent(partialTicks));
+        Wrapper.getEventManager().callEvent(new Render3DEvent(partialTicks));
 
         if (!flag2 && this.renderHand && !Shaders.isShadowPass)
         {

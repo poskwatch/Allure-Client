@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
+import org.lwjgl.util.glu.GLU;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
@@ -95,12 +96,12 @@ public class HUD extends Module {
             else {
                 final String csgoWatermark = String.format("allureclient.vip \2477|\247f FPS: %s \2477|\247f %s", Minecraft.getDebugFPS(),
                         Wrapper.getMinecraft().getCurrentServerData() == null ? "Singleplayer" : Wrapper.getMinecraft().getCurrentServerData().serverIP);
-                RenderUtil.drawBorderedRect(5, 5, AllureClient.getInstance().getFontManager().smallFontRenderer.getStringWidth(csgoWatermark) + 5,
-                        15, 0x90000000, 0x20ffffff);
-                GLUtil.glHorizontalGradientQuad(5, 5, (float) (AllureClient.getInstance().getFontManager().smallFontRenderer.getStringWidth(csgoWatermark) + 5), 1,
+                RenderUtil.drawBorderedRect(5, 5, AllureClient.getInstance().getFontManager().csgoFontRenderer.getStringWidth(csgoWatermark) + 5,
+                        13, 0x90000000, 0x20ffffff);
+                GLUtil.glHorizontalGradientQuad(5, 5, (float) (AllureClient.getInstance().getFontManager().csgoFontRenderer.getStringWidth(csgoWatermark) + 5), 1,
                         ColorUtil.interpolateColorsDynamic(7, 1, Color.MAGENTA, Color.BLUE).getRGB(),
                         ColorUtil.interpolateColorsDynamic(7, 1, Color.BLUE, Color.MAGENTA).getRGB());
-                AllureClient.getInstance().getFontManager().smallFontRenderer.drawStringWithShadow(csgoWatermark, 7, 10, -1);
+                AllureClient.getInstance().getFontManager().csgoFontRenderer.drawStringWithShadow(csgoWatermark, 7, 10, -1);
             }
 
             if (playerInfoProperty.getPropertyValue()) {

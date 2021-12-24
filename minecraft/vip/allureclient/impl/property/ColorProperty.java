@@ -24,4 +24,5 @@ public class ColorProperty extends Property<Color> {
     public void setPropertyValue(Color propertyValue) {
         super.setPropertyValue(propertyValue);
     }
+
 }

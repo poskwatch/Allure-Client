@@ -1,15 +1,20 @@
 package vip.allureclient;
 
+import org.lwjgl.input.Keyboard;
 import vip.allureclient.base.bind.BindManager;
-import vip.allureclient.base.bind.Bindable;
-import vip.allureclient.base.event.Event;
-import vip.allureclient.base.event.EventManager;
+import vip.allureclient.base.bind.BindableObject;
+import vip.allureclient.base.command.CommandManager;
+import vip.allureclient.base.config.ConfigManager;
+import vip.allureclient.base.event.EventConsumer;
+import vip.allureclient.base.event.EventListener;
+import vip.allureclient.base.file.FileManager;
 import vip.allureclient.base.font.FontManager;
 import vip.allureclient.base.module.ModuleManager;
 import vip.allureclient.base.property.PropertyManager;
+import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.impl.event.client.ClientExitEvent;
+import vip.allureclient.impl.event.client.ClientStartEvent;
 import vip.allureclient.visual.screens.dropdown.GuiDropDown;
-
-import java.util.function.Consumer;
 
 public class AllureClient {
 
@@ -18,33 +23,38 @@ public class AllureClient {
     private static final AllureClient INSTANCE = new AllureClient();
 
     private ModuleManager moduleManager;
-    private EventManager<Event> eventManager;
     private FontManager fontManager;
     private PropertyManager propertyManager;
-    private BindManager<Bindable> bindManager;
+    private BindManager<BindableObject> bindManager;
+    private FileManager fileManager;
+    private ConfigManager configManager;
+    private CommandManager commandManager;
+    private final GuiDropDown guiDropDown = new GuiDropDown();
 
-    public Consumer<AllureClient> onClientStart = (allureClient -> {
-        System.out.printf("Starting %s Client. Version %s%n", allureClient.CLIENT_NAME, allureClient.CLIENT_VERSION);
-        eventManager = new EventManager<>();
-        fontManager = new FontManager();
-        propertyManager = new PropertyManager();
-        bindManager = new BindManager<>();
-        moduleManager = new ModuleManager();
-
-        GuiDropDown.onStartTask.run();
+    @EventListener
+    @SuppressWarnings("unused")
+    EventConsumer<ClientStartEvent> onClientStart = (event -> {
+        System.out.printf("Starting %s Client. Version %s%n", getInstance().CLIENT_NAME, getInstance().CLIENT_VERSION);
+        this.fontManager = new FontManager();
+        this.propertyManager = new PropertyManager();
+        this.bindManager = new BindManager<>();
+        this.moduleManager = new ModuleManager();
+        this.fileManager = new FileManager();
+        this.configManager = new ConfigManager();
+        this.commandManager = new CommandManager();
+        this.guiDropDown.onStartTask.run();
+        getBindManager().registerBind(Keyboard.KEY_RSHIFT, () -> Wrapper.getMinecraft().displayGuiScreen(guiDropDown));
     });
 
-    public Consumer<AllureClient> onClientExit = (allureClient -> {
-        System.out.printf("Exiting %s Client. Version %s%n", allureClient.CLIENT_NAME, allureClient.CLIENT_VERSION);
+    @EventListener
+    @SuppressWarnings("unused")
+    EventConsumer<ClientExitEvent> onClientExit = (event -> {
+        System.out.printf("Exiting %s Client. Version %s%n", getInstance().CLIENT_NAME, getInstance().CLIENT_VERSION);
         System.out.println("Exited Safely!");
     });
 
     public ModuleManager getModuleManager(){
         return moduleManager;
-    }
-
-    public EventManager<Event> getEventManager() {
-        return eventManager;
     }
 
     public FontManager getFontManager() {
@@ -55,8 +65,16 @@ public class AllureClient {
         return propertyManager;
     }
 
-    public BindManager<Bindable> getBindManager() {
+    public BindManager<BindableObject> getBindManager() {
         return bindManager;
+    }
+
+    public FileManager getFileManager() {
+        return fileManager;
+    }
+
+    public ConfigManager getConfigManager() {
+        return configManager;
     }
 
     public static AllureClient getInstance(){

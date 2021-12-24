@@ -31,6 +31,7 @@ import optifine.Reflector;
 
 import org.lwjgl.opengl.GL11;
 import shadersmod.client.Shaders;
+import vip.allureclient.impl.module.combat.killaura.KillAura;
 import vip.allureclient.impl.module.visual.Animations;
 
 public class ItemRenderer
@@ -345,7 +346,7 @@ public class ItemRenderer
             {
                 this.renderItemMap(entityplayersp, f2, f, f1);
             }
-            else if (entityplayersp.getItemInUseCount() > 0)
+            else if (entityplayersp.getItemInUseCount() > 0 || KillAura.getInstance().isBlocking())
             {
                 EnumAction enumaction = this.itemToRender.getItemUseAction();
 
@@ -392,6 +393,11 @@ public class ItemRenderer
                             case Slide:
                                 this.transformFirstPersonItem(f - 0.15f, 0);
                                 GlStateManager.rotate(scalableProg * -35.0F, 1, -0.0F, 0.0F);
+                                this.func_178103_d();
+                                break;
+                            case Flux:
+                                this.transformFirstPersonItem(f, 0);
+                                GlStateManager.rotate(scalableProg * -35.0F, 1, -1, 0);
                                 this.func_178103_d();
                                 break;
                         }

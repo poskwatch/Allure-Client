@@ -12,6 +12,7 @@ public class KeybindingComponent extends Component {
 
     private final Supplier<Integer> keyBindSupplier;
     private final Consumer<Integer> keyBindConsumer;
+    private final Runnable unbindRunnable;
 
     private boolean active;
 
@@ -19,9 +20,12 @@ public class KeybindingComponent extends Component {
 
     private int offset;
 
-    public KeybindingComponent(Supplier<Integer> keyBindSupplier, Consumer<Integer> keyBindConsumer, ModuleComponent parent, int offset) {
+    public KeybindingComponent(Supplier<Integer> keyBindSupplier,
+                               Consumer<Integer> keyBindConsumer,
+                               Runnable unbindRunnable, ModuleComponent parent, int offset) {
         this.keyBindSupplier = keyBindSupplier;
         this.keyBindConsumer = keyBindConsumer;
+        this.unbindRunnable = unbindRunnable;
         this.parent = parent;
         this.offset = offset;
     }
@@ -33,7 +37,7 @@ public class KeybindingComponent extends Component {
 
         Gui.drawRectWithWidth(x, y, 115, 14, isHoveringComponent(mouseX, mouseY) ? 0xff050505 : 0xff151515);
 
-        getFontRenderer().drawStringWithShadow("Keybind", x + 3, y + 4, -1);
+        getFontRenderer().drawStringWithShadow("Key-bind", x + 3, y + 4, -1);
 
         final String state = (active ? "\2477[...]" : "\2477[" + Keyboard.getKeyName(keyBindSupplier.get()) + "]");
 
@@ -45,7 +49,11 @@ public class KeybindingComponent extends Component {
     @Override
     public void onKeyTyped(int typedKey) {
         if (active) {
-            keyBindConsumer.accept(typedKey);
+            if (typedKey != Keyboard.KEY_DELETE) {
+                keyBindConsumer.accept(typedKey);
+            }
+            else
+                unbindRunnable.run();
             active = false;
         }
         super.onKeyTyped(typedKey);

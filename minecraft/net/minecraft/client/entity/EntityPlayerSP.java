@@ -52,6 +52,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
 import vip.allureclient.AllureClient;
+import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.visual.ChatUtil;
 import vip.allureclient.impl.event.player.ChatMessageSendEvent;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
@@ -198,7 +199,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
         boolean flag = this.isSprinting();
 
         UpdatePositionEvent updatePositionEvent = new UpdatePositionEvent(posX, getEntityBoundingBox().minY, posZ, rotationYaw, rotationPitch, onGround);
-        AllureClient.getInstance().getEventManager().callEvent(updatePositionEvent);
+        Wrapper.getEventManager().callEvent(updatePositionEvent);
 
         if (flag != this.serverSprintState)
         {
@@ -283,13 +284,13 @@ public class EntityPlayerSP extends AbstractClientPlayer
             }
 
             updatePositionEvent.setPre(false);
-            AllureClient.getInstance().getEventManager().callEvent(updatePositionEvent);
+            Wrapper.getEventManager().callEvent(updatePositionEvent);
         }
     }
 
     public void moveEntity(double x, double y, double z){
         PlayerMoveEvent playerMoveEvent = new PlayerMoveEvent(x, y, z);
-        AllureClient.getInstance().getEventManager().callEvent(playerMoveEvent);
+        Wrapper.getEventManager().callEvent(playerMoveEvent);
         if(playerMoveEvent.isCancelled()){
             return;
         }
@@ -343,7 +344,9 @@ public class EntityPlayerSP extends AbstractClientPlayer
     public void sendChatMessage(String message)
     {
         ChatMessageSendEvent chatMessageSendEvent = new ChatMessageSendEvent(message);
-        AllureClient.getInstance().getEventManager().callEvent(chatMessageSendEvent);
+        Wrapper.getEventManager().callEvent(chatMessageSendEvent);
+        if (chatMessageSendEvent.isCancelled())
+            return;
         this.sendQueue.addToSendQueue(new C01PacketChatMessage(chatMessageSendEvent.getMessage()));
     }
 

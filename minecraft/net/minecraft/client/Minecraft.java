@@ -187,6 +187,8 @@ import org.lwjgl.util.glu.GLU;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.visual.BlurUtil;
+import vip.allureclient.impl.event.client.ClientExitEvent;
+import vip.allureclient.impl.event.client.ClientStartEvent;
 import vip.allureclient.impl.event.client.KeyPressedEvent;
 import vip.allureclient.impl.event.world.WorldLoadEvent;
 import vip.allureclient.visual.screens.dropdown.GuiDropDown;
@@ -566,7 +568,11 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         this.checkGLError("Post startup");
         this.ingameGUI = new GuiIngame(this);
 
-        AllureClient.getInstance().onClientStart.accept(AllureClient.getInstance());
+        Wrapper.initEventManager();
+        Wrapper.getEventManager().subscribe(AllureClient.getInstance());
+
+        ClientStartEvent clientStartEvent = new ClientStartEvent();
+        Wrapper.getEventManager().callEvent(clientStartEvent);
 
         if (this.serverName != null)
         {
@@ -1034,7 +1040,8 @@ public class Minecraft implements IThreadListener, IPlayerUsage
      */
     public void shutdownMinecraftApplet()
     {
-        AllureClient.getInstance().onClientExit.accept(AllureClient.getInstance());
+        ClientExitEvent clientExitEvent = new ClientExitEvent();
+        Wrapper.getEventManager().callEvent(clientExitEvent);
         try
         {
             this.stream.shutdownStream();
@@ -1933,11 +1940,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
                     {
 
                         KeyPressedEvent keyPressedEvent = new KeyPressedEvent(k);
-                        AllureClient.getInstance().getEventManager().callEvent(keyPressedEvent);
-
-                        if(k == 54){
-                            displayGuiScreen(new GuiDropDown());
-                        }
+                        Wrapper.getEventManager().callEvent(keyPressedEvent);
 
                         if (k == 1)
                         {
@@ -2412,7 +2415,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
             this.thePlayer.movementInput = new MovementInputFromOptions(this.gameSettings);
             this.playerController.setPlayerCapabilities(this.thePlayer);
             this.renderViewEntity = this.thePlayer;
-            AllureClient.getInstance().getEventManager().callEvent(new WorldLoadEvent());
+            Wrapper.getEventManager().callEvent(new WorldLoadEvent());
         }
         else
         {

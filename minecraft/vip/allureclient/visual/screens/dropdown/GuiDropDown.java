@@ -20,7 +20,7 @@ public class GuiDropDown extends GuiScreen {
     private static final ArrayList<ModuleCategoryFrame> MODULE_CATEGORY_FRAMES = new ArrayList<>();
     private double nekoAnimation;
 
-    public static Runnable onStartTask = () -> {
+    public Runnable onStartTask = () -> {
         for(int i = 0; i < ModuleCategory.values().length; i++){
             MODULE_CATEGORY_FRAMES.add(new ModuleCategoryFrame(ModuleCategory.values()[i], 10 + i * 125, 10));
         }

@@ -212,6 +212,7 @@ import net.minecraft.world.storage.MapData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import vip.allureclient.AllureClient;
+import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.event.network.PacketSendEvent;
 
 public class NetHandlerPlayClient implements INetHandlerPlayClient
@@ -816,7 +817,7 @@ public class NetHandlerPlayClient implements INetHandlerPlayClient
     public void addToSendQueue(Packet p_147297_1_)
     {
         PacketSendEvent packetSendEvent = new PacketSendEvent(p_147297_1_);
-        AllureClient.getInstance().getEventManager().callEvent(packetSendEvent);
+        Wrapper.getEventManager().callEvent(packetSendEvent);
         if(packetSendEvent.isCancelled())
             return;
         this.netManager.sendPacket(packetSendEvent.getPacket());

@@ -18,6 +18,7 @@ import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.NetworkUtil;
 import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.base.util.visual.BlurUtil;
 import vip.allureclient.base.util.visual.ColorUtil;
 import vip.allureclient.base.util.visual.GLUtil;
 import vip.allureclient.impl.event.visual.Render2DEvent;
@@ -134,6 +135,8 @@ public class PlayerESP extends Module {
                     if (espComponentsProperty.isSelected(ESPComponents.Box)) {
                         final int outlineColor = 0xff000000;
                         final int color = boxColorProperty.getPropertyValueRGB();
+
+                        BlurUtil.blurArea(posX, posY, endPosX - posX, endPosY - posY);
 
                         Gui.drawRect(posX - 0.5D, posY + 0.5D, posX + 0.5D - 0.5D, endPosY - 0.5D, color);
                         Gui.drawRect(posX, endPosY - 0.5D, endPosX, endPosY, color);

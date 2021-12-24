@@ -16,7 +16,6 @@ import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.visual.AnimationUtil;
-import vip.allureclient.base.util.visual.BlurUtil;
 import vip.allureclient.base.util.visual.ColorUtil;
 import vip.allureclient.impl.event.visual.Render2DEvent;
 import vip.allureclient.impl.module.combat.killaura.KillAura;
@@ -31,12 +30,16 @@ public class TargetHUD extends Module {
 
     public double xLocation = new ScaledResolution(Wrapper.getMinecraft()).getScaledWidth()/2.0D, yLocation = new ScaledResolution(Wrapper.getMinecraft()).getScaledHeight()/2.0D;
 
+    public double scaleAnimationTarget = 0, scaleAnimation;
+
     public TargetHUD() {
         this.onRender2DEvent = (render2DEvent -> {
+            scaleAnimation = AnimationUtil.easeOutAnimation(scaleAnimationTarget, scaleAnimation, 0.03);
             if (KillAura.getInstance().getCurrentTarget() != null) {
                 drawTargetHUD((EntityLivingBase) KillAura.getInstance().getCurrentTarget());
             }
             if (Wrapper.getMinecraft().currentScreen instanceof GuiChat) {
+                scaleAnimationTarget = 1.0;
                 drawTargetHUD(Wrapper.getPlayer());
             }
         });
@@ -47,7 +50,8 @@ public class TargetHUD extends Module {
     public void drawTargetHUD(EntityLivingBase entity) {
         GL11.glPushMatrix();
         GL11.glTranslated(xLocation, yLocation, 0);
-        BlurUtil.blurArea(xLocation + 5, yLocation + 7, 125, 32);
+        GlStateManager.scale(scaleAnimation, scaleAnimation, 0);
+       // BlurUtil.blurArea(xLocation + 5, yLocation + 7, 125, 32);
         Gui.drawRectWithWidth(5, 7, 125, 32, 0x90202020);
         Gui.drawRectWithWidth(4, 7, 1, 32, 0xff101010);
         Gui.drawRectWithWidth(130, 7, 1, 32, 0xff101010);

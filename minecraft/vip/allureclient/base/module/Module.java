@@ -15,6 +15,8 @@ import vip.allureclient.base.util.visual.ChatUtil;
 import vip.allureclient.impl.property.*;
 
 import java.awt.*;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Objects;
 
 public class Module implements ToggleableObject, BindableObject, ConfigurableObject {
@@ -156,11 +158,12 @@ public class Module implements ToggleableObject, BindableObject, ConfigurableObj
             }
             if (property instanceof MultiSelectEnumProperty) {
                 MultiSelectEnumProperty<?> multiSelectEnumProperty = (MultiSelectEnumProperty<?>) property;
-                JsonArray multiSelectArray = new JsonArray();
-                for (Enum<?> enumObject : multiSelectEnumProperty.getSelectedValues()) {
-                    multiSelectArray.add(new JsonPrimitive(enumObject.name()));
+                JsonObject multiSelectObject = new JsonObject();
+                for (int i = 0; i < multiSelectEnumProperty.getConstantEnumValues().length; i++) {
+                    multiSelectObject.addProperty(multiSelectEnumProperty.getConstantEnumValues()[i].name(),
+                            multiSelectEnumProperty.isSelected(i));
                 }
-                propertiesObject.add(multiSelectEnumProperty.getPropertyLabel(), multiSelectArray);
+                propertiesObject.add(multiSelectEnumProperty.getPropertyLabel(), multiSelectObject);
             }
             if (property instanceof ColorProperty) {
                 ColorProperty colorProperty = (ColorProperty) property;
@@ -233,13 +236,13 @@ public class Module implements ToggleableObject, BindableObject, ConfigurableObj
                     }
                     if (property instanceof MultiSelectEnumProperty) {
                         MultiSelectEnumProperty multiSelectEnumProperty = (MultiSelectEnumProperty) property;
-                        JsonArray array = propertiesObject.getAsJsonArray(multiSelectEnumProperty.getPropertyLabel());
-                        for (JsonElement jsonElement : array) {
-                            for (int i = 0; i < multiSelectEnumProperty.getConstantEnumValues().length; i++) {
-                                if (jsonElement.getAsString().equalsIgnoreCase(multiSelectEnumProperty.getConstantEnumValues()[i].name())) {
-                                    //multiSelectEnumProperty.selectEnumValue(multiSelectEnumProperty.getConstantEnumValues()[i]);
-                                    multiSelectEnumProperty.setValue(i);
-                                }
+                        JsonObject object = propertiesObject.getAsJsonObject(multiSelectEnumProperty.getPropertyLabel());
+                        for (int i = 0; i < multiSelectEnumProperty.getConstantEnumValues().length; i++) {
+                            if (object.has(multiSelectEnumProperty.getConstantEnumValues()[i].name())) {
+                                if (object.get(multiSelectEnumProperty.getConstantEnumValues()[i].name()).getAsBoolean())
+                                    multiSelectEnumProperty.setValue(i, MultiSelectEnumProperty.MultiOption.SELECT);
+                                else
+                                    multiSelectEnumProperty.setValue(i, MultiSelectEnumProperty.MultiOption.UNSELECT);
                             }
                         }
                     }

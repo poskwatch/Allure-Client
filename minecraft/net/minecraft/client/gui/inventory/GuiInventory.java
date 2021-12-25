@@ -73,7 +73,6 @@ public class GuiInventory extends InventoryEffectRenderer
      */
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
-        BlurUtil.blurArea(0, 0, width, height);
         super.drawScreen(mouseX, mouseY, partialTicks);
         this.oldMouseX = (float)mouseX;
         this.oldMouseY = (float)mouseY;

@@ -48,6 +48,7 @@ public class ModuleManager {
                     new Crosshair(),
                     new TargetHUD(),
                     new PlayerESP(),
+                    new HitMarkers(),
                     // World Modules
                     new Atmosphere(),
                     new ChestStealer(),

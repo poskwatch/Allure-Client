@@ -1,5 +1,6 @@
 package vip.allureclient.impl.module.combat.killaura;
 
+import io.netty.util.internal.ThreadLocalRandom;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -11,7 +12,9 @@ import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
 import org.lwjgl.input.Keyboard;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.event.EventConsumer;
@@ -102,6 +105,17 @@ public class KillAura extends Module {
                         if (apsTimerUtil.hasReached(1000 / averageAPSProperty.getPropertyValue())) {
                             Wrapper.getPlayer().swingItem();
                             Wrapper.sendPacketDirect(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));
+                            for (int i = 0; i < 10; i++) {
+                                World targetWorld = currentTarget.getEntityWorld();
+                                double x, y, z;
+                                x = currentTarget.posX;
+                                y = currentTarget.posY;
+                                z = currentTarget.posZ;
+                                targetWorld.spawnParticle(EnumParticleTypes.BLOCK_CRACK,
+                                        x + ThreadLocalRandom.current().nextDouble(-0.5, 0.5),
+                                        y + ThreadLocalRandom.current().nextDouble(-1, 1),
+                                        z + ThreadLocalRandom.current().nextDouble(-0.5, 0.5), 23, 23, 23, 152);
+                            }
                             apsTimerUtil.reset();
                         }
                     }

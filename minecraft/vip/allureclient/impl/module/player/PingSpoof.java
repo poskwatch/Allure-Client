@@ -2,6 +2,7 @@ package vip.allureclient.impl.module.player;
 
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C00PacketKeepAlive;
+import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.event.EventConsumer;
@@ -10,6 +11,7 @@ import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.TimerUtil;
 import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.base.util.player.MovementUtil;
 import vip.allureclient.impl.event.network.PacketSendEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.property.ValueProperty;
@@ -34,9 +36,14 @@ public class PingSpoof extends Module {
     public PingSpoof() {
         onPacketSendEvent = (packetSendEvent -> {
             if (packetSendEvent.getPacket() instanceof C0FPacketConfirmTransaction) {
-                C0FPacketConfirmTransaction c0f = (C0FPacketConfirmTransaction) packetSendEvent.getPacket();
-                delayedPackets.add(packetSendEvent.getPacket());
-                packetSendEvent.setCancelled(true);
+                //delayedPackets.add(packetSendEvent.getPacket());
+                //packetSendEvent.setCancelled(true);
+            }
+            if (packetSendEvent.getPacket() instanceof C03PacketPlayer.C06PacketPlayerPosLook ||
+            packetSendEvent.getPacket() instanceof C03PacketPlayer.C05PacketPlayerLook) {
+                packetSendEvent.setPacket(new C03PacketPlayer.C06PacketPlayerPosLook(
+                        Wrapper.getPlayer().posX, Wrapper.getPlayer().posY, Wrapper.getPlayer().posZ, MovementUtil.getMovementDirection(),
+                        Wrapper.getPlayer().rotationPitch, Wrapper.getPlayer().onGround));
             }
         });
         onUpdatePositionEvent = (updatePositionEvent -> {

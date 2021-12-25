@@ -136,8 +136,6 @@ public class PlayerESP extends Module {
                         final int outlineColor = 0xff000000;
                         final int color = boxColorProperty.getPropertyValueRGB();
 
-                        BlurUtil.blurArea(posX, posY, endPosX - posX, endPosY - posY);
-
                         Gui.drawRect(posX - 0.5D, posY + 0.5D, posX + 0.5D - 0.5D, endPosY - 0.5D, color);
                         Gui.drawRect(posX, endPosY - 0.5D, endPosX, endPosY, color);
                         Gui.drawRect(posX - 0.5D, posY, endPosX, posY + 0.5D, color);

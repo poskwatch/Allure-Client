@@ -65,7 +65,7 @@ public class MultiSelectEnumPropertyComponent extends Component {
                 boolean hoveringText = mouseX >= x + 5 && mouseX <= x + 110
                         && mouseY >= (y + 19 + (i * 15)) && mouseY <= (y + 19 + (i * 15) + 13);
                 if (hoveringText) {
-                    property.setValue(i);
+                    property.setValue(i, MultiSelectEnumProperty.MultiOption.TOGGLE);
                 }
             }
         }

@@ -32,7 +32,6 @@ public class ConfigManager {
         this.onWorldLoadEvent = (event -> {
             if (!hasLoadedDefault) {
                 loadDefaultConfig();
-                ChatUtil.sendMessageToPlayer("Loaded settings from: " + CONFIG_FOLDER.listFiles()[1].lastModified());
                 hasLoadedDefault = true;
             }
         });

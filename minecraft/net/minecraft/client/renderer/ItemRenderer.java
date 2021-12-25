@@ -396,7 +396,7 @@ public class ItemRenderer
                                 this.func_178103_d();
                                 break;
                             case Flux:
-                                this.transformFirstPersonItem(f, 0);
+                                this.transformFirstPersonItem(f/2, 0);
                                 GlStateManager.rotate(scalableProg * -35.0F, 1, -1, 0);
                                 this.func_178103_d();
                                 break;

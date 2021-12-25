@@ -19,6 +19,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
+import vip.allureclient.base.util.visual.BlurUtil;
 
 public abstract class GuiContainer extends GuiScreen
 {
@@ -99,7 +100,7 @@ public abstract class GuiContainer extends GuiScreen
      */
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
-        Gui.drawRectWithWidth(0, 0, width, height, 0x99000000);
+        BlurUtil.blurArea(0, 0, width, height);
         int i = this.guiLeft;
         int j = this.guiTop;
         this.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);

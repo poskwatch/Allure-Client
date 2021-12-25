@@ -14,21 +14,24 @@ public class MultiSelectEnumProperty<T extends Enum<T>> extends Property<List<T>
     @SafeVarargs
     public MultiSelectEnumProperty(String propertyLabel, Module parentModule, T... propertyValues) {
         super(propertyLabel, Arrays.asList(propertyValues), parentModule);
-        this.constantEnumValues = (T[]) getPropertyValue().get(0).getClass().getEnumConstants();
+        this.constantEnumValues = getPropertyValue().get(0).getDeclaringClass().getEnumConstants();
     }
 
-    public void selectEnumValue(T value) {
-        if (!getPropertyValue().contains(value))
-            getPropertyValue().add(value);
-    }
-
-    public void setValue(int index) {
+    public void setValue(int index, MultiOption multiOption) {
         final List<T> values = new ArrayList<>(getPropertyValue());
         final T referencedVariant = this.getConstantEnumValues()[index];
-        if (values.contains(referencedVariant)) {
+        if (multiOption.equals(MultiOption.TOGGLE)) {
+            if (!values.contains(referencedVariant))
+                values.add(referencedVariant);
+            else
+                values.remove(referencedVariant);
+        }
+        else if (multiOption.equals(MultiOption.SELECT)) {
+            if (!values.contains(referencedVariant))
+                values.add(referencedVariant);
+        }
+        else if (multiOption.equals(MultiOption.UNSELECT)) {
             values.remove(referencedVariant);
-        } else {
-            values.add(referencedVariant);
         }
         setPropertyValue(values);
     }
@@ -41,7 +44,17 @@ public class MultiSelectEnumProperty<T extends Enum<T>> extends Property<List<T>
         return getPropertyValue().contains(value);
     }
 
+    public boolean isSelected(int index) {
+        return getPropertyValue().contains(getConstantEnumValues()[index]);
+    }
+
     public T[] getConstantEnumValues() {
         return constantEnumValues;
+    }
+
+    public enum MultiOption {
+        SELECT,
+        UNSELECT,
+        TOGGLE
     }
 }

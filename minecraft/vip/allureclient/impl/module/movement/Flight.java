@@ -54,12 +54,11 @@ public class Flight extends Module {
             }
         });
         onPlayerMoveEvent = (playerMoveEvent -> {
-
-            if(!playerMoveEvent.isMoving())
-                playerMoveEvent.setSpeed(0);
-            if (flightModeProperty.getPropertyValue().equals(flightModes.Watchdog) && Wrapper.getPlayer().ticksExisted % 4 != 0) {
-               // playerMoveEvent.setCancelled(true);
+            if (flightModeProperty.getPropertyValue().equals(flightModes.Watchdog)) {
+                playerMoveEvent.setCancelled(true);
             }
+            else
+                playerMoveEvent.setSpeed(flightSpeedProperty.getPropertyValue());
         });
     }
 

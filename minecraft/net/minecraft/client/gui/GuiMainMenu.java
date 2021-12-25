@@ -540,14 +540,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
         GlStateManager.popMatrix();
         String s = "Allure Client Version " + AllureClient.getInstance().CLIENT_VERSION;
 
-        if (this.mc.isDemo())
-        {
-            s = s + " Demo";
-        }
-
-        this.drawString(this.fontRendererObj, s, 2, this.height - 10, -1);
-        String s1 = "Copyright Mojang AB. Do not distribute!";
-        this.drawString(this.fontRendererObj, s1, this.width - this.fontRendererObj.getStringWidth(s1) - 2, this.height - 10, -1);
+        AllureClient.getInstance().getFontManager().smallFontRenderer.drawStringWithShadow(s, 2, this.height - 10, -1);
 
         if (this.openGLWarning1 != null && this.openGLWarning1.length() > 0)
         {

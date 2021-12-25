@@ -34,11 +34,11 @@ public class Flight extends Module {
                    Wrapper.getPlayer().motionY = 0.0D;
                    if(MovementUtil.isMoving()) {
                        float yaw = Wrapper.getPlayer().rotationYaw;
-                       double dist = 7.9;
+                       double dist = 7.3;
                        double x = Wrapper.getPlayer().posX;
                        double y = Wrapper.getPlayer().posY;
                        double z = Wrapper.getPlayer().posZ;
-                       if (Wrapper.getPlayer().ticksExisted % 7 == 0)
+                       if (Wrapper.getPlayer().ticksExisted % 6 == 0)
                        Wrapper.sendPacketDirect(new C03PacketPlayer.C04PacketPlayerPosition(x + (-Math.sin(Math.toRadians(yaw)) * dist), y - 1.75, z + (Math.cos(Math.toRadians(yaw)) * dist), Wrapper.getPlayer().onGround));
                    }
 

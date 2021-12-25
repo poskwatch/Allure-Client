@@ -64,13 +64,13 @@ public class PlayerESP extends Module {
             return !espComponentsProperty.isSelected(ESPComponents.Health) || !healthBarModeProperty.getPropertyValue().equals(HealthBarMode.Solid);
         }
     };
-    private final ColorProperty gradientBarStartProperty = new ColorProperty("Gradient Start", Color.GREEN, this) {
+    private final ColorProperty gradientBarStartProperty = new ColorProperty("Bar Gradient Start", Color.GREEN, this) {
         @Override
         public boolean isPropertyHidden() {
             return !espComponentsProperty.isSelected(ESPComponents.Health) || !healthBarModeProperty.getPropertyValue().equals(HealthBarMode.Gradient);
         }
     };
-    private final ColorProperty gradientBarEndProperty = new ColorProperty("Gradient Start", Color.MAGENTA, this) {
+    private final ColorProperty gradientBarEndProperty = new ColorProperty("Bar Gradient End", Color.MAGENTA, this) {
         @Override
         public boolean isPropertyHidden() {
             return !espComponentsProperty.isSelected(ESPComponents.Health) || !healthBarModeProperty.getPropertyValue().equals(HealthBarMode.Gradient);

@@ -77,7 +77,7 @@ public class LongJump extends Module {
                     switch (chargingTicks) {
                         case 2:
                         case 3:
-                            updatePositionEvent.setPitch(-90);
+                            updatePositionEvent.setPitch(-90, true);
                             break;
                         case 4:
                             Wrapper.sendPacketDirect(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));

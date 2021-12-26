@@ -2,6 +2,7 @@ package vip.allureclient.visual.screens.dropdown.component;
 
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.font.MinecraftFontRenderer;
+import vip.allureclient.visual.screens.dropdown.component.sub.ModuleCategoryFrame;
 
 public class Component {
 

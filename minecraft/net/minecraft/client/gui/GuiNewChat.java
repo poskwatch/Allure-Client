@@ -87,7 +87,7 @@ public class GuiNewChat extends Gui
                             {
                                 int i2 = 0;
                                 int j2 = -i1 * 10;
-                                chatline.animation = AnimationUtil.easeOutAnimation(j2 - 15, chatline.animation, 0.04);
+                                chatline.animation = AnimationUtil.linearAnimation(j2 - 15, chatline.animation, 2.5);
                                 BlurUtil.blurArea(i2, GuiScreen.height - i1 * 10 - 45, l + 6, 10);
                                 drawRect(i2, j2 - 16, i2 + l + 4, j2 - 6, new Color(0, 0, 0, 27).getRGB());
                                 String s = chatline.getChatComponent().getFormattedText();

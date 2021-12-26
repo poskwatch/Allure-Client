@@ -1,11 +1,11 @@
-package vip.allureclient.visual.screens.dropdown.component;
+package vip.allureclient.visual.screens.dropdown.component.sub;
 
 import net.minecraft.client.gui.Gui;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.util.visual.AnimationUtil;
-import vip.allureclient.visual.screens.dropdown.component.sub.ModuleComponent;
+import vip.allureclient.visual.screens.dropdown.component.Component;
 
 import java.util.ArrayList;
 

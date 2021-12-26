@@ -100,8 +100,8 @@ public class KillAura extends Module {
                     currentTarget = targetEntities.get(0);
                     if (currentTarget != null) {
                         TargetHUD.getInstance().scaleAnimationTarget = 1.0;
-                        updatePositionEvent.setYaw(getRotations((EntityLivingBase) currentTarget)[0]);
-                        updatePositionEvent.setPitch(getRotations((EntityLivingBase) currentTarget)[1]);
+                        updatePositionEvent.setYaw(getRotations((EntityLivingBase) currentTarget)[0], true);
+                        updatePositionEvent.setPitch(getRotations((EntityLivingBase) currentTarget)[1], true);
                         if (apsTimerUtil.hasReached(1000 / averageAPSProperty.getPropertyValue())) {
                             Wrapper.getPlayer().swingItem();
                             Wrapper.sendPacketDirect(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));

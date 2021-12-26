@@ -191,7 +191,6 @@ import vip.allureclient.impl.event.client.ClientExitEvent;
 import vip.allureclient.impl.event.client.ClientStartEvent;
 import vip.allureclient.impl.event.client.KeyPressedEvent;
 import vip.allureclient.impl.event.world.WorldLoadEvent;
-import vip.allureclient.visual.screens.dropdown.GuiDropDown;
 
 public class Minecraft implements IThreadListener, IPlayerUsage
 {
@@ -1074,10 +1073,12 @@ public class Minecraft implements IThreadListener, IPlayerUsage
     /**
      * Called repeatedly from run()
      */
+
     private void runGameLoop() throws IOException
     {
         long i = System.nanoTime();
         this.mcProfiler.startSection("root");
+
 
         if (Display.isCreated() && Display.isCloseRequested())
         {

@@ -8,7 +8,9 @@ import vip.allureclient.base.module.Module;
 import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.base.util.player.MovementUtil;
 import vip.allureclient.impl.event.network.PacketReceiveEvent;
+import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.property.BooleanProperty;
 
 @ModuleData(moduleName = "Disabler", moduleBind = 0, moduleCategory = ModuleCategory.PLAYER)
@@ -18,6 +20,9 @@ public class Disabler extends Module {
 
     @EventListener
     EventConsumer<PacketReceiveEvent> onPacketReceiveEvent;
+
+    @EventListener
+    EventConsumer<UpdatePositionEvent> onUpdatePositionEvent;
 
     public Disabler() {
         this.onPacketReceiveEvent = (event -> {
@@ -34,5 +39,6 @@ public class Disabler extends Module {
                 }
             }
         });
+        this.onUpdatePositionEvent = (event -> event.setYaw(MovementUtil.getMovementDirection(), false));
     }
 }

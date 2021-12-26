@@ -30,7 +30,6 @@ public class Speed extends Module {
 
     public Speed() {
         this.onUpdatePositionEvent = (event -> {
-            event.setYaw(MovementUtil.getMovementDirection());
             if (MovementUtil.isMoving()) {
                 Wrapper.getMinecraft().timer.timerSpeed = timerBoostProperty.getPropertyValue();
                if (Wrapper.getPlayer().onGround) {

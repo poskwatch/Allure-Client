@@ -32,15 +32,18 @@ public class UpdatePositionEvent extends CancellableEvent {
         this.z = z;
     }
 
-    public void setYaw(float yaw) {
+    public void setYaw(float yaw, boolean visualize) {
         this.yaw = yaw;
-        Wrapper.getPlayer().renderYawOffset = yaw;
-        Wrapper.getPlayer().rotationYawHead = yaw;
+        if (visualize) {
+            Wrapper.getPlayer().renderYawOffset = yaw;
+            Wrapper.getPlayer().rotationYawHead = yaw;
+        }
     }
 
-    public void setPitch(float pitch) {
+    public void setPitch(float pitch, boolean visualize) {
         this.pitch = pitch;
-        Wrapper.getPlayer().rotationPitchHead = pitch;
+        if (visualize)
+            Wrapper.getPlayer().rotationPitchHead = pitch;
     }
 
     public void setOnGround(boolean onGround) {

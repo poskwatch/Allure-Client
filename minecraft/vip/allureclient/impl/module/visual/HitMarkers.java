@@ -64,4 +64,14 @@ public class HitMarkers extends Module {
         glEnd();
         glEnable(GL_TEXTURE_2D);
     }
+
+    @Override
+    public void onEnable() {
+        super.onEnable();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+    }
 }

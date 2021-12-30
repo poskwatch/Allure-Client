@@ -42,6 +42,7 @@ public class ModuleManager {
                     new LongJump(),
                     new Speed(),
                     new Step(),
+                    new VerusFlight(),
                     // Visual Modules
                     new HUD(),
                     new Animations(),
@@ -53,6 +54,7 @@ public class ModuleManager {
                     new Atmosphere(),
                     new ChestStealer(),
                     new GameSpeed(),
+                    new Scaffold(),
                     new ChatBypass(),
                     new AntiDeath(),
                     new EntityDesync(),
@@ -77,7 +79,7 @@ public class ModuleManager {
 
     public Function<MinecraftFontRenderer, ArrayList<Module>> getSortedDisplayModules = (fontRenderer -> {
         ArrayList<Module> sortedDisplayModules = new ArrayList<>(getModules.get());
-        sortedDisplayModules.removeIf(module -> (!module.isToggled()));
+        //sortedDisplayModules.removeIf(module -> (!module.isToggled()));
         sortedDisplayModules.sort(Comparator.comparingDouble(module -> fontRenderer.getStringWidth(((Module) module).getModuleDisplayName())).reversed());
         return sortedDisplayModules;
     });

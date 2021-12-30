@@ -11,8 +11,10 @@ import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.module.interfaces.ToggleableObject;
 import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.base.util.visual.AnimatedCoordinate;
 import vip.allureclient.base.util.visual.ChatUtil;
 import vip.allureclient.impl.property.*;
+import vip.allureclient.visual.notification.NotificationType;
 
 import java.awt.*;
 import java.util.Arrays;
@@ -26,6 +28,8 @@ public class Module implements ToggleableObject, BindableObject, ConfigurableObj
     private final ModuleCategory moduleCategory;
     private boolean isModuleToggled;
     private String moduleSuffix;
+
+    private final AnimatedCoordinate animatedCoordinate = new AnimatedCoordinate(0, 0);
 
     public Module(){
         if(isIdentified()) {
@@ -81,6 +85,8 @@ public class Module implements ToggleableObject, BindableObject, ConfigurableObj
             Wrapper.getEventManager().unsubscribe(this);
             onDisable();
         }
+        AllureClient.getInstance().getNotificationManager().addNotification("Module toggled",
+                String.format("Module %s was %s", moduleName, isModuleToggled ? "enabled" : "disabled"), 1000, NotificationType.INFO);
     }
 
     @Override
@@ -94,6 +100,8 @@ public class Module implements ToggleableObject, BindableObject, ConfigurableObj
             Wrapper.getEventManager().unsubscribe(this);
             onDisable();
         }
+        AllureClient.getInstance().getNotificationManager().addNotification("Module toggled",
+                String.format("Module %s was %s", moduleName, isModuleToggled ? "enabled" : "disabled"), 1000, NotificationType.INFO);
     }
 
     @Override
@@ -127,6 +135,10 @@ public class Module implements ToggleableObject, BindableObject, ConfigurableObj
         AllureClient.getInstance().getBindManager().unbind(this);
         AllureClient.getInstance().getBindManager().registerBind(bind, this);
         this.moduleKeyBind = bind;
+    }
+
+    public AnimatedCoordinate getAnimatedCoordinate() {
+        return animatedCoordinate;
     }
 
     @SuppressWarnings({"unchecked"})

@@ -7,6 +7,8 @@ import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
 import net.minecraft.util.Session;
+import vip.allureclient.AllureClient;
+import vip.allureclient.visual.notification.NotificationType;
 
 import java.io.IOException;
 import java.net.Proxy;

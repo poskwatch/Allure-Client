@@ -25,7 +25,6 @@ import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.NetworkUtil;
 import vip.allureclient.base.util.client.TimerUtil;
 import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.base.util.visual.ChatUtil;
 import vip.allureclient.base.util.visual.GLUtil;
 import vip.allureclient.impl.event.network.PacketSendEvent;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
@@ -33,6 +32,7 @@ import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.event.visual.Render3DEvent;
 import vip.allureclient.impl.module.combat.AntiBot;
 import vip.allureclient.impl.module.visual.TargetHUD;
+import vip.allureclient.base.util.player.IRotations;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.EnumProperty;
 import vip.allureclient.impl.property.MultiSelectEnumProperty;
@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 @ModuleData(moduleName = "Kill Aura", moduleBind = Keyboard.KEY_Y, moduleCategory = ModuleCategory.COMBAT)
-public class KillAura extends Module {
+public class KillAura extends Module implements IRotations {
 
     @EventListener
     EventConsumer<UpdatePositionEvent> onUpdatePositionEvent;
@@ -100,8 +100,7 @@ public class KillAura extends Module {
                     currentTarget = targetEntities.get(0);
                     if (currentTarget != null) {
                         TargetHUD.getInstance().scaleAnimationTarget = 1.0;
-                        updatePositionEvent.setYaw(getRotations((EntityLivingBase) currentTarget)[0], true);
-                        updatePositionEvent.setPitch(getRotations((EntityLivingBase) currentTarget)[1], true);
+                        setRotations(updatePositionEvent, getRotations(), true);
                         if (apsTimerUtil.hasReached(1000 / averageAPSProperty.getPropertyValue())) {
                             Wrapper.getPlayer().swingItem();
                             Wrapper.sendPacketDirect(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));
@@ -137,13 +136,7 @@ public class KillAura extends Module {
         });
 
         this.onPacketSendEvent = (packetSendEvent -> {
-            //To ensure block packets aren't messed up.
-           if (packetSendEvent.getPacket() instanceof C07PacketPlayerDigging) {
-               isBlocking = false;
-           }
-           if (packetSendEvent.getPacket() instanceof C08PacketPlayerBlockPlacement) {
-               isBlocking = true;
-           }
+
         });
 
         this.onPlayerMoveEvent = (playerMoveEvent -> {
@@ -164,6 +157,7 @@ public class KillAura extends Module {
     public void onEnable() {
         currentTarget = null;
         apsTimerUtil.reset();
+        super.onEnable();
     }
 
     @Override
@@ -175,6 +169,7 @@ public class KillAura extends Module {
         currentTarget = null;
         apsTimerUtil.reset();
         Wrapper.getMinecraft().timer.timerSpeed = 1;
+        super.onDisable();
     }
 
     private boolean isEntityValid(Entity entity) {
@@ -201,23 +196,6 @@ public class KillAura extends Module {
         return targetsProperty.isSelected(Targets.Invisibles) || !entity.isInvisible();
     }
 
-    public static float[] getRotationFromPosition(double x, double z, double y) {
-        double xDiff = x - Minecraft.getMinecraft().thePlayer.posX;
-        double zDiff = z - Minecraft.getMinecraft().thePlayer.posZ;
-        double yDiff = y - Minecraft.getMinecraft().thePlayer.posY - 0.5D;
-        double dist = MathHelper.sqrt_double(xDiff * xDiff + zDiff * zDiff);
-        float yaw = (float) (Math.atan2(zDiff, xDiff) * 180.0D / 3.141592653589793D) - 90.0F;
-        float pitch = (float) -(Math.atan2(yDiff, dist) * 180.0D / 3.141592653589793D);
-        return new float[]{yaw, pitch};
-    }
-
-    public static float[] getRotations(EntityLivingBase ent) {
-        double x = ent.posX;
-        double z = ent.posZ;
-        double y = ent.posY + (ent.getEyeHeight() / 3.1F);
-        return getRotationFromPosition(x, z, y);
-    }
-
     private boolean isHoldingSword() {
         if (Wrapper.getPlayer().getCurrentEquippedItem() == null) {
             return false;
@@ -235,6 +213,30 @@ public class KillAura extends Module {
 
     public static KillAura getInstance() {
         return (KillAura) AllureClient.getInstance().getModuleManager().getModuleByClass.apply(KillAura.class);
+    }
+
+    private float[] getRotationFromPosition(double x, double z, double y) {
+        double xDiff = x - Minecraft.getMinecraft().thePlayer.posX;
+        double zDiff = z - Minecraft.getMinecraft().thePlayer.posZ;
+        double yDiff = y - Minecraft.getMinecraft().thePlayer.posY - 0.5D;
+        double dist = MathHelper.sqrt_double(xDiff * xDiff + zDiff * zDiff);
+        float yaw = (float) (Math.atan2(zDiff, xDiff) * 180.0D / 3.141592653589793D) - 90.0F;
+        float pitch = (float) -(Math.atan2(yDiff, dist) * 180.0D / 3.141592653589793D);
+        return new float[]{yaw, pitch};
+    }
+
+    @Override
+    public float[] getRotations() {
+        double x = getCurrentTarget().posX;
+        double z = getCurrentTarget().posZ;
+        double y = getCurrentTarget().posY + (getCurrentTarget().getEyeHeight() / 3.1F);
+        return getRotationFromPosition(x, z, y);
+    }
+
+    @Override
+    public void setRotations(UpdatePositionEvent event, float[] rotations, boolean visualize) {
+        event.setYaw(getRotations()[0], visualize);
+        event.setPitch(getRotations()[1], visualize);
     }
 
     private enum TargetingMode {

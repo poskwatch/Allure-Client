@@ -58,4 +58,14 @@ public class Step extends Module {
         });
         onUpdatePositionEvent = (updatePositionEvent -> setModuleSuffix(cancelExtraPackets.getPropertyValue() ? "NCP" : "Vanilla"));
     }
+
+    @Override
+    public void onEnable() {
+        super.onEnable();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+    }
 }

@@ -1,5 +1,6 @@
 package vip.allureclient.impl.module.visual;
 
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
@@ -15,10 +16,7 @@ import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.NetworkUtil;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.player.MovementUtil;
-import vip.allureclient.base.util.visual.BlurUtil;
-import vip.allureclient.base.util.visual.ColorUtil;
-import vip.allureclient.base.util.visual.GLUtil;
-import vip.allureclient.base.util.visual.RenderUtil;
+import vip.allureclient.base.util.visual.*;
 import vip.allureclient.impl.event.visual.Render2DEvent;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.ColorProperty;
@@ -86,6 +84,8 @@ public class HUD extends Module {
 
             final MinecraftFontRenderer fontRenderer = AllureClient.getInstance().getFontManager().mediumFontRenderer;
 
+            AllureClient.getInstance().getNotificationManager().render(render2DEvent.getScaledResolution(), 5);
+
             String watermark = String.format("%s v%s", AllureClient.getInstance().CLIENT_NAME, AllureClient.getInstance().CLIENT_VERSION);
             if (waterMarkModeProperty.getPropertyValue().equals(WatermarkModes.New))
                 watermark = String.format("\247r%s\247f%s v%s", AllureClient.getInstance().CLIENT_NAME.charAt(0), AllureClient.getInstance().CLIENT_NAME.substring(1), AllureClient.getInstance().CLIENT_VERSION);
@@ -113,8 +113,21 @@ public class HUD extends Module {
             final ArrayList<Module> sortedDisplayModules = new ArrayList<>(AllureClient.getInstance().getModuleManager().getSortedDisplayModules.apply(AllureClient.getInstance().getFontManager().mediumFontRenderer));
             final AtomicInteger moduleDrawCount = new AtomicInteger();
             sortedDisplayModules.forEach(module -> {
-                final double posX = render2DEvent.getScaledResolution().getScaledWidth() - fontRenderer.getStringWidth(module.getModuleDisplayName()) - 3;
-                final double posY = 3 + moduleDrawCount.get() * 13;
+
+                double targetPosX = render2DEvent.getScaledResolution().getScaledWidth() - fontRenderer.getStringWidth(module.getModuleDisplayName()) - 3;
+                double targetPosY = 3 + moduleDrawCount.get() * 13;
+
+                module.getAnimatedCoordinate().animateCoordinates(module.isToggled() ? targetPosX : 0, module.isToggled() ? targetPosY : 0, AnimatedCoordinate.AnimationType.EASE_OUT);
+                double posX = module.getAnimatedCoordinate().getX();
+                double posY = module.getAnimatedCoordinate().getY();
+
+                if (!module.isToggled())
+                    module.getAnimatedCoordinate().setX(width);
+
+                if (!module.isToggled()) {
+                    return;
+                }
+
                 int listColor;
                 switch (listColorProperty.getPropertyValue()) {
                     case Client:
@@ -144,11 +157,13 @@ public class HUD extends Module {
                         GLUtil.glFilledQuad(render2DEvent.getScaledResolution().getScaledWidth() - 1, (float) (posY - 4), 1, 13, listColor);
                         break;
                     case Outline:
+                        ArrayList<Module> outlineModuleCache = new ArrayList<>(sortedDisplayModules);
+                        outlineModuleCache.removeIf(module1 -> !module1.isToggled());
                         GlStateManager.color(1, 1, 1);
-                        int toggledIndex = sortedDisplayModules.indexOf(module);
+                        int toggledIndex = outlineModuleCache.indexOf(module);
                         int m1Offset = -1;
-                        if (toggledIndex != sortedDisplayModules.size() - 1) {
-                            m1Offset += fontRenderer.getStringWidth(sortedDisplayModules.get(toggledIndex + 1).getModuleDisplayName());
+                        if (toggledIndex != outlineModuleCache.size() - 1) {
+                            m1Offset += fontRenderer.getStringWidth(outlineModuleCache.get(toggledIndex + 1).getModuleDisplayName());
                             m1Offset += 6;
                         }
                         GlStateManager.color(1, 1, 1, 1);
@@ -166,6 +181,16 @@ public class HUD extends Module {
             });
         });
         setToggled(true);
+    }
+
+    @Override
+    public void onEnable() {
+        super.onEnable();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
     }
 
     private enum ListColorModes {

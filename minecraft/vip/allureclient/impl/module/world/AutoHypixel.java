@@ -2,6 +2,7 @@ package vip.allureclient.impl.module.world;
 
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraft.network.play.server.S02PacketChat;
+import net.minecraft.network.play.server.S45PacketTitle;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.module.Module;
@@ -41,4 +42,13 @@ public class AutoHypixel extends Module {
         });
     }
 
+    @Override
+    public void onEnable() {
+        super.onEnable();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+    }
 }

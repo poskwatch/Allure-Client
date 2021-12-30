@@ -31,5 +31,11 @@ public class AntiDeath extends Module {
     @Override
     public void onEnable() {
         spamTimer.reset();
+        super.onEnable();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
     }
 }

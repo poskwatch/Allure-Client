@@ -28,6 +28,7 @@ public class BindManager<T extends BindableObject> {
     }
 
     public void registerBind(int bind, T register) {
+        keyToObjectMap.remove(bind);
         keyToObjectMap.put(bind, register);
     }
 

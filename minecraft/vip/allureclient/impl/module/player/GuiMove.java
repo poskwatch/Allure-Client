@@ -38,4 +38,14 @@ public class GuiMove extends Module {
             }
         });
     }
+
+    @Override
+    public void onEnable() {
+        super.onEnable();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+    }
 }

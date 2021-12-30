@@ -91,6 +91,16 @@ public class TargetHUD extends Module {
         GL11.glPopMatrix();
     }
 
+    @Override
+    public void onEnable() {
+        super.onEnable();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+    }
+
     public static TargetHUD getInstance() {
         return (TargetHUD) AllureClient.getInstance().getModuleManager().getModuleByClass.apply(TargetHUD.class);
     }

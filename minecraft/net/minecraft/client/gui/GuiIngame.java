@@ -47,6 +47,7 @@ import optifine.Config;
 import optifine.CustomColors;
 import org.lwjgl.opengl.GL11;
 import vip.allureclient.AllureClient;
+import vip.allureclient.base.module.Module;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.visual.BlurUtil;
 import vip.allureclient.base.util.visual.ColorUtil;
@@ -601,10 +602,12 @@ public class GuiIngame extends Gui
         int j = p_180475_2_.getScaledWidth() - i - b0;
         int k = 0;
 
+        final ArrayList<Module> sortedModulesRemoved = AllureClient.getInstance().getModuleManager().getSortedDisplayModules.apply(
+                AllureClient.getInstance().getFontManager().smallFontRenderer
+        );
+        sortedModulesRemoved.removeIf(module -> !module.isToggled());
         GlStateManager.translate(0, Math.max(0,
-                AllureClient.getInstance().getModuleManager().getSortedDisplayModules.apply(
-                        AllureClient.getInstance().getFontManager().smallFontRenderer
-                ).size() * 13 - 135), 0);
+                sortedModulesRemoved.size() * 13 - 135), 0);
 
         for (Object score1 : arraylist1)
         {
@@ -627,19 +630,16 @@ public class GuiIngame extends Gui
                 String s3 = p_180475_1_.getDisplayName();
                 BlurUtil.blurArea(j - 2, l - 1
                         + Math.max(0,
-                        AllureClient.getInstance().getModuleManager().getSortedDisplayModules.apply(
-                                AllureClient.getInstance().getFontManager().smallFontRenderer
-                        ).size() * 13 - 135), i1 - j - 2, k * this.getFontRenderer().FONT_HEIGHT);
+                        sortedModulesRemoved.size() * 13 - 135), i1 - j - 2, k * this.getFontRenderer().FONT_HEIGHT);
                 drawRect(j - 2, l - this.getFontRenderer().FONT_HEIGHT - 1, i1, l - 1, 1610612736);
                 drawRect(j - 2, l - 1, i1, l, 1342177280);
 
                 this.getFontRenderer().drawString(s3, j + i / 2 - this.getFontRenderer().getStringWidth(s3) / 2, l - this.getFontRenderer().FONT_HEIGHT, 553648127);
             }
         }
+
         GlStateManager.translate(0, -Math.max(0,
-                AllureClient.getInstance().getModuleManager().getSortedDisplayModules.apply(
-                        AllureClient.getInstance().getFontManager().smallFontRenderer
-                ).size() * 13 - 135), 0);
+                sortedModulesRemoved.size() * 13 - 135), 0);
     }
 
     private void renderPlayerStats(ScaledResolution p_180477_1_)

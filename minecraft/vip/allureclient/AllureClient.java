@@ -14,6 +14,7 @@ import vip.allureclient.base.property.PropertyManager;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.event.client.ClientExitEvent;
 import vip.allureclient.impl.event.client.ClientStartEvent;
+import vip.allureclient.visual.notification.NotificationManager;
 import vip.allureclient.visual.screens.dropdown.GuiDropDown;
 
 public class AllureClient {
@@ -29,6 +30,7 @@ public class AllureClient {
     private FileManager fileManager;
     private ConfigManager configManager;
     private CommandManager commandManager;
+    private NotificationManager notificationManager;
     private final GuiDropDown guiDropDown = new GuiDropDown();
 
     @EventListener
@@ -36,6 +38,7 @@ public class AllureClient {
     EventConsumer<ClientStartEvent> onClientStart = (event -> {
         System.out.printf("Starting %s Client. Version %s%n", getInstance().CLIENT_NAME, getInstance().CLIENT_VERSION);
         this.fontManager = new FontManager();
+        this.notificationManager = new NotificationManager();
         this.propertyManager = new PropertyManager();
         this.bindManager = new BindManager<>();
         this.moduleManager = new ModuleManager();
@@ -75,6 +78,10 @@ public class AllureClient {
 
     public ConfigManager getConfigManager() {
         return configManager;
+    }
+
+    public NotificationManager getNotificationManager() {
+        return notificationManager;
     }
 
     public static AllureClient getInstance(){

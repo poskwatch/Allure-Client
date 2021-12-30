@@ -32,6 +32,7 @@ import optifine.Reflector;
 import org.lwjgl.opengl.GL11;
 import shadersmod.client.Shaders;
 import vip.allureclient.impl.module.combat.killaura.KillAura;
+import vip.allureclient.impl.module.player.NoSlow;
 import vip.allureclient.impl.module.visual.Animations;
 
 public class ItemRenderer
@@ -285,7 +286,8 @@ public class ItemRenderer
         GlStateManager.rotate(f * -20.0F, 0.0F, 1.0F, 0.0F);
         GlStateManager.rotate(f1 * -20.0F, 0.0F, 0.0F, 1.0F);
         GlStateManager.rotate(f1 * -80.0F, 1.0F, 0.0F, 0.0F);
-        GlStateManager.scale(0.4F, 0.4F, 0.4F);
+        final double accountedScale = Animations.getInstance().itemScaleProperty.getPropertyValue() * 0.4F;
+        GlStateManager.scale(accountedScale, accountedScale, accountedScale);
     }
 
     private void func_178098_a(float p_178098_1_, AbstractClientPlayer clientPlayer)
@@ -346,7 +348,7 @@ public class ItemRenderer
             {
                 this.renderItemMap(entityplayersp, f2, f, f1);
             }
-            else if (entityplayersp.getItemInUseCount() > 0 || KillAura.getInstance().isBlocking())
+            else if (entityplayersp.getItemInUseCount() > 0 || KillAura.getInstance().isBlocking() || (NoSlow.getInstance().isBlocking && NoSlow.getInstance().isToggled()))
             {
                 EnumAction enumaction = this.itemToRender.getItemUseAction();
 
@@ -379,7 +381,7 @@ public class ItemRenderer
                                 this.func_178103_d();
                                 break;
                             case Swang:
-                                this.transformFirstPersonItem(f - 0.15f, f1);
+                                this.transformFirstPersonItem(f/2 - 0.15f, f1);
                                 GlStateManager.rotate(scalableProg * 35.0F / 2.0F, -scalableProg, -0.0F, 23.0F);
                                 GlStateManager.rotate(scalableProg * 50.0F, 1.0F, -scalableProg / 2.0F, 0.F);
                                 this.func_178103_d();
@@ -398,6 +400,13 @@ public class ItemRenderer
                             case Flux:
                                 this.transformFirstPersonItem(f/2, 0);
                                 GlStateManager.rotate(scalableProg * -35.0F, 1, -1, 0);
+                                this.func_178103_d();
+                                break;
+                            case Exhibition:
+                                this.transformFirstPersonItem(f/2, 0);
+                                GlStateManager.translate(0F, 0.25F, 0);
+                                GL11.glRotated(-scalableProg * 25.0F, scalableProg / 4.9, 0, 2.0F);
+                                GL11.glRotated(-scalableProg * 30.0F, 4.0F, scalableProg * 1.7, 0F);
                                 this.func_178103_d();
                                 break;
                         }

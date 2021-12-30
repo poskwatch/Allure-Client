@@ -46,6 +46,16 @@ public class AntiVoid extends Module {
         distanceProperty.onValueChange = () -> setModuleSuffix(antiFallModeProperty.getEnumValueAsString());
     }
 
+    @Override
+    public void onEnable() {
+        super.onEnable();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+    }
+
     private enum AntiFallMode {
         Packet,
         Motion

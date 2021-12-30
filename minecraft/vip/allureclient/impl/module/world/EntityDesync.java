@@ -39,4 +39,13 @@ public class EntityDesync extends Module {
         });
     }
 
+    @Override
+    public void onEnable() {
+        super.onEnable();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+    }
 }

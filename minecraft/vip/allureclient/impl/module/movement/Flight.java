@@ -2,6 +2,7 @@ package vip.allureclient.impl.module.movement;
 
 import net.minecraft.network.play.client.C03PacketPlayer;
 import org.lwjgl.input.Keyboard;
+import vip.allureclient.AllureClient;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.module.Module;
@@ -15,6 +16,7 @@ import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.EnumProperty;
 import vip.allureclient.impl.property.ValueProperty;
+import vip.allureclient.visual.notification.NotificationType;
 
 @ModuleData(moduleName = "Flight", moduleBind = Keyboard.KEY_G, moduleCategory = ModuleCategory.MOVEMENT)
 public class Flight extends Module {
@@ -60,6 +62,16 @@ public class Flight extends Module {
             else
                 playerMoveEvent.setSpeed(flightSpeedProperty.getPropertyValue());
         });
+    }
+
+    @Override
+    public void onEnable() {
+        super.onEnable();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
     }
 
     @EventListener

@@ -34,7 +34,13 @@ public class GameSpeed extends Module {
     }
 
     @Override
+    public void onEnable() {
+        super.onEnable();
+    }
+
+    @Override
     public void onDisable() {
         Wrapper.getMinecraft().timer.timerSpeed = 1.0F;
+        super.onDisable();
     }
 }

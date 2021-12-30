@@ -1,7 +1,10 @@
 package vip.allureclient.base.util.visual;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import org.lwjgl.opengl.GL11;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.math.MathUtil;
 
@@ -109,6 +112,27 @@ public class GLUtil {
         glDisable(GL_LINE_SMOOTH);
         glEnable(GL_TEXTURE_2D);
         glPopMatrix();
+    }
+
+    public static void glStartScissor() {
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_SCISSOR_TEST);
+    }
+
+    public static void glEndScissor() {
+        Minecraft.getMinecraft().getFramebuffer().bindFramebuffer(false);
+        glDisable(GL_SCISSOR_TEST);
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ZERO, GL_ONE);
+        GlStateManager.disableBlend();
+    }
+
+    public static void glScissor(double x, double y, double width, double height) {
+        int scaleFactor = new ScaledResolution(Wrapper.getMinecraft()).getScaleFactor();
+        while (scaleFactor < 2 && Minecraft.getMinecraft().displayWidth / (scaleFactor + 1) >= 320  && Minecraft.getMinecraft().displayHeight / (scaleFactor + 1) >= 240) {
+            ++scaleFactor;
+        }
+        GL11.glScissor((int) (x * scaleFactor), (int) (Minecraft.getMinecraft().displayHeight - (y + height) * scaleFactor), (int) (width * scaleFactor), (int) (height * scaleFactor));
     }
 
     public static void glColor(final int color) {

@@ -32,6 +32,16 @@ public class AntiBot extends Module {
         return (AntiBot) AllureClient.getInstance().getModuleManager().getModuleByClass.apply(AntiBot.class);
     }
 
+    @Override
+    public void onEnable() {
+        super.onEnable();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+    }
+
     public enum AntiBotMode {
         Watchdog,
         Simple,

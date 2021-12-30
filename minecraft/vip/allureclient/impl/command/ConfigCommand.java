@@ -4,6 +4,7 @@ import vip.allureclient.AllureClient;
 import vip.allureclient.base.command.Command;
 import vip.allureclient.base.command.CommandArgumentException;
 import vip.allureclient.base.util.visual.ChatUtil;
+import vip.allureclient.visual.notification.NotificationType;
 
 public class ConfigCommand implements Command {
     @Override
@@ -16,16 +17,20 @@ public class ConfigCommand implements Command {
         if (arguments.length == 3) {
             if (arguments[1].equalsIgnoreCase("save")) {
                 if (AllureClient.getInstance().getConfigManager().saveConfig(arguments[2]))
-                    ChatUtil.sendMessageToPlayer("Saved config " + arguments[2]);
+                    AllureClient.getInstance().getNotificationManager().addNotification("Config saved", "Successfully saved config " + arguments[2],
+                            1500, NotificationType.SUCCESS);
                 else
-                    ChatUtil.sendMessageToPlayer("Couldn't save config " + arguments[2]);
+                    AllureClient.getInstance().getNotificationManager().addNotification("Couldn't save config", "Unable to save config " + arguments[2],
+                            1500, NotificationType.ERROR);
                 return;
             }
             else if (arguments[1].equalsIgnoreCase("load")) {
                 if (AllureClient.getInstance().getConfigManager().loadConfig(arguments[2]))
-                    ChatUtil.sendMessageToPlayer("Loaded config " + arguments[2]);
+                    AllureClient.getInstance().getNotificationManager().addNotification("Config loaded", "Successfully loaded config " + arguments[2],
+                            1500, NotificationType.SUCCESS);
                 else
-                    ChatUtil.sendMessageToPlayer("Couldn't load config " + arguments[2]);
+                    AllureClient.getInstance().getNotificationManager().addNotification("Couldn't load config", "Unable to load config config " + arguments[2],
+                            1500, NotificationType.ERROR);
                 return;
             } else {
                 throw new CommandArgumentException(getUsage());

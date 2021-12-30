@@ -61,6 +61,8 @@ import shadersmod.client.Shaders;
 import shadersmod.client.ShadersRender;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.base.util.visual.GLShader;
+import vip.allureclient.base.util.visual.GLUtil;
 import vip.allureclient.impl.event.visual.Render3DEvent;
 
 import java.io.IOException;
@@ -1299,6 +1301,8 @@ public class EntityRenderer implements IResourceManagerReloadListener
             final int k1 = i1 - Mouse.getY() * i1 / this.mc.displayHeight - 1;
             int l1 = this.mc.gameSettings.limitFramerate;
 
+
+
             if (this.mc.theWorld != null)
             {
                 this.mc.mcProfiler.startSection("level");
@@ -1332,6 +1336,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
                     GlStateManager.alphaFunc(516, 0.1F);
                     this.mc.ingameGUI.renderGameOverlay(p_181560_1_);
 
+
                     if (this.mc.gameSettings.ofShowFps && !this.mc.gameSettings.showDebugInfo)
                     {
                         Config.drawFps();
@@ -1345,6 +1350,7 @@ public class EntityRenderer implements IResourceManagerReloadListener
 
                 this.mc.mcProfiler.endSection();
             }
+
             else
             {
                 GlStateManager.viewport(0, 0, this.mc.displayWidth, this.mc.displayHeight);

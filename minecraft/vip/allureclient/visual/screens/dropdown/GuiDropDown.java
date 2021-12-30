@@ -8,7 +8,7 @@ import org.lwjgl.opengl.GL11;
 import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.util.visual.AnimationUtil;
 import vip.allureclient.base.util.visual.BlurUtil;
-import vip.allureclient.visual.screens.dropdown.component.ModuleCategoryFrame;
+import vip.allureclient.visual.screens.dropdown.component.sub.ModuleCategoryFrame;
 import vip.allureclient.visual.screens.dropdown.component.Component;
 import vip.allureclient.visual.screens.dropdown.component.sub.ModuleComponent;
 

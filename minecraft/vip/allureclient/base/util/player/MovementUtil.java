@@ -57,6 +57,11 @@ public class MovementUtil {
         return !Wrapper.getWorld().getCollidingBoundingBoxes(Wrapper.getPlayer(), Wrapper.getPlayer().getEntityBoundingBox().offset(0.0D, -height, 0.0D)).isEmpty();
     }
 
+    public static BlockPos getBlockUnder() {
+        EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+        return new BlockPos(player.posX, player.posY - 1.0D, player.posZ);
+    }
+
     public static boolean isOverVoid() {
         for (double posY = (Wrapper.getPlayer()).posY; posY > 0.0D; posY--) {
             if (!(Wrapper.getWorld().getBlockState(new BlockPos((Wrapper.getPlayer()).posX, posY, (Wrapper.getPlayer()).posZ)).getBlock() instanceof net.minecraft.block.BlockAir)) {
@@ -118,5 +123,30 @@ public class MovementUtil {
             direction += 90.0F;
         }
         return direction;
+    }
+
+    public static void damagePlayer() {
+        double x = Wrapper.getPlayer().posX;
+        double y = Wrapper.getPlayer().posY;
+        double z = Wrapper.getPlayer().posZ;
+        float minValue = 3.1F;
+        if (Wrapper.getPlayer().isPotionActive(Potion.jump)) {
+            minValue += Wrapper.getPlayer().getActivePotionEffect(Potion.jump).getAmplifier() + 1.0F;
+        }
+        for (int i = 0; i < (int) ((minValue / (MathUtil.getRandomNumber(0.0890D, 0.0849D) - 1.0E-3D - Math.random() * 0.0002F - Math.random() * 0.0002F)) + 6); i++) {
+            Wrapper.sendPacketDirect(new C03PacketPlayer.C04PacketPlayerPosition(x, y + MathUtil.getRandomNumber(0.0655D, 0.0625D) - MathUtil.getRandomNumber(1.0E-3D, 1.0E-2D) - Math.random() * 0.0002F, z, false));
+            Wrapper.sendPacketDirect(new C03PacketPlayer.C04PacketPlayerPosition(x, y + Math.random() * 0.0002F, z, false));
+        }
+        Wrapper.sendPacketDirect(new C03PacketPlayer(true));
+    }
+
+    public static double getJumpHeight() {
+        double baseJumpHeight = 0.41999998688697815D;
+        if (Wrapper.getPlayer().isInWater() || Wrapper.getPlayer().isInLava())
+            return 0.13500000163912773D;
+        if (Wrapper.getPlayer().isPotionActive(Potion.jump)) {
+            return baseJumpHeight + ((Wrapper.getPlayer().getActivePotionEffect(Potion.jump).getAmplifier() + 1.0F) * 0.1F);
+        }
+        return baseJumpHeight;
     }
 }

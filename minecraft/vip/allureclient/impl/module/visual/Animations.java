@@ -16,6 +16,7 @@ public class Animations extends Module {
     public final ValueProperty<Double> xValueProperty = new ValueProperty<>("X", 0D, -0.4D, 0.4D, this);
     public final ValueProperty<Double> yValueProperty = new ValueProperty<>("Y", 0D, -0.4D, 0.4D, this);
     public final ValueProperty<Double> zValueProperty = new ValueProperty<>("Z", 0D, -0.4D, 0.4D, this);
+    public final ValueProperty<Double> itemScaleProperty = new ValueProperty<>("Item Scale", 1.0D, 0.1D, 2.0D, this);
 
     @Override
     public void onEnable() {
@@ -24,13 +25,19 @@ public class Animations extends Module {
         super.onEnable();
     }
 
+    @Override
+    public void onDisable() {
+        super.onDisable();
+    }
+
     public enum blockModes {
         Swing,
         Swong,
         Swang,
         Swank,
         Slide,
-        Flux
+        Flux,
+        Exhibition
     }
 
     public static Animations getInstance() {

@@ -2,7 +2,6 @@ package vip.allureclient.impl.module.movement;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBow;
-import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
@@ -17,7 +16,6 @@ import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.visual.ChatUtil;
 import vip.allureclient.impl.event.network.PacketReceiveEvent;
-import vip.allureclient.impl.event.network.PacketSendEvent;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.property.BooleanProperty;
@@ -30,14 +28,12 @@ public class LongJump extends Module {
     @EventListener
     EventConsumer<UpdatePositionEvent> onUpdatePositionEvent;
     @EventListener
-    EventConsumer<PacketSendEvent> onPacketSendEvent;
-    @EventListener
     EventConsumer<PacketReceiveEvent> onPacketReceiveEvent;
 
     private final BooleanProperty hideJumpsProperty = new BooleanProperty("Hide Jumps", false, this);
 
     private boolean hasDamaged, bowCharging, bowFinished;
-    private int chargingTicks, oldSlot;
+    private int chargingTicks, oldSlot, groundTicks;
 
     public LongJump() {
         setModuleSuffix("Watchdog");
@@ -77,7 +73,7 @@ public class LongJump extends Module {
                     switch (chargingTicks) {
                         case 2:
                         case 3:
-                            updatePositionEvent.setPitch(-90, true);
+                            updatePositionEvent.setPitch(-90, false);
                             break;
                         case 4:
                             Wrapper.sendPacketDirect(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
@@ -87,10 +83,9 @@ public class LongJump extends Module {
                     }
                 }
             }
-        });
-        onPacketSendEvent = (packetSendEvent -> {
-            if (hasDamaged && packetSendEvent.getPacket() instanceof C03PacketPlayer.C04PacketPlayerPosition) {
-                //packetSendEvent.setCancelled(true);
+            if (Wrapper.getPlayer().onGround && hasDamaged && bowFinished && ++groundTicks > 1) {
+                ChatUtil.sendMessageToPlayer("Auto Toggled LongJump");
+                toggle();
             }
         });
         onPacketReceiveEvent = (packetReceiveEvent -> {
@@ -108,12 +103,15 @@ public class LongJump extends Module {
         bowCharging = false;
         bowFinished = false;
         chargingTicks = 0;
+        groundTicks = 0;
         oldSlot = Wrapper.getPlayer().inventory.currentItem;
+        super.onEnable();
     }
 
     @Override
     public void onDisable() {
         Wrapper.sendPacketDirect(new C09PacketHeldItemChange(oldSlot));
+        super.onDisable();
     }
 
     private int getBowSlot() {

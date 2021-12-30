@@ -30,6 +30,7 @@ public class Speed extends Module {
 
     public Speed() {
         this.onUpdatePositionEvent = (event -> {
+            Wrapper.getMinecraft().gameSettings.guiScale = 2;
             if (MovementUtil.isMoving()) {
                 Wrapper.getMinecraft().timer.timerSpeed = timerBoostProperty.getPropertyValue();
                if (Wrapper.getPlayer().onGround) {
@@ -45,7 +46,7 @@ public class Speed extends Module {
         });
         this.onPlayerMoveEvent = (event -> {
            if (event.isMoving()) {
-                event.setSpeed(Wrapper.getPlayer().onGround ? MovementUtil.getBaseMoveSpeed() * 1.15 : MovementUtil.getBaseMoveSpeed() * 1.06);
+                event.setSpeed(Wrapper.getPlayer().onGround ? 0.3 : MovementUtil.getBaseMoveSpeed() * 1.1);
                 if (lowHopProperty.getPropertyValue() && !MovementUtil.isOverVoid() && event.getY() < 0) {
                     event.setY(event.getY() - 0.15);
                 }
@@ -56,10 +57,14 @@ public class Speed extends Module {
     @Override
     public void onEnable() {
         groundTicks = 0;
+        super.onEnable();
     }
 
     @Override
     public void onDisable() {
         Wrapper.getMinecraft().timer.timerSpeed = 1.0F;
+        Wrapper.getPlayer().motionX = 0;
+        Wrapper.getPlayer().motionZ = 0;
+        super.onDisable();
     }
 }

@@ -58,10 +58,12 @@ public class PingSpoof extends Module {
     public void onEnable() {
         delayedPackets.clear();
         packetDelayTimer.reset();
+        super.onEnable();
     }
 
     private void sendDelayedPackets() {
         delayedPackets.forEach(Wrapper::sendPacketDirect);
         delayedPackets.clear();
+        super.onDisable();
     }
 }

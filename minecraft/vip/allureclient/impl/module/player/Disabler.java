@@ -5,6 +5,7 @@ import net.minecraft.network.play.client.C00PacketKeepAlive;
 import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
 import net.minecraft.network.play.client.C13PacketPlayerAbilities;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
+import vip.allureclient.AllureClient;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.module.Module;
@@ -17,6 +18,8 @@ import vip.allureclient.impl.event.network.PacketReceiveEvent;
 import vip.allureclient.impl.event.network.PacketSendEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.event.world.WorldLoadEvent;
+
+import java.awt.*;
 
 @ModuleData(moduleName = "Disabler", moduleBind = 0, moduleCategory = ModuleCategory.PLAYER)
 public class Disabler extends Module implements IRotations {
@@ -66,7 +69,9 @@ public class Disabler extends Module implements IRotations {
         });
         this.onUpdatePositionEvent = (event -> {
             setModuleSuffix("Watchdog");
-            setRotations(event, getRotations(), false);
+            if (MovementUtil.isMoving()) {
+                setRotations(event, getRotations(), false);
+            }
             if (event.isPre() && Wrapper.getPlayer().ticksExisted % (C0FState ? 50 : 30) == 0) {
                 if (!C0FState) {
                     Wrapper.sendPacketDirect(new C00PacketKeepAlive(18));

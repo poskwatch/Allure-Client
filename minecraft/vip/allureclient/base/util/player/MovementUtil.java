@@ -133,7 +133,7 @@ public class MovementUtil {
         if (Wrapper.getPlayer().isPotionActive(Potion.jump)) {
             minValue += Wrapper.getPlayer().getActivePotionEffect(Potion.jump).getAmplifier() + 1.0F;
         }
-        for (int i = 0; i < (int) ((minValue / (MathUtil.getRandomNumber(0.0890D, 0.0849D) - 1.0E-3D - Math.random() * 0.0002F - Math.random() * 0.0002F)) + 6); i++) {
+        for (int i = 0; i < (int) ((minValue / (MathUtil.getRandomNumber(0.0890D, 0.0849D) - 1.0E-3D - Math.random() * 0.0002F - Math.random() * 0.0002F)) + 18); i++) {
             Wrapper.sendPacketDirect(new C03PacketPlayer.C04PacketPlayerPosition(x, y + MathUtil.getRandomNumber(0.0655D, 0.0625D) - MathUtil.getRandomNumber(1.0E-3D, 1.0E-2D) - Math.random() * 0.0002F, z, false));
             Wrapper.sendPacketDirect(new C03PacketPlayer.C04PacketPlayerPosition(x, y + Math.random() * 0.0002F, z, false));
         }

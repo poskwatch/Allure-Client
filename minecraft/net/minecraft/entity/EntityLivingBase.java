@@ -51,9 +51,7 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.base.util.visual.SoundUtil;
 import vip.allureclient.impl.event.player.PlayerHurtSoundEvent;
-import vip.allureclient.impl.module.combat.killaura.KillAura;
 import vip.allureclient.impl.module.visual.Animations;
 
 public abstract class EntityLivingBase extends Entity

@@ -67,6 +67,7 @@ public class Flight extends Module {
     @Override
     public void onEnable() {
         super.onEnable();
+        MovementUtil.damagePlayer();
     }
 
     @Override

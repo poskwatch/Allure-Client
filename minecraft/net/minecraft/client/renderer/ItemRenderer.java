@@ -31,7 +31,7 @@ import optifine.Reflector;
 
 import org.lwjgl.opengl.GL11;
 import shadersmod.client.Shaders;
-import vip.allureclient.impl.module.combat.killaura.KillAura;
+import vip.allureclient.impl.module.combat.KillAura;
 import vip.allureclient.impl.module.player.NoSlow;
 import vip.allureclient.impl.module.visual.Animations;
 

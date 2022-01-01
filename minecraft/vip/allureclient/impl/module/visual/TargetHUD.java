@@ -18,7 +18,7 @@ import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.visual.AnimationUtil;
 import vip.allureclient.base.util.visual.ColorUtil;
 import vip.allureclient.impl.event.visual.Render2DEvent;
-import vip.allureclient.impl.module.combat.killaura.KillAura;
+import vip.allureclient.impl.module.combat.KillAura;
 import vip.allureclient.impl.property.BooleanProperty;
 
 import static org.lwjgl.opengl.GL11.*;

@@ -10,9 +10,7 @@ import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.util.visual.*;
 import vip.allureclient.impl.event.player.PlayerHurtSoundEvent;
 import vip.allureclient.impl.event.visual.Render2DEvent;
-import vip.allureclient.impl.module.combat.killaura.KillAura;
-
-import java.awt.*;
+import vip.allureclient.impl.module.combat.KillAura;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_BLEND;

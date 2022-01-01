@@ -20,7 +20,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.event.network.ServerConnectEvent;
-import vip.allureclient.impl.module.visual.Statistics;
 
 public class GuiConnecting extends GuiScreen
 {

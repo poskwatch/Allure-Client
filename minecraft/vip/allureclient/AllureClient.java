@@ -85,6 +85,10 @@ public class AllureClient {
         return notificationManager;
     }
 
+    public CommandManager getCommandManager() {
+        return commandManager;
+    }
+
     public static AllureClient getInstance(){
         return INSTANCE;
     }

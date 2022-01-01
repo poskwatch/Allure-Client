@@ -5,7 +5,7 @@ import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.module.combat.AntiBot;
 import vip.allureclient.impl.module.combat.Velocity;
-import vip.allureclient.impl.module.combat.killaura.KillAura;
+import vip.allureclient.impl.module.combat.KillAura;
 import vip.allureclient.impl.module.movement.*;
 import vip.allureclient.impl.module.player.*;
 import vip.allureclient.impl.module.visual.*;

@@ -1,4 +1,4 @@
-package vip.allureclient.impl.module.combat.killaura;
+package vip.allureclient.impl.module.combat;
 
 import io.netty.util.internal.ThreadLocalRandom;
 import net.minecraft.client.Minecraft;
@@ -19,25 +19,21 @@ import vip.allureclient.AllureClient;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.module.Module;
-import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.module.annotations.ModuleData;
+import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.util.client.NetworkUtil;
 import vip.allureclient.base.util.client.TimerUtil;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.math.MathUtil;
+import vip.allureclient.base.util.player.IRotations;
 import vip.allureclient.base.util.visual.ChatUtil;
 import vip.allureclient.base.util.visual.GLUtil;
-import vip.allureclient.impl.event.network.PacketSendEvent;
-import vip.allureclient.impl.event.player.PlayerMoveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.event.visual.Render3DEvent;
-import vip.allureclient.impl.module.combat.AntiBot;
-import vip.allureclient.base.util.player.IRotations;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.EnumProperty;
 import vip.allureclient.impl.property.MultiSelectEnumProperty;
 import vip.allureclient.impl.property.ValueProperty;
-import vip.allureclient.visual.notification.NotificationType;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -47,12 +43,6 @@ public class KillAura extends Module implements IRotations {
 
     @EventListener
     EventConsumer<UpdatePositionEvent> onUpdatePositionEvent;
-
-    @EventListener
-    EventConsumer<PacketSendEvent> onPacketSendEvent;
-
-    @EventListener
-    EventConsumer<PlayerMoveEvent> onPlayerMoveEvent;
 
     @EventListener
     EventConsumer<Render3DEvent> onRender3DEvent;
@@ -69,19 +59,11 @@ public class KillAura extends Module implements IRotations {
 
     private final EnumProperty<TargetingMode> targetingModeProperty = new EnumProperty<>("Target by", TargetingMode.Distance, this);
 
-    private final BooleanProperty movementFixProperty = new BooleanProperty("Move Fix", false, this);
-
-    private final EnumProperty<MovementFixMode> movementFixModeProperty = new EnumProperty<MovementFixMode>("Mode", MovementFixMode.Watchdog, this) {
-        @Override
-        public boolean isPropertyHidden() {
-            return !movementFixProperty.getPropertyValue();
-        }
-    };
+    private final EnumProperty<AttackingMode> attackingModeProperty = new EnumProperty<>("Attacking Mode", AttackingMode.Always, this);
 
     private final BooleanProperty renderRangeProperty = new BooleanProperty("Render Range", true, this);
 
     private Entity currentTarget;
-    private Entity lastValidTarget;
     private boolean isBlocking;
 
     public KillAura(){
@@ -100,9 +82,10 @@ public class KillAura extends Module implements IRotations {
             if (updatePositionEvent.isPre()) {
                 if (!targetEntities.isEmpty()) {
                     currentTarget = targetEntities.get(0);
-                    lastValidTarget = targetEntities.get(0);
                     if (currentTarget != null) {
                         setRotations(updatePositionEvent, getRotations(), true);
+                        if (attackingModeProperty.getPropertyValue().equals(AttackingMode.Tick) && Wrapper.getPlayer().ticksExisted % 3 != 0)
+                            return;
                         if (apsTimerUtil.hasReached(1000 / averageAPSProperty.getPropertyValue())) {
                             Wrapper.getPlayer().swingItem();
                             Wrapper.sendPacketDirect(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));
@@ -118,7 +101,6 @@ public class KillAura extends Module implements IRotations {
                                         z + ThreadLocalRandom.current().nextDouble(-0.5, 0.5), 23, 23, 23, 152);
                             }
                             apsTimerUtil.reset();
-                            ChatUtil.sendMessageToPlayer("Debug: " + MathUtil.roundToPlace(((EntityLivingBase) currentTarget).getHealth(), 1));
                         }
                     }
                 }
@@ -135,18 +117,6 @@ public class KillAura extends Module implements IRotations {
                 else
                     isBlocking = false;
             }
-        });
-
-        this.onPacketSendEvent = (packetSendEvent -> {
-
-        });
-
-        this.onPlayerMoveEvent = (playerMoveEvent -> {
-           if (movementFixProperty.getPropertyValue() && movementFixModeProperty.getPropertyValue().equals(MovementFixMode.Watchdog))
-               KillAuraMoveFixImpl.watchdogMoveFix(playerMoveEvent);
-           if (!playerMoveEvent.isMoving()) {
-               Wrapper.getMinecraft().timer.timerSpeed = 1;
-           }
         });
 
         this.onRender3DEvent = (render3DEvent -> {
@@ -213,10 +183,6 @@ public class KillAura extends Module implements IRotations {
         return currentTarget;
     }
 
-    public Entity getLastValidTarget() {
-        return lastValidTarget;
-    }
-
     public static KillAura getInstance() {
         return (KillAura) AllureClient.getInstance().getModuleManager().getModuleByClass.apply(KillAura.class);
     }
@@ -250,8 +216,9 @@ public class KillAura extends Module implements IRotations {
         Health
     }
 
-    private enum MovementFixMode {
-        Watchdog
+    private enum AttackingMode {
+        Always,
+        Tick
     }
 
     private enum Targets {

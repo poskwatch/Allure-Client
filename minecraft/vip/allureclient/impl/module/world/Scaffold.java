@@ -8,6 +8,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.client.C0APacketAnimation;
+import net.minecraft.potion.Potion;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import org.lwjgl.opengl.GL11;
@@ -28,9 +29,11 @@ import vip.allureclient.base.util.visual.GLUtil;
 import vip.allureclient.base.util.world.BlockData;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.event.visual.Render2DEvent;
+import vip.allureclient.impl.module.movement.Speed;
 import vip.allureclient.impl.property.EnumProperty;
 import vip.allureclient.impl.property.MultiSelectEnumProperty;
 import vip.allureclient.impl.property.ValueProperty;
+import vip.allureclient.visual.notification.NotificationType;
 
 import java.awt.*;
 
@@ -72,10 +75,12 @@ public class Scaffold extends Module implements IRotations {
     public Scaffold() {
         this.onUpdatePositionEvent = (event -> {
             if (event.isPre()) {
+                setModuleSuffix("Watchdog");
                 updateBlockCount();
                 if (addonsProperty.isSelected(Addons.No_Sprint)) {
                     Wrapper.getPlayer().setSprinting(false);
-                    MovementUtil.setSpeed(0.06);
+                    MovementUtil.setSpeed(MovementUtil.getBaseMoveSpeed() *
+                            (Wrapper.getPlayer().isPotionActive(Potion.moveSpeed) ? 0.2 : 0.4));
                 }
                 if (MovementUtil.isMoving())
                     Wrapper.getMinecraft().timer.timerSpeed = timerBoostProperty.getPropertyValue();
@@ -85,8 +90,8 @@ public class Scaffold extends Module implements IRotations {
                     if (this.bestBlockStack < 36 && this.clickTimer.hasReached(250L)) {
                         for (int i = 44; i >= 36; i--) {
                             ItemStack stack = Wrapper.getPlayer().inventoryContainer.getSlot(i).getStack();
-                            if (stack != null && stack.stackSize > 1 && stack.getItem() instanceof ItemBlock) {
-                                Wrapper.getMinecraft().playerController.windowClick(Wrapper.getPlayer().inventoryContainer.windowId, i - 36, i - 36, 2, Wrapper.getPlayer());
+                            if (stack != null && stack.stackSize > 1 && stack.getItem() instanceof ItemBlock && isValidBlock(((ItemBlock) stack.getItem()).getBlock())) {
+                                Wrapper.getMinecraft().playerController.windowClick(Wrapper.getPlayer().inventoryContainer.windowId, this.bestBlockStack, i - 36, 2, Wrapper.getPlayer());
                                 this.bestBlockStack = i;
                                 break;
                             }
@@ -123,12 +128,15 @@ public class Scaffold extends Module implements IRotations {
                         Wrapper.getPlayer().swingItem();
                     if (addonsProperty.isSelected(Addons.Tower)) {
                         if (Wrapper.getMinecraft().gameSettings.keyBindJump.isKeyDown() &&
-                            Wrapper.getWorld().checkBlockCollision(Wrapper.getPlayer().getEntityBoundingBox().addCoord(0, -0.0626D, 0)))
+                            Wrapper.getWorld().checkBlockCollision(Wrapper.getPlayer().getEntityBoundingBox().addCoord(0, -0.0626D, 0))
+                        && !MovementUtil.isMoving())
                         switch (towerModeProperty.getPropertyValue()) {
                             case NCP:
                                 Wrapper.getPlayer().motionY = MovementUtil.getJumpHeight() - 4.54352838557992E-4D;
                                 break;
                             case Watchdog:
+                                Wrapper.getPlayer().motionX = 0;
+                                Wrapper.getPlayer().motionZ = 0;
                                 if (Wrapper.getPlayer().ticksExisted % 2 != 0)
                                     Wrapper.getPlayer().jump();
                                 break;
@@ -149,13 +157,14 @@ public class Scaffold extends Module implements IRotations {
                     break;
                 case Bar:
                     blockBarAnimation = AnimationUtil.linearAnimation(98 * (Math.min(blockCount / 128.0F, 1.0F)), blockBarAnimation, 1);
-                    GLUtil.glFilledQuad(x - 50, y, 100, 8, 0x90000000);
+                    GLUtil.glFilledQuad(x - 50, y, 100, 6, 0x90000000);
                     GL11.glPushMatrix();
                     GL11.glEnable(GL11.GL_SCISSOR_TEST);
                     GLUtil.glScissor(x - 49, y + 1, blockBarAnimation, 6);
-                    GLUtil.glHorizontalGradientQuad(x - 49, y + 1, 98, 6, Color.GREEN.getRGB(), Color.MAGENTA.getRGB());
+                    GLUtil.glHorizontalGradientQuad(x - 49, y + 1, 98, 4, Color.GREEN.getRGB(), Color.MAGENTA.getRGB());
                     GL11.glDisable(GL11.GL_SCISSOR_TEST);
                     GL11.glPopMatrix();
+                    GL11.glColor4f(1, 1, 1, 1);
                     break;
             }
 
@@ -166,6 +175,11 @@ public class Scaffold extends Module implements IRotations {
     public void onEnable() {
         this.originalHotBarSlot = Wrapper.getPlayer().inventory.currentItem;
         super.onEnable();
+        if (AllureClient.getInstance().getModuleManager().getModuleByClass.apply(Speed.class).isToggled()) {
+            AllureClient.getInstance().getModuleManager().getModuleByClass.apply(Speed.class).setToggled(false);
+            AllureClient.getInstance().getNotificationManager().addNotification("Module Toggled",
+                    "Speed was automatically toggled to prevent lagbacks", 1500, NotificationType.WARNING);
+        }
     }
 
     @Override

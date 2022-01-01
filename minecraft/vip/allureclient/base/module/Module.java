@@ -1,9 +1,8 @@
 package vip.allureclient.base.module;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import net.minecraft.client.gui.GuiScreen;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.bind.BindableObject;
 import vip.allureclient.base.config.ConfigurableObject;
@@ -12,13 +11,10 @@ import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.module.interfaces.ToggleableObject;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.visual.AnimatedCoordinate;
-import vip.allureclient.base.util.visual.ChatUtil;
 import vip.allureclient.impl.property.*;
 import vip.allureclient.visual.notification.NotificationType;
 
 import java.awt.*;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Objects;
 
 public class Module implements ToggleableObject, BindableObject, ConfigurableObject {
@@ -28,8 +24,9 @@ public class Module implements ToggleableObject, BindableObject, ConfigurableObj
     private final ModuleCategory moduleCategory;
     private boolean isModuleToggled;
     private String moduleSuffix;
+    private boolean hidden;
 
-    private final AnimatedCoordinate animatedCoordinate = new AnimatedCoordinate(0, 0);
+    private final AnimatedCoordinate animatedCoordinate = new AnimatedCoordinate(GuiScreen.width, 0);
 
     public Module(){
         if(isIdentified()) {
@@ -85,8 +82,6 @@ public class Module implements ToggleableObject, BindableObject, ConfigurableObj
             Wrapper.getEventManager().unsubscribe(this);
             onDisable();
         }
-        AllureClient.getInstance().getNotificationManager().addNotification("Module toggled",
-                String.format("Module %s was %s", moduleName, isModuleToggled ? "enabled" : "disabled"), 1000, NotificationType.INFO);
     }
 
     @Override
@@ -141,12 +136,25 @@ public class Module implements ToggleableObject, BindableObject, ConfigurableObj
         return animatedCoordinate;
     }
 
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    public void setHidden(boolean hidden) {
+        this.hidden = hidden;
+    }
+
+    public boolean isVisible() {
+        return !isHidden() && isToggled();
+    }
+
     @SuppressWarnings({"unchecked"})
     @Override
     public JsonObject save() {
         JsonObject moduleObject = new JsonObject();
         moduleObject.addProperty("toggled", isModuleToggled);
         moduleObject.addProperty("bind", moduleKeyBind);
+        moduleObject.addProperty("hidden", hidden);
         JsonObject propertiesObject = new JsonObject();
         AllureClient.getInstance().getPropertyManager().getPropertiesByModule(this).forEach(property -> {
             if (property instanceof BooleanProperty) {
@@ -199,6 +207,9 @@ public class Module implements ToggleableObject, BindableObject, ConfigurableObj
         }
         if (jsonObject.has("bind")) {
             setBind(jsonObject.get("bind").getAsInt());
+        }
+        if (jsonObject.has("hidden")) {
+            setHidden(jsonObject.get("hidden").getAsBoolean());
         }
         if (jsonObject.has("properties")) {
             JsonObject propertiesObject = jsonObject.getAsJsonObject("properties");

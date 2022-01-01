@@ -19,7 +19,6 @@ public class ToggleCommand implements Command {
             for (Module module : AllureClient.getInstance().getModuleManager().getModules.get()) {
                 if (arguments[1].equalsIgnoreCase(module.getModuleName())) {
                     module.toggle();
-                    ChatUtil.sendMessageToPlayer("Toggled " + module.getModuleName());
                     return;
                 }
             }

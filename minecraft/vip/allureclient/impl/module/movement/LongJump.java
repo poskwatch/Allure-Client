@@ -8,6 +8,7 @@ import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
+import vip.allureclient.AllureClient;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.module.Module;
@@ -19,6 +20,7 @@ import vip.allureclient.impl.event.network.PacketReceiveEvent;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.property.BooleanProperty;
+import vip.allureclient.visual.notification.NotificationType;
 
 @ModuleData(moduleName = "Long Jump", moduleBind = 0, moduleCategory = ModuleCategory.MOVEMENT)
 public class LongJump extends Module {
@@ -65,8 +67,9 @@ public class LongJump extends Module {
                         bowCharging = true;
                         chargingTicks = 0;
                     } else {
-                        ChatUtil.sendMessageToPlayer("You must have a bow in your hot-bar.");
-                        setToggled(false);
+                        AllureClient.getInstance().getNotificationManager().addNotification("Long Jump",
+                                "You must have a bow in your hotbar for Long Jump", 1000, NotificationType.ERROR);
+                        toggle();
                     }
                 } else {
                     chargingTicks++;
@@ -84,7 +87,8 @@ public class LongJump extends Module {
                 }
             }
             if (Wrapper.getPlayer().onGround && hasDamaged && bowFinished && ++groundTicks > 1) {
-                ChatUtil.sendMessageToPlayer("Auto Toggled LongJump");
+                AllureClient.getInstance().getNotificationManager().addNotification("Long Jump",
+                        "Long Jump was auto disabled to prevent flags/errors", 1000, NotificationType.WARNING);
                 toggle();
             }
         });
@@ -105,13 +109,11 @@ public class LongJump extends Module {
         chargingTicks = 0;
         groundTicks = 0;
         oldSlot = Wrapper.getPlayer().inventory.currentItem;
-        super.onEnable();
     }
 
     @Override
     public void onDisable() {
         Wrapper.sendPacketDirect(new C09PacketHeldItemChange(oldSlot));
-        super.onDisable();
     }
 
     private int getBowSlot() {

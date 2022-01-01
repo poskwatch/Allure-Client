@@ -603,7 +603,7 @@ public class GuiIngame extends Gui
         int k = 0;
 
         final ArrayList<Module> sortedModulesRemoved = AllureClient.getInstance().getModuleManager().getSortedDisplayModules.apply(
-                AllureClient.getInstance().getFontManager().smallFontRenderer
+                false
         );
         sortedModulesRemoved.removeIf(module -> !module.isToggled());
         GlStateManager.translate(0, Math.max(0,

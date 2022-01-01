@@ -4,10 +4,7 @@ import net.minecraft.util.ChatComponentText;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.impl.command.BindCommand;
-import vip.allureclient.impl.command.ConfigCommand;
-import vip.allureclient.impl.command.ToggleCommand;
-import vip.allureclient.impl.command.VClipCommand;
+import vip.allureclient.impl.command.*;
 import vip.allureclient.impl.event.player.ChatMessageSendEvent;
 
 import java.util.ArrayList;
@@ -51,6 +48,8 @@ public class CommandManager {
         commands.add(new VClipCommand());
         commands.add(new ToggleCommand());
         commands.add(new BindCommand());
+        commands.add(new HideCommand());
+        commands.add(new RenameCommand());
     }
 
 }

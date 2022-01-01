@@ -30,6 +30,29 @@ public class GLUtil {
         glEnable(GL_TEXTURE_2D);
     }
 
+    public static void glOutlinedFilledQuad(double x, double y, double width, double height, int quadColor, int outlineColor) {
+        glFilledQuad(x + 0.5, y + 0.5, width - 1, height - 1, quadColor);
+        glLine(x, y, x, y + height, 1.5F, outlineColor);
+        glLine(x + width, y, x + width, y + height, 1.5F, outlineColor);
+        glLine(x, y, x + width, y, 1.5F, outlineColor);
+        glLine(x, y + height, x + width, y + height, 1.5F, outlineColor);
+    }
+
+    public static void glLine(double startX, double startY, double endX, double endY, float lineWidth, int color) {
+        glDisable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(770, 771);
+        glColor(color);
+        glLineWidth(lineWidth);
+        glBegin(GL_LINES);
+        {
+            glVertex2d(startX, startY);
+            glVertex2d(endX, endY);
+        }
+        glEnd();
+        glEnable(GL_TEXTURE_2D);
+    }
+
     public static void glHorizontalGradientQuad(double x, double y, double width, double height, int startColor, int endColor) {
         glDisable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
@@ -102,7 +125,7 @@ public class GLUtil {
                     y = MathUtil.linearInterpolate(entity.lastTickPosY, entity.posY, partialTicks) - Wrapper.getRenderManager().viewerPosY,
                     z = MathUtil.linearInterpolate(entity.lastTickPosZ, entity.posZ, partialTicks) - Wrapper.getRenderManager().viewerPosZ;
             for (int i = 0; i <= points; i++) {
-                    glColor(ColorUtil.interpolateColorsDynamic(3, i * 15, Color.MAGENTA, Color.MAGENTA.darker().darker().darker().darker().darker()).getRGB());
+                    glColor(ColorUtil.interpolateColorsDynamic(3, i * 10, Color.MAGENTA, Color.MAGENTA.darker().darker().darker().darker().darker()).getRGB());
                     glVertex3d(x + radius * Math.cos(i * Math.PI / (points / 2)), y + 0.5, z + radius * Math.sin(i * Math.PI / (points / 2)));
             }
         }

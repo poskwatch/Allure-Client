@@ -18,6 +18,9 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.ChatComponentTranslation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.impl.event.network.ServerConnectEvent;
+import vip.allureclient.impl.module.visual.Statistics;
 
 public class GuiConnecting extends GuiScreen
 {
@@ -48,6 +51,8 @@ public class GuiConnecting extends GuiScreen
     private void connect(final String ip, final int port)
     {
         logger.info("Connecting to " + ip + ", " + port);
+        ServerConnectEvent serverConnectEvent = new ServerConnectEvent(ip);
+        Wrapper.getEventManager().callEvent(serverConnectEvent);
         (new Thread("Server Connector #" + CONNECTION_ID.incrementAndGet())
         {
             public void run()

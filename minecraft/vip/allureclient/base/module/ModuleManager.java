@@ -1,11 +1,11 @@
 package vip.allureclient.base.module;
 
 import vip.allureclient.AllureClient;
-import vip.allureclient.base.font.MinecraftFontRenderer;
 import vip.allureclient.base.module.enums.ModuleCategory;
+import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.module.combat.AntiBot;
-import vip.allureclient.impl.module.combat.killaura.KillAura;
 import vip.allureclient.impl.module.combat.Velocity;
+import vip.allureclient.impl.module.combat.killaura.KillAura;
 import vip.allureclient.impl.module.movement.*;
 import vip.allureclient.impl.module.player.*;
 import vip.allureclient.impl.module.visual.*;
@@ -36,6 +36,7 @@ public class ModuleManager {
                     new NoSlow(),
                     new GuiMove(),
                     new AntiVoid(),
+                    new DamageSelf(),
                     // Movement Modules
                     new Sprint(),
                     new Flight(),
@@ -50,6 +51,7 @@ public class ModuleManager {
                     new TargetHUD(),
                     new PlayerESP(),
                     new HitMarkers(),
+                    new Statistics(),
                     // World Modules
                     new Atmosphere(),
                     new ChestStealer(),
@@ -77,10 +79,11 @@ public class ModuleManager {
         return filteredModules;
     });
 
-    public Function<MinecraftFontRenderer, ArrayList<Module>> getSortedDisplayModules = (fontRenderer -> {
+    public Function<Boolean, ArrayList<Module>> getSortedDisplayModules = (isVanillaFont -> {
         ArrayList<Module> sortedDisplayModules = new ArrayList<>(getModules.get());
-        //sortedDisplayModules.removeIf(module -> (!module.isToggled()));
-        sortedDisplayModules.sort(Comparator.comparingDouble(module -> fontRenderer.getStringWidth(((Module) module).getModuleDisplayName())).reversed());
+        sortedDisplayModules.sort(Comparator.comparingDouble(module -> (isVanillaFont ?
+                Wrapper.getMinecraftFontRenderer().getStringWidth(((Module)module).getModuleDisplayName()) :
+                AllureClient.getInstance().getFontManager().mediumFontRenderer.getStringWidth(((Module) module).getModuleDisplayName()))).reversed());
         return sortedDisplayModules;
     });
 

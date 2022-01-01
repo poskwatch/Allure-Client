@@ -370,7 +370,7 @@ public class ItemRenderer
                                 Animations.getInstance().zValueProperty.getPropertyValue());
                         switch (Animations.getInstance().blockModeProperty.getPropertyValue()){
                             case Swing:
-                                this.transformFirstPersonItem(f - 0.25f, f1);
+                                this.transformFirstPersonItem(f/2 - 0.25f, f1);
                                 this.func_178103_d();
                                 break;
                             case Swong:

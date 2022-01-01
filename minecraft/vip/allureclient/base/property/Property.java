@@ -1,6 +1,7 @@
 package vip.allureclient.base.property;
 
 import vip.allureclient.AllureClient;
+import vip.allureclient.base.config.ConfigurableObject;
 import vip.allureclient.base.module.Module;
 
 public class Property<T> {

@@ -9,7 +9,6 @@ import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C02PacketUseEntity;
-import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumParticleTypes;
@@ -25,18 +24,20 @@ import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.NetworkUtil;
 import vip.allureclient.base.util.client.TimerUtil;
 import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.base.util.math.MathUtil;
+import vip.allureclient.base.util.visual.ChatUtil;
 import vip.allureclient.base.util.visual.GLUtil;
 import vip.allureclient.impl.event.network.PacketSendEvent;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.event.visual.Render3DEvent;
 import vip.allureclient.impl.module.combat.AntiBot;
-import vip.allureclient.impl.module.visual.TargetHUD;
 import vip.allureclient.base.util.player.IRotations;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.EnumProperty;
 import vip.allureclient.impl.property.MultiSelectEnumProperty;
 import vip.allureclient.impl.property.ValueProperty;
+import vip.allureclient.visual.notification.NotificationType;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -80,6 +81,7 @@ public class KillAura extends Module implements IRotations {
     private final BooleanProperty renderRangeProperty = new BooleanProperty("Render Range", true, this);
 
     private Entity currentTarget;
+    private Entity lastValidTarget;
     private boolean isBlocking;
 
     public KillAura(){
@@ -98,8 +100,8 @@ public class KillAura extends Module implements IRotations {
             if (updatePositionEvent.isPre()) {
                 if (!targetEntities.isEmpty()) {
                     currentTarget = targetEntities.get(0);
+                    lastValidTarget = targetEntities.get(0);
                     if (currentTarget != null) {
-                        TargetHUD.getInstance().scaleAnimationTarget = 1.0;
                         setRotations(updatePositionEvent, getRotations(), true);
                         if (apsTimerUtil.hasReached(1000 / averageAPSProperty.getPropertyValue())) {
                             Wrapper.getPlayer().swingItem();
@@ -116,12 +118,12 @@ public class KillAura extends Module implements IRotations {
                                         z + ThreadLocalRandom.current().nextDouble(-0.5, 0.5), 23, 23, 23, 152);
                             }
                             apsTimerUtil.reset();
+                            ChatUtil.sendMessageToPlayer("Debug: " + MathUtil.roundToPlace(((EntityLivingBase) currentTarget).getHealth(), 1));
                         }
                     }
                 }
                 else {
                     currentTarget = null;
-                    TargetHUD.getInstance().scaleAnimationTarget = 0;
                 }
             }
             else {
@@ -209,6 +211,10 @@ public class KillAura extends Module implements IRotations {
 
     public Entity getCurrentTarget() {
         return currentTarget;
+    }
+
+    public Entity getLastValidTarget() {
+        return lastValidTarget;
     }
 
     public static KillAura getInstance() {

@@ -20,6 +20,7 @@ import vip.allureclient.visual.screens.dropdown.GuiDropDown;
 public class AllureClient {
 
     public final String CLIENT_NAME = "Allure";
+    public String CUSTOM_CLIENT_NAME = CLIENT_NAME;
     public final double CLIENT_VERSION = 0.1;
     private static final AllureClient INSTANCE = new AllureClient();
 

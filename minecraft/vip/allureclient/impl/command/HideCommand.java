@@ -1,28 +1,26 @@
 package vip.allureclient.impl.command;
 
-import org.lwjgl.input.Keyboard;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.command.Command;
 import vip.allureclient.base.command.CommandArgumentException;
 import vip.allureclient.base.module.Module;
-import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.base.util.visual.ChatUtil;
 import vip.allureclient.visual.notification.NotificationType;
 
-public class BindCommand implements Command {
+public class HideCommand implements Command {
     @Override
     public String[] getAliases() {
-        return new String[]{"bind", "b"};
+        return new String[]{"hide", "h"};
     }
 
     @Override
     public void execute(String[] arguments) throws CommandArgumentException {
-        if (arguments.length == 3 && arguments[2].length() == 1) {
+        if (arguments.length == 2) {
             for (Module module : AllureClient.getInstance().getModuleManager().getModules.get()) {
-                if (arguments[1].equalsIgnoreCase(module.getModuleName())) {
-                    module.setBind(Keyboard.getKeyIndex(arguments[2]));
-                    AllureClient.getInstance().getNotificationManager().addNotification("Bound Module",
-                            "Registered key " + arguments[2].toUpperCase() + " to toggle " + module.getModuleName(), 500, NotificationType.SUCCESS);
+                if (arguments[1].equalsIgnoreCase(module.getModuleName().replaceAll(" ", ""))) {
+                    module.setHidden(!module.isHidden());
+                    AllureClient.getInstance().getNotificationManager().addNotification("Module Hidden",
+                            "Module " + module.getModuleName() + " is now " +
+                            (module.isHidden() ? "hidden" : "unhidden"), 1000, NotificationType.SUCCESS);
                     return;
                 }
             }
@@ -33,6 +31,6 @@ public class BindCommand implements Command {
 
     @Override
     public String getUsage() {
-        return ".bind <module> <key>";
+        return ".hide <module>";
     }
 }

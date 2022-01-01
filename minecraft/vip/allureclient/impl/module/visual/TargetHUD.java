@@ -19,6 +19,7 @@ import vip.allureclient.base.util.visual.AnimationUtil;
 import vip.allureclient.base.util.visual.ColorUtil;
 import vip.allureclient.impl.event.visual.Render2DEvent;
 import vip.allureclient.impl.module.combat.killaura.KillAura;
+import vip.allureclient.impl.property.BooleanProperty;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -30,16 +31,14 @@ public class TargetHUD extends Module {
 
     public double xLocation = new ScaledResolution(Wrapper.getMinecraft()).getScaledWidth()/2.0D, yLocation = new ScaledResolution(Wrapper.getMinecraft()).getScaledHeight()/2.0D;
 
-    public double scaleAnimationTarget = 0, scaleAnimation;
+    private final BooleanProperty animateBarProperty = new BooleanProperty("Animate bar", true, this);
 
     public TargetHUD() {
         this.onRender2DEvent = (render2DEvent -> {
-            scaleAnimation = AnimationUtil.easeOutAnimation(scaleAnimationTarget, scaleAnimation, 0.03);
             if (KillAura.getInstance().getCurrentTarget() != null) {
                 drawTargetHUD((EntityLivingBase) KillAura.getInstance().getCurrentTarget());
             }
             if (Wrapper.getMinecraft().currentScreen instanceof GuiChat) {
-                scaleAnimationTarget = 1.0;
                 drawTargetHUD(Wrapper.getPlayer());
             }
         });
@@ -50,9 +49,7 @@ public class TargetHUD extends Module {
     public void drawTargetHUD(EntityLivingBase entity) {
         GL11.glPushMatrix();
         GL11.glTranslated(xLocation, yLocation, 0);
-        GlStateManager.scale(scaleAnimation, scaleAnimation, 0);
-       // BlurUtil.blurArea(xLocation + 5, yLocation + 7, 125, 32);
-        Gui.drawRectWithWidth(5, 7, 125, 32, 0x90202020);
+        Gui.drawRectWithWidth(5, 7, 125, 32, 0xff202020);
         Gui.drawRectWithWidth(4, 7, 1, 32, 0xff101010);
         Gui.drawRectWithWidth(130, 7, 1, 32, 0xff101010);
         Gui.drawRectWithWidth(4, 6, 127, 1, 0xff101010);
@@ -76,17 +73,17 @@ public class TargetHUD extends Module {
             Gui.drawRectWithWidth(5, 7, 32, 32, 0xff000000);
             Wrapper.getMinecraft().fontRendererObj.drawStringWithShadow("?", 18F, 19.5F, -1);
         }
-        AllureClient.getInstance().getFontManager().mediumFontRenderer.drawStringWithShadow(entity.getName(), 40, 12, -1);
+        Wrapper.getMinecraftFontRenderer().drawStringWithShadow(entity.getName(), 40, 12, -1);
         final double currentHealth = entity.getHealth();
         final double maxHealth = entity.getMaxHealth();
         final double percent = Math.min((currentHealth / maxHealth), 1);
         animationValue = AnimationUtil.linearAnimation(87 * percent, animationValue, 0.7);
         Gui.drawRectWithWidth(39, 24, 89, 12, 0x70101010);
         Gui.drawRectWithWidth(40, 25, 87, 10, ColorUtil.getHealthColor(entity, 127).darker().getRGB());
-        Gui.drawRectWithWidth(40, 25, animationValue, 10, ColorUtil.getHealthColor(entity, 255).getRGB());
+        Gui.drawRectWithWidth(40, 25, animateBarProperty.getPropertyValue() ? animationValue : percent * 87, 10, ColorUtil.getHealthColor(entity, 255).getRGB());
         String percentage = String.format("%.1f%%", 100 * (currentHealth/maxHealth));
-        double percentageX = (38 + animationValue) - Wrapper.getMinecraft().fontRendererObj.getStringWidth(percentage);
-        AllureClient.getInstance().getFontManager().smallFontRenderer.drawStringWithShadow(percentage, Math.round(Math.max(percentageX, 43.0)), 26.5, -1);
+        double percentageX = (38 + (animateBarProperty.getPropertyValue() ? animationValue : percent * 87)) - Wrapper.getMinecraft().fontRendererObj.getStringWidth(percentage);
+        Wrapper.getMinecraftFontRenderer().drawStringWithShadow(percentage, Math.round(Math.max(percentageX, 43.0)), 26.5F, -1);
         GlStateManager.color(1,1, 1);
         GL11.glPopMatrix();
     }

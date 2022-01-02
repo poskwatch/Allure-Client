@@ -46,32 +46,38 @@ public class AutoHypixel extends Module {
     public AutoHypixel() {
         onPacketReceiveEvent = (event -> {
            if (event.getPacket() instanceof S02PacketChat) {
-               final String formattedText = ((S02PacketChat) event.getPacket()).getChatComponent().getUnformattedText();
-               if (formattedText.contains("was killed by")) {
-                   final String[] wordsInMessage = formattedText.split(" ");
-                   if (wordsInMessage[4].contains(Wrapper.getPlayer().getName())) {
-                       Wrapper.sendPacketDirect(new C01PacketChatMessage("/achat " +
-                               (killInsultsModeProperty.getPropertyValue().equals(
-                                       KillInsultsMode.Polish) ? polishInsults : normalInsults
-                               )[new Random().nextInt(normalInsults.length)].replaceAll("%s", NetworkUtil.removeRankColorCodes(wordsInMessage[0]))));
-                       Statistics.getInstance().addKill();
+               if (((S02PacketChat) event.getPacket()).getChatComponent() != null) {
+                   final String formattedText = ((S02PacketChat) event.getPacket()).getChatComponent().getUnformattedText();
+                   if (formattedText.contains("was killed by")) {
+                       final String[] wordsInMessage = formattedText.split(" ");
+                       if (wordsInMessage[4].contains(Wrapper.getPlayer().getName())) {
+                           Wrapper.sendPacketDirect(new C01PacketChatMessage("/achat " +
+                                   (killInsultsModeProperty.getPropertyValue().equals(
+                                           KillInsultsMode.Polish) ? polishInsults : normalInsults
+                                   )[new Random().nextInt(((killInsultsModeProperty.getPropertyValue().equals(
+                                           KillInsultsMode.Polish) ? polishInsults : normalInsults
+                                   ).length))].replaceAll("%s", NetworkUtil.removeRankColorCodes(wordsInMessage[0]))));
+                           Statistics.getInstance().addKill();
+                       }
                    }
-               }
-               if (formattedText.toLowerCase().contains("you died")) {
-                   Wrapper.getPlayer().sendChatMessage("/play solo_insane");
-                   AllureClient.getInstance().getNotificationManager().addNotification("Auto Hypixel",
-                           "You have been sent to a new game", 3000, NotificationType.INFO);
+                   if (formattedText.toLowerCase().contains("you died")) {
+                       Wrapper.getPlayer().sendChatMessage("/play solo_insane");
+                       AllureClient.getInstance().getNotificationManager().addNotification("Auto Hypixel",
+                               "You have been sent to a new game", 3000, NotificationType.INFO);
+                   }
                }
            }
            if (event.getPacket() instanceof S45PacketTitle) {
-               if (((S45PacketTitle) event.getPacket()).getMessage() != null) {
-                   final String message = ((S45PacketTitle) event.getPacket()).getMessage().getFormattedText();
-                   if (message.toLowerCase().contains("you died") || message.toLowerCase().contains("victory")) {
-                       Wrapper.getPlayer().sendChatMessage("/play solo_insane");
-                       AllureClient.getInstance().getNotificationManager().addNotification("Auto Hypixel",
-                               "You have been sent to a new game", 1500, NotificationType.INFO);
-                       if (message.toLowerCase().contains("victory"))
-                           Statistics.getInstance().addWin();
+               if (event.getPacket() != null) {
+                   if (((S45PacketTitle) event.getPacket()).getMessage() != null && ((S45PacketTitle) event.getPacket()).getMessage().getFormattedText() != null) {
+                       final String message = ((S45PacketTitle) event.getPacket()).getMessage().getFormattedText();
+                       if (message.toLowerCase().contains("you died") || message.toLowerCase().contains("victory")) {
+                           Wrapper.getPlayer().sendChatMessage("/play solo_insane");
+                           AllureClient.getInstance().getNotificationManager().addNotification("Auto Hypixel",
+                                   "You have been sent to a new game", 1500, NotificationType.INFO);
+                           if (message.toLowerCase().contains("victory"))
+                               Statistics.getInstance().addWin();
+                       }
                    }
                }
            }

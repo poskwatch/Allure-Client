@@ -194,7 +194,7 @@ public class Scaffold extends Module implements IRotations {
     @Override
     public float[] getRotations() {
         final float originalYaw = MovementUtil.getMovementDirection() - 180.0F;
-        return new float[]{(float) MathUtil.getRandomNumber(originalYaw - 45, originalYaw + 45), 75.0F};
+        return new float[]{originalYaw, 75.0F};
     }
 
     @Override

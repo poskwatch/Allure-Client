@@ -36,7 +36,7 @@ public class EnumPropertyComponent extends Component {
                 boolean hoveringText = mouseX >= x + 5 && mouseX <= x + 110
                         && mouseY >= (y + 19 + (i * 15)) && mouseY <= (y + 19 + (i * 15) + 13);
                 fontRenderer.drawCenteredStringWithShadow(
-                        property.getPropertyEnumConstants()[i].toString(), (float) x + 57.5F, (float) (y + 19 + (i * 15)),
+                        property.getPropertyEnumConstants()[i].toString().replaceAll("_", ""), (float) x + 57.5F, (float) (y + 19 + (i * 15)),
                         property.getPropertyValue() == property.getPropertyEnumConstants()[i] ? -1 : hoveringText ? 0xff999999 : 0xff707070);
             }
         }

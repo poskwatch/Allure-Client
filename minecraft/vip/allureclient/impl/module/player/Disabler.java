@@ -18,6 +18,7 @@ import vip.allureclient.impl.event.network.PacketReceiveEvent;
 import vip.allureclient.impl.event.network.PacketSendEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.event.world.WorldLoadEvent;
+import vip.allureclient.impl.module.world.Scaffold;
 
 import java.awt.*;
 
@@ -69,7 +70,7 @@ public class Disabler extends Module implements IRotations {
         });
         this.onUpdatePositionEvent = (event -> {
             setModuleSuffix("Watchdog");
-            if (MovementUtil.isMoving()) {
+            if (MovementUtil.isMoving() && !AllureClient.getInstance().getModuleManager().getModuleByClass.apply(Scaffold.class).isToggled()) {
                 setRotations(event, getRotations(), false);
             }
             if (event.isPre() && Wrapper.getPlayer().ticksExisted % (C0FState ? 50 : 30) == 0) {

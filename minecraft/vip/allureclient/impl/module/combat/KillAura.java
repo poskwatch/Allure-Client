@@ -78,6 +78,9 @@ public class KillAura extends Module implements IRotations {
                 case Health:
                     targetEntities.sort(Comparator.comparingDouble(entity -> ((EntityLivingBase) (entity)).getHealth()));
                     break;
+                case Hurt_Time:
+                    targetEntities.sort(Comparator.comparingInt(entity -> ((EntityLivingBase) (entity)).hurtTime));
+                    break;
             }
             if (updatePositionEvent.isPre()) {
                 if (!targetEntities.isEmpty()) {
@@ -213,7 +216,8 @@ public class KillAura extends Module implements IRotations {
 
     private enum TargetingMode {
         Distance,
-        Health
+        Health,
+        Hurt_Time
     }
 
     private enum AttackingMode {

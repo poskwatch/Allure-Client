@@ -50,6 +50,7 @@ public class ModuleManager {
                     new Crosshair(),
                     new TargetHUD(),
                     new PlayerESP(),
+                    new ChestESP(),
                     new HitMarkers(),
                     new Statistics(),
                     // World Modules

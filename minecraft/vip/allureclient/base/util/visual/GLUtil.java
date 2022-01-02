@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.AxisAlignedBB;
 import org.lwjgl.opengl.GL11;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.math.MathUtil;
@@ -129,6 +130,27 @@ public class GLUtil {
                     glVertex3d(x + radius * Math.cos(i * Math.PI / (points / 2)), y + 0.5, z + radius * Math.sin(i * Math.PI / (points / 2)));
             }
         }
+        glEnd();
+        glDepthMask(true);
+        glEnable(GL_DEPTH_TEST);
+        glDisable(GL_LINE_SMOOTH);
+        glEnable(GL_TEXTURE_2D);
+        glPopMatrix();
+    }
+
+    public static void glAxisAlignedBBQuad(AxisAlignedBB axisAlignedBB, int color) {
+        glPushMatrix();
+        GlStateManager.enableDepth();
+        glDisable(GL_TEXTURE_2D);
+        glEnable(GL_LINE_SMOOTH);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_QUADS);
+        glColor(color);
+        glVertex2d(axisAlignedBB.minX, axisAlignedBB.minY);
+        glVertex2d(axisAlignedBB.maxX, axisAlignedBB.minY);
+        glVertex2d(axisAlignedBB.maxX, axisAlignedBB.maxY);
+        glVertex2d(axisAlignedBB.minX, axisAlignedBB.maxY);
         glEnd();
         glDepthMask(true);
         glEnable(GL_DEPTH_TEST);

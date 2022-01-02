@@ -549,7 +549,7 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
             this.drawString(this.fontRendererObj, this.openGLWarning2, (this.width - this.field_92024_r) / 2, ((GuiButton)this.buttonList.get(0)).yPosition - 12, -1);
         }
 
-        Gui.drawRectWithWidth(4, 3, 40, 7, 0x90000000);
+        Gui.drawRectWithWidth(2, 2, 43, 9, 0x90000000);
         AllureClient.getInstance().getFontManager().csgoFontRenderer.drawStringWithShadow("Changelog", 4, 4, -1);
 
         super.drawScreen(mouseX, mouseY, partialTicks);

@@ -21,6 +21,8 @@ import vip.allureclient.visual.notification.NotificationType;
 @ModuleData(moduleName = "Flight", moduleBind = Keyboard.KEY_G, moduleCategory = ModuleCategory.MOVEMENT)
 public class Flight extends Module {
 
+    private int groundTicks;
+
     public Flight() {
         onUpdatePositionEvent = (updatePositionEvent -> {
            switch (flightModeProperty.getPropertyValue()){
@@ -43,7 +45,26 @@ public class Flight extends Module {
                        if (Wrapper.getPlayer().ticksExisted % 6 == 0)
                        Wrapper.sendPacketDirect(new C03PacketPlayer.C04PacketPlayerPosition(x + (-Math.sin(Math.toRadians(yaw)) * dist), y - 1.75, z + (Math.cos(Math.toRadians(yaw)) * dist), Wrapper.getPlayer().onGround));
                    }
+                   break;
+               case Watchmeme:
 
+                   Wrapper.getPlayer().posY -= Wrapper.getPlayer().posY - Wrapper.getPlayer().lastTickPosY;
+                   Wrapper.getPlayer().lastTickPosY -= Wrapper.getPlayer().posY - Wrapper.getPlayer().lastTickPosY;
+
+
+                   if (MovementUtil.isMoving()) {
+                       if (Wrapper.getPlayer().onGround) {
+                           MovementUtil.setSpeed(MovementUtil.getBaseMoveSpeed() * 2);
+                           Wrapper.getPlayer().jump();
+                       }
+                       if (Wrapper.getPlayer().motionY <= 0)
+                           MovementUtil.setSpeed(MovementUtil.getBaseMoveSpeed() * 0.8);
+                   }
+                   if (Wrapper.getPlayer().onGround && groundTicks++ > 2) {
+                       AllureClient.getInstance().getNotificationManager().addNotification("Flight toggled",
+                               "Flight was automatically toggled to prevent lagbacks", 2500, NotificationType.WARNING);
+                       setToggled(false);
+                   }
                    break;
            }
            setModuleSuffix(flightModeProperty.getEnumValueAsString());
@@ -59,19 +80,23 @@ public class Flight extends Module {
             if (flightModeProperty.getPropertyValue().equals(flightModes.Watchdog)) {
                 playerMoveEvent.setCancelled(true);
             }
-            else
+            else if (!flightModeProperty.getPropertyValue().equals(flightModes.Watchmeme))
                 playerMoveEvent.setSpeed(flightSpeedProperty.getPropertyValue());
         });
     }
 
     @Override
     public void onEnable() {
+        groundTicks = 0;
+        Wrapper.getPlayer().motionX = 0;
+        Wrapper.getPlayer().motionZ = 0;
+        Wrapper.getPlayer().motionY = 0;
         super.onEnable();
-        MovementUtil.damagePlayer();
     }
 
     @Override
     public void onDisable() {
+        Wrapper.getMinecraft().timer.timerSpeed = 1;
         super.onDisable();
     }
 
@@ -92,7 +117,8 @@ public class Flight extends Module {
 
     enum flightModes {
         Vanilla,
-        Watchdog
+        Watchdog,
+        Watchmeme
     }
 
 }

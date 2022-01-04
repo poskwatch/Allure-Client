@@ -10,6 +10,7 @@ import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.player.MovementUtil;
+import vip.allureclient.base.util.visual.ChatUtil;
 import vip.allureclient.impl.event.network.PacketSendEvent;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
@@ -36,21 +37,22 @@ public class Flight extends Module {
                    break;
                case Watchdog:
                    Wrapper.getPlayer().motionY = 0.0D;
-                   if(MovementUtil.isMoving()) {
+                   ChatUtil.sendMessageToPlayer(String.valueOf(Math.random() * 100));
                        float yaw = Wrapper.getPlayer().rotationYaw;
-                       double dist = 7.3;
+                       double dist = .13;
                        double x = Wrapper.getPlayer().posX;
                        double y = Wrapper.getPlayer().posY;
                        double z = Wrapper.getPlayer().posZ;
-                       if (Wrapper.getPlayer().ticksExisted % 6 == 0)
-                       Wrapper.sendPacketDirect(new C03PacketPlayer.C04PacketPlayerPosition(x + (-Math.sin(Math.toRadians(yaw)) * dist), y - 1.75, z + (Math.cos(Math.toRadians(yaw)) * dist), Wrapper.getPlayer().onGround));
-                   }
+                       updatePositionEvent.setOnGround(true);
+
+                           Wrapper.getPlayer().setPosition(Wrapper.getPlayer().posX + -Math.sin(Math.toRadians(yaw)) * dist,
+                                   Wrapper.getPlayer().posY, Wrapper.getPlayer().posZ + Math.cos(Math.toRadians(yaw)) * dist);
+
                    break;
                case Watchmeme:
 
                    Wrapper.getPlayer().posY -= Wrapper.getPlayer().posY - Wrapper.getPlayer().lastTickPosY;
                    Wrapper.getPlayer().lastTickPosY -= Wrapper.getPlayer().posY - Wrapper.getPlayer().lastTickPosY;
-
 
                    if (MovementUtil.isMoving()) {
                        if (Wrapper.getPlayer().onGround) {
@@ -58,7 +60,7 @@ public class Flight extends Module {
                            Wrapper.getPlayer().jump();
                        }
                        if (Wrapper.getPlayer().motionY <= 0)
-                           MovementUtil.setSpeed(MovementUtil.getBaseMoveSpeed() * 0.8);
+                           MovementUtil.setSpeed(MovementUtil.getBaseMoveSpeed() * 1.1);
                    }
                    if (Wrapper.getPlayer().onGround && groundTicks++ > 2) {
                        AllureClient.getInstance().getNotificationManager().addNotification("Flight toggled",

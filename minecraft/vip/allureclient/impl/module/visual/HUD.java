@@ -122,7 +122,7 @@ public class HUD extends Module {
                 double targetPosX = render2DEvent.getScaledResolution().getScaledWidth() - getStringWidth(module.getModuleDisplayName()) - 3;
                 double targetPosY = 3 + moduleDrawCount.get() * 13;
 
-                module.getAnimatedCoordinate().animateCoordinates(module.isToggled() ? targetPosX : 0, module.isToggled() ? targetPosY : 0, AnimatedCoordinate.AnimationType.EASE_OUT);
+                module.getAnimatedCoordinate().animateCoordinates(module.isToggled() ? targetPosX : 0, targetPosY, AnimatedCoordinate.AnimationType.EASE_OUT);
                 double posX = module.getAnimatedCoordinate().getX();
                 double posY = module.getAnimatedCoordinate().getY();
 
@@ -140,6 +140,9 @@ public class HUD extends Module {
                     case Gradient:
                         listColor = ColorUtil.interpolateColorsDynamic(gradientSpeedProperty.getPropertyValue(), gradientOffsetProperty.getPropertyValue() * moduleDrawCount.get(),
                                 gradientStartColorProperty.getPropertyValue(), gradientsEndColorProperty.getPropertyValue()).getRGB();
+                        break;
+                    case Rainbow:
+                        listColor = ColorUtil.getRainbowColor(1F, moduleDrawCount.get() * 40, 0.7f);
                         break;
                     default:
                         listColor = staticColorProperty.getPropertyValueRGB();
@@ -174,7 +177,7 @@ public class HUD extends Module {
                         }
                         GlStateManager.color(1, 1, 1, 1);
                         Gui.drawRect(
-                                sr.getScaledWidth() - getStringWidth(module.getModuleDisplayName()) - 5,
+                                posX - 2,
                                 posY + 1 + fontRenderer.getHeight(),
                                 sr.getScaledWidth() - m1Offset,
                                 posY + 2 + fontRenderer.getHeight(),
@@ -217,6 +220,7 @@ public class HUD extends Module {
         Client,
         Gradient,
         Solid,
+        Rainbow
     }
 
     private enum ListOutlineModes {

@@ -47,7 +47,7 @@ public class Module implements ToggleableObject, BindableObject, ConfigurableObj
     }
 
     public String getModuleDisplayName() {
-        return getModuleSuffix() == null ? getModuleName() : getModuleName() + " \2477" + getModuleSuffix();
+        return getModuleSuffix() == null ? getModuleName() : getModuleName() + " \2477" + getModuleSuffix().replaceAll("_", " ");
     }
 
     public String getModuleSuffix() {

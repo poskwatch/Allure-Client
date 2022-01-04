@@ -8,15 +8,17 @@ public class UpdatePositionEvent extends CancellableEvent {
     private double x, y, z;
     private float yaw, pitch;
     private boolean onGround;
+    private boolean sprinting;
     private boolean pre;
 
-    public UpdatePositionEvent(double x, double y, double z, float yaw, float pitch, boolean onGround){
+    public UpdatePositionEvent(double x, double y, double z, float yaw, float pitch, boolean onGround, boolean sprinting){
         this.x = x;
         this.y = y;
         this.z = z;
         this.yaw = yaw;
         this.pitch = pitch;
         this.onGround = onGround;
+        this.sprinting = sprinting;
         this.pre = true;
     }
 
@@ -50,6 +52,10 @@ public class UpdatePositionEvent extends CancellableEvent {
         this.onGround = onGround;
     }
 
+    public void setSprinting(boolean sprinting) {
+        this.sprinting = sprinting;
+    }
+
     public void setPre(boolean pre) {
         this.pre = pre;
     }
@@ -76,6 +82,10 @@ public class UpdatePositionEvent extends CancellableEvent {
 
     public boolean isOnGround() {
         return onGround;
+    }
+
+    public boolean isSprinting() {
+        return sprinting;
     }
 
     public boolean isPre() {

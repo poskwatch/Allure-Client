@@ -196,10 +196,11 @@ public class EntityPlayerSP extends AbstractClientPlayer
      */
     public void onUpdateWalkingPlayer()
     {
-        boolean flag = this.isSprinting();
 
-        UpdatePositionEvent updatePositionEvent = new UpdatePositionEvent(posX, getEntityBoundingBox().minY, posZ, rotationYaw, rotationPitch, onGround);
+        UpdatePositionEvent updatePositionEvent = new UpdatePositionEvent(posX, getEntityBoundingBox().minY, posZ, rotationYaw, rotationPitch, onGround, this.isSprinting());
         Wrapper.getEventManager().callEvent(updatePositionEvent);
+
+        boolean flag = updatePositionEvent.isSprinting();
 
         if (flag != this.serverSprintState)
         {

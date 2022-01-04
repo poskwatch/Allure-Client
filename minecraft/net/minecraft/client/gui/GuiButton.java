@@ -6,7 +6,10 @@ import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import vip.allureclient.base.util.visual.BlurUtil;
+import vip.allureclient.base.util.visual.ColorUtil;
 import vip.allureclient.base.util.visual.GLUtil;
+
+import java.awt.*;
 
 public class GuiButton extends Gui
 {
@@ -92,6 +95,15 @@ public class GuiButton extends Gui
             //this.drawTexturedModalRect(this.xPosition, this.yPosition, 0, 46 + i * 20, this.width / 2, this.height);
             //this.drawTexturedModalRect(this.xPosition + this.width / 2, this.yPosition, 200 - this.width / 2, 46 + i * 20, this.width / 2, this.height);
             GLUtil.glFilledQuad(this.xPosition, this.yPosition, this.width, height, hovered ? 0x99000000 : 0x60000000);
+
+            final int interpolateMagenta = ColorUtil.interpolateColorsDynamic(4, 1, Color.MAGENTA, Color.MAGENTA.darker().darker()).getRGB();
+            final int interpolateBlack = ColorUtil.interpolateColorsDynamic(4, 1, Color.BLACK, Color.MAGENTA).getRGB();
+
+            GLUtil.glHorizontalGradientQuad(this.xPosition, this.yPosition, this.width, 1, interpolateBlack, interpolateMagenta);
+            GLUtil.glVerticalGradientQuad(this.xPosition, this.yPosition, 1, this.height, interpolateBlack, interpolateMagenta);
+            GLUtil.glHorizontalGradientQuad(this.xPosition, this.yPosition + this.height - 1, this.width, 1, interpolateMagenta, interpolateBlack);
+            GLUtil.glVerticalGradientQuad(this.xPosition + this.width - 1, this.yPosition, 1, this.height, interpolateMagenta, interpolateBlack);
+
             BlurUtil.blurArea(xPosition, yPosition, width, height);
             this.mouseDragged(mc, mouseX, mouseY);
             int j = 14737632;
@@ -105,7 +117,7 @@ public class GuiButton extends Gui
                 j = 16777120;
             }
 
-            this.drawCenteredString(fontrenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, j);
+            this.drawCenteredString(fontrenderer, this.displayString, this.xPosition + this.width / 2, this.yPosition + (this.height - 8) / 2, hovered ? Color.MAGENTA.getRGB() : -1);
         }
     }
 

@@ -114,7 +114,7 @@ public class KillAura extends Module implements IRotations {
             else {
                 if (autoBlockProperty.getPropertyValue() && currentTarget != null && isHoldingSword()){
                     Wrapper.sendPacketDirect(new C08PacketPlayerBlockPlacement(new BlockPos(-Double.MIN_VALUE, -Double.MIN_VALUE, -Double.MIN_VALUE),
-                            255, Wrapper.getPlayer().getCurrentEquippedItem(), 0.0f, 0.0f, 0.0f));
+                            255, Wrapper.getPlayer().getHeldItem(), 0.0f, 0.0f, 0.0f));
                     isBlocking = true;
                 }
                 else

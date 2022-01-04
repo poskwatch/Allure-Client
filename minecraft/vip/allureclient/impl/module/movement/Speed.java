@@ -31,7 +31,7 @@ public class Speed extends Module {
     public Speed() {
         this.onUpdatePositionEvent = (event -> {
             setModuleSuffix("Watchdog");
-            if (MovementUtil.isMoving()) {
+            if (MovementUtil.isMoving() && !Wrapper.getPlayer().isSneaking()) {
                 Wrapper.getMinecraft().timer.timerSpeed = timerBoostProperty.getPropertyValue();
                if (Wrapper.getPlayer().onGround) {
                    groundTicks++;
@@ -45,7 +45,7 @@ public class Speed extends Module {
                 Wrapper.getMinecraft().timer.timerSpeed = 1.0F;
         });
         this.onPlayerMoveEvent = (event -> {
-           if (event.isMoving()) {
+           if (event.isMoving() && !Wrapper.getPlayer().isSneaking()) {
                 event.setSpeed(Wrapper.getPlayer().onGround ? MovementUtil.getBaseMoveSpeed() * 1.588 : MovementUtil.getBaseMoveSpeed());
                 if (lowHopProperty.getPropertyValue() && !MovementUtil.isOverVoid() && event.getY() < 0) {
                     event.setY(event.getY() - 0.15);

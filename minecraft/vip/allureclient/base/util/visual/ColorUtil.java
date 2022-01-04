@@ -35,6 +35,11 @@ public class ColorUtil {
         return interpolateColors(start, end, angle / 360f);
     }
 
+    public static int getRainbowColor(float speed, int index, float saturation) {
+        float hue = ((System.currentTimeMillis() + index) % (int)(speed*1000)) / (speed * 1000);
+        return Color.HSBtoRGB(hue, saturation, 1);
+    }
+
     public static int overwriteAlphaComponent(final int colour, final int alphaComponent) {
         final int red = colour >> 16 & 0xFF;
         final int green = colour >> 8 & 0xFF;

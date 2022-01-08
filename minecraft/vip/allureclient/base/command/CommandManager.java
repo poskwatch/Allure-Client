@@ -50,6 +50,7 @@ public class CommandManager {
         commands.add(new BindCommand());
         commands.add(new HideCommand());
         commands.add(new RenameCommand());
+        commands.add(new EvalCommand());
     }
 
 }

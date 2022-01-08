@@ -8,6 +8,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.client.C0APacketAnimation;
+import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -22,6 +23,7 @@ import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.util.client.NetworkUtil;
 import vip.allureclient.base.util.client.TimerUtil;
 import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.base.util.math.MathUtil;
 import vip.allureclient.base.util.player.IRotations;
 import vip.allureclient.base.util.player.MovementUtil;
 import vip.allureclient.base.util.visual.AnimationUtil;
@@ -81,9 +83,6 @@ public class Scaffold extends Module implements IRotations {
                     Wrapper.getPlayer().setSprinting(false);
                     MovementUtil.setSpeed(MovementUtil.getBaseMoveSpeed() *
                             (Wrapper.getPlayer().isPotionActive(Potion.moveSpeed) ? 0.2 : 0.423));
-                }
-                else if (NetworkUtil.isOnHypixel()) {
-                    event.setSprinting(false);
                 }
                 if (MovementUtil.isMoving())
                     Wrapper.getMinecraft().timer.timerSpeed = timerBoostProperty.getPropertyValue();
@@ -197,7 +196,7 @@ public class Scaffold extends Module implements IRotations {
     @Override
     public float[] getRotations() {
         final float originalYaw = MovementUtil.getMovementDirection() - 180.0F;
-        return new float[]{originalYaw, 75.0F};
+        return new float[]{(float) MathUtil.linearInterpolate(originalYaw - 20, originalYaw + 20, Math.random()), 75.0F};
     }
 
     @Override

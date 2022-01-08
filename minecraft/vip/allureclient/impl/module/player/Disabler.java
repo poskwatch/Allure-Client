@@ -1,5 +1,6 @@
 package vip.allureclient.impl.module.player;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerCapabilities;
 import net.minecraft.network.play.client.C00PacketKeepAlive;
 import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
@@ -19,8 +20,6 @@ import vip.allureclient.impl.event.network.PacketSendEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.event.world.WorldLoadEvent;
 import vip.allureclient.impl.module.world.Scaffold;
-
-import java.awt.*;
 
 @ModuleData(moduleName = "Disabler", moduleBind = 0, moduleCategory = ModuleCategory.PLAYER)
 public class Disabler extends Module implements IRotations {
@@ -44,19 +43,21 @@ public class Disabler extends Module implements IRotations {
         this.onPacketReceiveEvent = (event -> {
             if (event.getPacket() instanceof S08PacketPlayerPosLook) {
                 S08PacketPlayerPosLook s08 = (S08PacketPlayerPosLook) event.getPacket();
-                if (Wrapper.getPlayer().ticksExisted < 80 && !event.isCancelled() && Wrapper.getPlayer() != null) {
-                    received++;
-                    event.setCancelled(true);
+                if (Minecraft.getMinecraft().thePlayer != null) {
+                    if (Minecraft.getMinecraft().thePlayer.ticksExisted < 80 && !event.isCancelled()) {
+                        received++;
+                        event.setCancelled(true);
 
-                    if (received <= 3) {
-                        PlayerCapabilities capabilities = new PlayerCapabilities();
-                        capabilities.allowFlying = true;
-                        capabilities.isFlying = true;
-                        Wrapper.sendPacketDirect(new C13PacketPlayerAbilities(capabilities));
+                        if (received <= 3) {
+                            PlayerCapabilities capabilities = new PlayerCapabilities();
+                            capabilities.allowFlying = true;
+                            capabilities.isFlying = true;
+                            Wrapper.sendPacketDirect(new C13PacketPlayerAbilities(capabilities));
+                        }
+
+                        Wrapper.getMinecraft().displayGuiScreen(null);
+                        Wrapper.getPlayer().setPosition(s08.getX(), s08.getY(), s08.getZ());
                     }
-
-                    Wrapper.getMinecraft().displayGuiScreen(null);
-                    Wrapper.getPlayer().setPosition(s08.getX(), s08.getY(), s08.getZ());
                 }
             }
         });

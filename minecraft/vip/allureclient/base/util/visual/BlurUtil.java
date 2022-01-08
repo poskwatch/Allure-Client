@@ -1,10 +1,8 @@
 package vip.allureclient.base.util.visual;
 
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.shader.Framebuffer;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -14,7 +12,6 @@ import static org.lwjgl.BufferUtils.createFloatBuffer;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL14.*;
 
 public final class BlurUtil {
 
@@ -60,14 +57,15 @@ public final class BlurUtil {
 
         @Override
         public void updateUniforms() {
-            final float radius = 30.f;
+
+            final float radius = 35;
 
             glUniform1i(this.getUniformLocation("texture"), 0);
             glUniform1i(this.getUniformLocation("texture2"), 20);
             glUniform1f(this.getUniformLocation("radius"), radius);
 
             final FloatBuffer buffer = createFloatBuffer(256);
-            final float blurRadius = radius / 2f;
+            final float blurRadius = radius/2f;
             for (int i = 0; i <= blurRadius; i++) {
                 buffer.put(BlurUtil.calculateGaussianOffset(i, radius / 4f));
             }
@@ -79,19 +77,27 @@ public final class BlurUtil {
                     1.0f / Display.getWidth(),
                     1.0f / Display.getHeight());
         }
+
+        @Override
+        public void updateUniforms(float radius) {
+
+        }
+
+        @Override
+        public void use(float radius) {
+
+        }
     };
 
     private static Framebuffer framebuffer, framebufferRender;
 
     public static boolean disableBlur;
 
-    private static List<double[]> blurAreas = new ArrayList<>();
-
-    private BlurUtil() {
-    }
+    private static final List<double[]> blurAreas = new ArrayList<>();
 
     public static void blurArea(final double x, final double y, final double width, final double height) {
         if (disableBlur) return;
+
         blurAreas.add(new double[]{x, y, width, height});
     }
 
@@ -171,7 +177,7 @@ public final class BlurUtil {
         if (framebufferRender != null)
             framebufferRender.deleteFramebuffer();
 
-        // Create new Framebuffers
+        // Create new Frame-buffers
         // False means it doesn't allocate a depth buffer which we don't need
         framebuffer = new Framebuffer(width, height, false);
         framebufferRender = new Framebuffer(width, height, false);

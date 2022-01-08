@@ -146,6 +146,8 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet>
             chatcomponenttranslation = new ChatComponentTranslation("disconnect.genericReason", new Object[] {"Internal Exception: " + p_exceptionCaught_2_});
         }
 
+        p_exceptionCaught_2_.printStackTrace();
+
         this.closeChannel(chatcomponenttranslation);
     }
 

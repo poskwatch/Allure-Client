@@ -46,7 +46,7 @@ public class Speed extends Module {
         });
         this.onPlayerMoveEvent = (event -> {
            if (event.isMoving() && !Wrapper.getPlayer().isSneaking()) {
-                event.setSpeed(Wrapper.getPlayer().onGround ? MovementUtil.getBaseMoveSpeed() * 1.588 : MovementUtil.getBaseMoveSpeed());
+                event.setSpeed(Wrapper.getPlayer().onGround ? MovementUtil.getBaseMoveSpeed() * 1.9138 : MovementUtil.getBaseMoveSpeed());
                 if (lowHopProperty.getPropertyValue() && !MovementUtil.isOverVoid() && event.getY() < 0) {
                     event.setY(event.getY() - 0.15);
                 }

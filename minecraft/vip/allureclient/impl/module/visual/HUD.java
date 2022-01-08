@@ -122,7 +122,8 @@ public class HUD extends Module {
                 double targetPosX = render2DEvent.getScaledResolution().getScaledWidth() - getStringWidth(module.getModuleDisplayName()) - 3;
                 double targetPosY = 3 + moduleDrawCount.get() * 13;
 
-                module.getAnimatedCoordinate().animateCoordinates(module.isToggled() ? targetPosX : 0, targetPosY, AnimatedCoordinate.AnimationType.EASE_OUT);
+                module.getAnimatedCoordinate().animateCoordinates(targetPosX, targetPosY, AnimatedCoordinate.AnimationType.EASE_OUT);
+
                 double posX = module.getAnimatedCoordinate().getX();
                 double posY = module.getAnimatedCoordinate().getY();
 
@@ -135,7 +136,7 @@ public class HUD extends Module {
                 int listColor;
                 switch (listColorProperty.getPropertyValue()) {
                     case Client:
-                        listColor = ColorUtil.interpolateColorsDynamic(5, moduleDrawCount.get() * 25, new Color(0x6042cef5), new Color(0xffd742f5)).getRGB();
+                        listColor = ColorUtil.interpolateColorsDynamic(5, moduleDrawCount.get() * 25, ColorUtil.getClientColors()[0], ColorUtil.getClientColors()[1]).getRGB();
                         break;
                     case Gradient:
                         listColor = ColorUtil.interpolateColorsDynamic(gradientSpeedProperty.getPropertyValue(), gradientOffsetProperty.getPropertyValue() * moduleDrawCount.get(),
@@ -156,6 +157,7 @@ public class HUD extends Module {
                         getStringWidth(module.getModuleDisplayName()) + 7, 13, new Color(0, 0, 0, backgroundOpacityProperty.getPropertyValue()).getRGB());
 
                 drawStringWithShadow(module.getModuleDisplayName(), (float) posX, (float) posY, listColor);
+
                 switch (listOutlineModeProperty.getPropertyValue()) {
                     case Left:
                         GlStateManager.color(1, 1, 1);
@@ -170,24 +172,17 @@ public class HUD extends Module {
                         outlineModuleCache.removeIf(module1 -> !module1.isVisible());
                         GlStateManager.color(1, 1, 1);
                         int toggledIndex = outlineModuleCache.indexOf(module);
-                        int m1Offset = -1;
-                        if (toggledIndex != outlineModuleCache.size() - 1) {
-                            m1Offset += getStringWidth(outlineModuleCache.get(toggledIndex + 1).getModuleDisplayName());
-                            m1Offset += vanillaFontProperty.getPropertyValue() ? 6 : 7;
-                        }
+                        double offsetWidth = getStringWidth(module.getModuleDisplayName()) + 5;
+                        if (toggledIndex != outlineModuleCache.size() - 1)
+                            offsetWidth -= getStringWidth(outlineModuleCache.get(toggledIndex + 1).getModuleDisplayName()) + 5;
                         GlStateManager.color(1, 1, 1, 1);
-                        Gui.drawRect(
-                                posX - 2,
-                                posY + 1 + fontRenderer.getHeight(),
-                                sr.getScaledWidth() - m1Offset,
-                                posY + 2 + fontRenderer.getHeight(),
-                                listColor);
+                        GLUtil.glFilledQuad(posX - 2, posY + 1 + fontRenderer.getHeight(), offsetWidth, 1, listColor);
                         GLUtil.glFilledQuad((int) posX - 2, posY - 4, 1, 14, listColor);
                         break;
                 }
-
                 moduleDrawCount.getAndIncrement();
             });
+
         });
         setToggled(true);
     }

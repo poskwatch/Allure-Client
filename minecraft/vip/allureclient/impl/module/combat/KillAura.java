@@ -86,11 +86,15 @@ public class KillAura extends Module implements IRotations {
                 if (!targetEntities.isEmpty()) {
                     currentTarget = targetEntities.get(0);
                     if (currentTarget != null) {
-                        setRotations(updatePositionEvent, getRotations(), true);
-                        if (attackingModeProperty.getPropertyValue().equals(AttackingMode.Tick) && Wrapper.getPlayer().ticksExisted % 3 != 0)
-                            return;
+                        if (!NetworkUtil.isOnHypixel())
+                            setRotations(updatePositionEvent, getRotations(), true);
+                        Wrapper.getPlayer().rotationYawHead = getRotations()[0];
+                        Wrapper.getPlayer().renderYawOffset = getRotations()[0];
+                        Wrapper.getPlayer().rotationPitchHead = getRotations()[1];
                         if (apsTimerUtil.hasReached(1000 / averageAPSProperty.getPropertyValue())) {
                             Wrapper.getPlayer().swingItem();
+                            if (attackingModeProperty.getPropertyValue().equals(AttackingMode.Tick) && Wrapper.getPlayer().ticksExisted % 3 != 0)
+                                return;
                             Wrapper.sendPacketDirect(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));
                             for (int i = 0; i < 10; i++) {
                                 World targetWorld = currentTarget.getEntityWorld();

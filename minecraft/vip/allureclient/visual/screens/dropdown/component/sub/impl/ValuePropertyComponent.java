@@ -3,6 +3,7 @@ package vip.allureclient.visual.screens.dropdown.component.sub.impl;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.util.math.MathUtil;
 import vip.allureclient.base.util.visual.AnimationUtil;
+import vip.allureclient.base.util.visual.ColorUtil;
 import vip.allureclient.base.util.visual.GLUtil;
 import vip.allureclient.impl.property.ValueProperty;
 import vip.allureclient.visual.screens.dropdown.component.Component;
@@ -62,8 +63,8 @@ public class ValuePropertyComponent extends Component {
 
         sliderAnimation = AnimationUtil.linearAnimation(sliderRectPercentage, sliderAnimation, 3);
 
-        GLUtil.glHorizontalGradientQuad(x + 2, y + 17, 111, 1, 0xffd742f5, 0xff42cef5);
-        GLUtil.glFilledEllipse(x + 5 + sliderAnimation, y + 17, 15, 0xffe1e1e1);
+        GLUtil.glHorizontalGradientQuad(x + 2, y + 17, 111, 1, ColorUtil.getClientColors()[0].getRGB(), ColorUtil.getClientColors()[1].getRGB());
+        GLUtil.glFilledEllipse(x + 5 + sliderAnimation, y + 17, 15, -1);
 
         String currentValue = null;
         if (property.getPropertyValue() instanceof Integer || property.getPropertyValue() instanceof Long) {
@@ -73,7 +74,7 @@ public class ValuePropertyComponent extends Component {
         }
 
         getFontRenderer().drawStringWithShadow(property.getPropertyLabel(), x + 3, y + 4, -1);
-        getFontRenderer().drawStringWithShadow(currentValue, x + 112 - AllureClient.getInstance().getFontManager().smallFontRenderer.getStringWidth(currentValue), y + 4, -1);
+        getFontRenderer().drawStringWithShadow(currentValue, x + 112 - AllureClient.getInstance().getFontManager().smallFontRenderer.getStringWidth(currentValue), y + 4, 0xff999999);
 
         super.onDrawScreen(mouseX, mouseY);
     }

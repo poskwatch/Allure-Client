@@ -117,6 +117,11 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
             {
                 float f = this.interpolateRotation(entity.prevRenderYawOffset, entity.renderYawOffset, partialTicks);
                 float f1 = this.interpolateRotation(entity.prevRotationYawHead, entity.rotationYawHead, partialTicks);
+                float f8;
+                if (entity instanceof EntityPlayerSP)
+                    f8 = this.interpolateRotation(entity.prevRotationPitchHead, entity.rotationPitchHead, partialTicks);
+                else
+                    f8 = this.interpolateRotation(entity.prevRotationPitch, entity.rotationPitch, partialTicks);
                 float f2 = f1 - f;
 
                 if (this.mainModel.isRiding && entity.ridingEntity instanceof EntityLivingBase)
@@ -144,7 +149,7 @@ public abstract class RendererLivingEntity<T extends EntityLivingBase> extends R
                     }
                 }
 
-                float f8 = entity.prevRotationPitchHead + (entity.rotationPitchHead - entity.prevRotationPitchHead) * partialTicks;
+
                 this.renderLivingAt(entity, x, y, z);
                 float f7 = this.handleRotationFloat(entity, partialTicks);
                 this.rotateCorpse(entity, f7, f, partialTicks);

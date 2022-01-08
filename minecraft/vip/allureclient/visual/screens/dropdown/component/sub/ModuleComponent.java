@@ -4,7 +4,9 @@ import net.minecraft.client.gui.Gui;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.base.property.Property;
+import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.visual.AnimationUtil;
+import vip.allureclient.base.util.visual.ColorUtil;
 import vip.allureclient.base.util.visual.GLUtil;
 import vip.allureclient.impl.property.*;
 import vip.allureclient.visual.screens.dropdown.component.Component;
@@ -67,11 +69,11 @@ public class ModuleComponent extends Component {
             y = Math.round(animationFlowY);
         }
 
-        Gui.drawRectWithWidth(getParentFrame().getX(), y, getParentFrame().frameWidth, getParentFrame().frameHeight,
+        GLUtil.glFilledQuad(getParentFrame().getX(), y, getParentFrame().frameWidth, getParentFrame().frameHeight,
                 isHoveringButton(mouseX, mouseY) ? 0xff303030 : 0xff202020);
 
         GLUtil.glHorizontalGradientQuad(getParentFrame().getX(), y, Math.round(animationToggleBar), getParentFrame().frameHeight,
-                0xffd742f5, 0xff42cef5);
+                ColorUtil.getClientColors()[0].getRGB(), ColorUtil.getClientColors()[1].getRGB());
 
         AllureClient.getInstance().getFontManager().smallFontRenderer.drawStringWithShadow(module.getModuleName(), getParentFrame().getX() + 4, y + 4, -1);
         final String ARROW_UP = "F";

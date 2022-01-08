@@ -6,7 +6,7 @@ import java.util.Map;
 
 import static org.lwjgl.opengl.GL20.*;
 
-public class GLShader {
+public abstract class GLShader {
 
     private int program;
 
@@ -67,4 +67,8 @@ public class GLShader {
     public int getUniformLocation(final String uniform) {
         return this.uniformLocationMap.get(uniform);
     }
+
+    public abstract void updateUniforms(float radius);
+
+    public abstract void use(float radius);
 }

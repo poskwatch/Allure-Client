@@ -163,9 +163,16 @@ public class PlayerESP extends Module {
                                 Gui.drawRect(posX - 3D, endPosY + 0.5D - ((endPosY - posY) * (livingEntity.getHealth() / livingEntity.getMaxHealth())), posX - 2D, endPosY - 0.5D, healthBarColor);
                             }
                             else {
-                                Gui.drawGradientRect(posX - 3D, endPosY + 0.5D - ((endPosY - posY) * (livingEntity.getHealth() / livingEntity.getMaxHealth())), posX - 2D, endPosY - 0.5D,
+                                GL11.glEnable(GL11.GL_SCISSOR_TEST);
+                                GLUtil.glScissor(posX - 3D, endPosY - ((endPosY - 0.5D) - (posY)) *
+                                        livingEntity.getHealth() / livingEntity.getMaxHealth(), 1, (endPosY - 0.5D) - (posY));
+                                Gui.drawGradientRect(posX - 3D, posY + 0.5D, posX - 2D, endPosY - 0.5D,
                                         gradientBarStartProperty.getPropertyValueRGB(), gradientBarEndProperty.getPropertyValueRGB());
+                                GL11.glDisable(GL11.GL_SCISSOR_TEST);
                             }
+                        }
+                        if (espComponentsProperty.isSelected(ESPComponents.Armor)) {
+
                         }
                     }
                 }

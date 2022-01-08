@@ -40,14 +40,13 @@ public class ColorUtil {
         return Color.HSBtoRGB(hue, saturation, 1);
     }
 
-    public static int overwriteAlphaComponent(final int colour, final int alphaComponent) {
-        final int red = colour >> 16 & 0xFF;
-        final int green = colour >> 8 & 0xFF;
-        final int blue = colour & 0xFF;
-
-        return ((alphaComponent & 0xFF) << 24) |
-                ((red & 0xFF) << 16) |
-                ((green & 0xFF) << 8) |
-                (blue & 0xFF);
+    public static Color changeAlpha(Color color, int alpha) {
+        return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
     }
+
+    public static Color[] getClientColors() {
+        return clientColors;
+    }
+
+    private static final Color[] clientColors = {  new Color(0xffff70bf), new Color(0xff9234eb)    };
 }

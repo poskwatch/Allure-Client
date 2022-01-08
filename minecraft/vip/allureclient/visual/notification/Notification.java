@@ -1,6 +1,7 @@
 package vip.allureclient.visual.notification;
 
 import net.minecraft.client.gui.ScaledResolution;
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.GLU;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.font.MinecraftFontRenderer;
@@ -55,7 +56,7 @@ public class Notification {
         final float x = (float) animatedCoordinate.getX();
         final float y = (float) animatedCoordinate.getY();
 
-        if (x >= screenWidth) {
+        if (x >= screenWidth - 3) {
             completed = true;
             return;
         }

@@ -25,17 +25,10 @@ public class GuiMove extends Module {
 
     public GuiMove () {
         onPacketSendEvent = (packetSendEvent -> {
-           if (packetSendEvent.getPacket() instanceof C0DPacketCloseWindow || packetSendEvent.getPacket() instanceof C16PacketClientStatus) {
-               packetSendEvent.setCancelled(true);
-           }
+
         });
         onPlayerMoveEvent = (playerMoveEvent -> {
-            if (Wrapper.getMinecraft().currentScreen instanceof GuiInventory || Wrapper.getMinecraft().currentScreen instanceof GuiContainer) {
-                Wrapper.getMinecraft().gameSettings.keyBindForward.setPressed(Keyboard.isKeyDown(Wrapper.getMinecraft().gameSettings.keyBindForward.getKeyCode()));
-                Wrapper.getMinecraft().gameSettings.keyBindBack.setPressed(Keyboard.isKeyDown(Wrapper.getMinecraft().gameSettings.keyBindBack.getKeyCode()));
-                Wrapper.getMinecraft().gameSettings.keyBindLeft.setPressed(Keyboard.isKeyDown(Wrapper.getMinecraft().gameSettings.keyBindLeft.getKeyCode()));
-                Wrapper.getMinecraft().gameSettings.keyBindRight.setPressed(Keyboard.isKeyDown(Wrapper.getMinecraft().gameSettings.keyBindRight.getKeyCode()));
-            }
+
         });
     }
 

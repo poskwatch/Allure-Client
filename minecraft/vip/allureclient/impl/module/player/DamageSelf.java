@@ -32,9 +32,7 @@ public class DamageSelf extends Module {
            }
         });
         this.onUpdatePositionEvent = (event -> {
-            event.setOnGround(false);
-            event.setY(event.getY() + 5);
-            event.setOnGround(true);
+
         });
     }
 }

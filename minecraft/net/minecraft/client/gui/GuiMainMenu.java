@@ -32,6 +32,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 import org.lwjgl.util.glu.Project;
 import vip.allureclient.AllureClient;
+import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.visual.screens.alt.GuiAltLogin;
 
 public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback

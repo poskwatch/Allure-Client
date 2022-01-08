@@ -44,6 +44,8 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import tv.twitch.chat.ChatUserInfo;
 import vip.allureclient.AllureClient;
+import vip.allureclient.visual.notification.NotificationType;
+import vip.allureclient.visual.screens.dropdown.GuiDropDown;
 
 public abstract class GuiScreen extends Gui implements GuiYesNoCallback
 {
@@ -98,6 +100,9 @@ public abstract class GuiScreen extends Gui implements GuiYesNoCallback
         {
             ((GuiLabel)this.labelList.get(j)).drawLabel(this.mc, mouseX, mouseY);
         }
+
+        if (!(this instanceof GuiDropDown))
+            AllureClient.getInstance().getNotificationManager().render(new ScaledResolution(mc), 5);
     }
 
     /**

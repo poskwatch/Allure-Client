@@ -12,7 +12,7 @@ import java.util.Map;
 public final class EventManager<Event> {
     private final Map<Type, List<CallSite<Event>>> callSiteMap = new HashMap<>();
     private final Map<Type, List<EventConsumer<Event>>> listenerCache = new HashMap<>();
-    public final void subscribe(Object subscriber) {
+    public void subscribe(Object subscriber) {
         byte b;
         int i;
         Field[] arrayOfField;

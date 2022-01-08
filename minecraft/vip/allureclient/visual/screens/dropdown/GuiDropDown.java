@@ -8,10 +8,14 @@ import org.lwjgl.opengl.GL11;
 import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.util.visual.AnimationUtil;
 import vip.allureclient.base.util.visual.BlurUtil;
+import vip.allureclient.base.util.visual.ColorUtil;
+import vip.allureclient.base.util.visual.GLUtil;
 import vip.allureclient.visual.screens.dropdown.component.sub.ModuleCategoryFrame;
 import vip.allureclient.visual.screens.dropdown.component.Component;
 import vip.allureclient.visual.screens.dropdown.component.sub.ModuleComponent;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -41,8 +45,8 @@ public class GuiDropDown extends GuiScreen {
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        Gui.drawGradientRect(0, 0, width, height, 0x6042cef5, 0xffd742f5);
-        Gui.drawRectWithWidth(0, 0, width, height, 0x70000000);
+        GLUtil.glVerticalGradientQuad(0, 0, width, height, ColorUtil.changeAlpha(ColorUtil.getClientColors()[0], 30).getRGB(), ColorUtil.getClientColors()[1].getRGB());
+        Gui.drawRectWithWidth(0, 0, width, height, 0x10000000);
         BlurUtil.blurArea(0, 0, width, height);
         GL11.glPushMatrix();
         mc.getTextureManager().bindTexture(new ResourceLocation("Allure/Images/anime.png"));
@@ -50,6 +54,7 @@ public class GuiDropDown extends GuiScreen {
         nekoAnimation = AnimationUtil.easeOutAnimation(height - 330, nekoAnimation, 0.05);
         Gui.drawModalRectWithCustomSizedTexture(width - 175, Math.round((float) nekoAnimation), 0, 0, 175, 330, 175, 330);
         GL11.glPopMatrix();
+
         MODULE_CATEGORY_FRAMES.forEach(moduleCategoryFrame -> {
             moduleCategoryFrame.onDrawScreen(mouseX, mouseY);
             moduleCategoryFrame.updateComponents();

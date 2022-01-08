@@ -1,6 +1,14 @@
 package net.minecraft.util;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.settings.KeyBinding;
+import org.lwjgl.input.Keyboard;
+import vip.allureclient.AllureClient;
+import vip.allureclient.impl.module.player.GuiMove;
+
+import java.util.function.Predicate;
 
 public class MovementInputFromOptions extends MovementInput
 {
@@ -16,27 +24,32 @@ public class MovementInputFromOptions extends MovementInput
         this.moveStrafe = 0.0F;
         this.moveForward = 0.0F;
 
-        if (this.gameSettings.keyBindForward.isKeyDown())
+        final Predicate<KeyBinding> isPressed = keyBinding ->
+                AllureClient.getInstance().getModuleManager().getModuleByClass.apply(GuiMove.class).isToggled() ?
+                        Keyboard.isKeyDown(keyBinding.getKeyCode()) && !(Minecraft.getMinecraft().currentScreen instanceof GuiChat) :
+                        keyBinding.isKeyDown();
+
+        if (isPressed.test(this.gameSettings.keyBindForward))
         {
             ++this.moveForward;
         }
 
-        if (this.gameSettings.keyBindBack.isKeyDown())
+        if (isPressed.test(this.gameSettings.keyBindBack))
         {
             --this.moveForward;
         }
 
-        if (this.gameSettings.keyBindLeft.isKeyDown())
+        if (isPressed.test(this.gameSettings.keyBindLeft))
         {
             ++this.moveStrafe;
         }
 
-        if (this.gameSettings.keyBindRight.isKeyDown())
+        if (isPressed.test(this.gameSettings.keyBindRight))
         {
             --this.moveStrafe;
         }
 
-        this.jump = this.gameSettings.keyBindJump.isKeyDown();
+        this.jump = isPressed.test(this.gameSettings.keyBindJump);
         this.sneak = this.gameSettings.keyBindSneak.isKeyDown();
 
         if (this.sneak)

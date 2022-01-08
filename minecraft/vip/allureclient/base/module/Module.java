@@ -26,7 +26,7 @@ public class Module implements ToggleableObject, BindableObject, ConfigurableObj
     private String moduleSuffix;
     private boolean hidden;
 
-    private final AnimatedCoordinate animatedCoordinate = new AnimatedCoordinate(GuiScreen.width, 0);
+    private final AnimatedCoordinate animatedCoordinate = new AnimatedCoordinate(0, 0);
 
     public Module(){
         if(isIdentified()) {

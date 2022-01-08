@@ -46,6 +46,7 @@ public class GuiAltLogin extends GuiScreen {
         if (passwordField.getText().length() == 0) {
             mc.fontRendererObj.drawString("\2477Password", width / 2.0F - 95, 106, -1);
         }
+
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
@@ -73,6 +74,8 @@ public class GuiAltLogin extends GuiScreen {
                 try {
                     loginToAccount(emailField.getText(), passwordField.getText());
                     status = "Logged in as: \247e" + mc.getSession().getUsername();
+                AllureClient.getInstance().getNotificationManager().addNotification("Successfully logged in",
+                        "Successfully logged into " + mc.getSession().getUsername(), 2000, NotificationType.SUCCESS);
                 } catch (AuthenticationException e) {
                     status = "\2474Invalid details!";
                     e.printStackTrace();

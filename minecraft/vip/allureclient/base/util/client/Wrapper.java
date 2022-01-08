@@ -48,4 +48,5 @@ public class Wrapper {
     public static void sendPacketDirect(Packet<?> packet) {
         getMinecraft().getNetHandler().getNetworkManager().sendPacket(packet);
     }
+
 }

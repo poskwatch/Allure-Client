@@ -10,7 +10,7 @@ public class ServerConnectEvent implements Event {
         this.ip = ip;
     }
 
-    public String getIp() {
+    public String getIP() {
         return ip;
     }
 }

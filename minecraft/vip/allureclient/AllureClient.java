@@ -11,6 +11,7 @@ import vip.allureclient.base.file.FileManager;
 import vip.allureclient.base.font.FontManager;
 import vip.allureclient.base.module.ModuleManager;
 import vip.allureclient.base.property.PropertyManager;
+import vip.allureclient.base.script.ScriptManager;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.event.client.ClientExitEvent;
 import vip.allureclient.impl.event.client.ClientStartEvent;
@@ -32,12 +33,14 @@ public class AllureClient {
     private ConfigManager configManager;
     private CommandManager commandManager;
     private NotificationManager notificationManager;
+    private ScriptManager scriptManager;
     private final GuiDropDown guiDropDown = new GuiDropDown();
 
     @EventListener
     @SuppressWarnings("unused")
     EventConsumer<ClientStartEvent> onClientStart = (event -> {
         System.out.printf("Starting %s Client. Version %s%n", getInstance().CLIENT_NAME, getInstance().CLIENT_VERSION);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> Wrapper.getEventManager().callEvent(new ClientExitEvent())));
         this.fontManager = new FontManager();
         this.notificationManager = new NotificationManager();
         this.propertyManager = new PropertyManager();
@@ -46,6 +49,7 @@ public class AllureClient {
         this.fileManager = new FileManager();
         this.configManager = new ConfigManager();
         this.commandManager = new CommandManager();
+        this.scriptManager = new ScriptManager();
         this.guiDropDown.onStartTask.run();
         getBindManager().registerBind(Keyboard.KEY_RSHIFT, () -> Wrapper.getMinecraft().displayGuiScreen(guiDropDown));
     });
@@ -87,6 +91,10 @@ public class AllureClient {
 
     public CommandManager getCommandManager() {
         return commandManager;
+    }
+
+    public ScriptManager getScriptManager() {
+        return scriptManager;
     }
 
     public static AllureClient getInstance(){

@@ -49,7 +49,7 @@ public class Statistics extends Module {
                             hypixelDiff / (60 * 60 * 1000) % 24 + "h " + hypixelDiff / (60 * 1000) % 60 + "m " + hypixelDiff / 1000 % 60 + "s" : "\2477n/a"), 13, 76, -1);
         });
         this.onServerConnectEvent = (event -> {
-            if (event.getIp().contains("hypixel"))
+            if (event.getIP() != null && event.getIP().contains("hypixel"))
                 resetHypixelTime();
         });
     }

@@ -51,6 +51,7 @@ public class CommandManager {
         commands.add(new HideCommand());
         commands.add(new RenameCommand());
         commands.add(new EvalCommand());
+        commands.add(new MemeCommand());
     }
 
 }

@@ -16,8 +16,8 @@ public class AnimatedCoordinate {
                 this.y = AnimationUtil.linearAnimation(newY, y, 1.5F);
                 break;
             case EASE_OUT:
-                this.x = AnimationUtil.easeOutAnimation(newX, x, 0.1F);
-                this.y = AnimationUtil.easeOutAnimation(newY, y, 0.1F);
+                this.x = AnimationUtil.easeOutAnimation(newX, x, 0.06F);
+                this.y = AnimationUtil.easeOutAnimation(newY, y, 0.06F);
                 break;
         }
     }

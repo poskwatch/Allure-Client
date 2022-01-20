@@ -1,8 +1,6 @@
 package vip.allureclient.impl.module.visual;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.event.EventConsumer;
@@ -32,6 +30,8 @@ public class HUD extends Module {
     EventConsumer<Render2DEvent> onRender2DEvent;
 
     private final BooleanProperty vanillaFontProperty = new BooleanProperty("Vanilla Font", false, this);
+
+    public final EnumProperty<ListPositionModes> listPositionProperty = new EnumProperty<>("List Position", ListPositionModes.TOP, this);
 
     private final EnumProperty<ListColorModes> listColorProperty = new EnumProperty<>("List Color", ListColorModes.Client, this);
 
@@ -80,15 +80,16 @@ public class HUD extends Module {
 
     private final BooleanProperty playerInfoProperty = new BooleanProperty("Player Info", true, this);
 
+    int notificationYOffset = 5;
+
     public HUD() {
         this.onRender2DEvent = (render2DEvent -> {
 
             final int height = render2DEvent.getScaledResolution().getScaledHeight(), width = render2DEvent.getScaledResolution().getScaledWidth();
-            ScaledResolution sr = render2DEvent.getScaledResolution();
 
             final MinecraftFontRenderer fontRenderer = AllureClient.getInstance().getFontManager().mediumFontRenderer;
 
-            AllureClient.getInstance().getNotificationManager().render(render2DEvent.getScaledResolution(), 5);
+            AllureClient.getInstance().getNotificationManager().render(render2DEvent.getScaledResolution(), notificationYOffset);
 
             String watermark = String.format("%s v%s", AllureClient.getInstance().CUSTOM_CLIENT_NAME, AllureClient.getInstance().CLIENT_VERSION);
             if (waterMarkModeProperty.getPropertyValue().equals(WatermarkModes.New))
@@ -114,24 +115,30 @@ public class HUD extends Module {
                 fontRenderer.drawStringWithShadow(String.format("%.1f, %.1f, %.1f", Wrapper.getPlayer().posX, Wrapper.getPlayer().posY, Wrapper.getPlayer().posZ), 1, height - 9, -1);
             }
 
-            final ArrayList<Module> sortedDisplayModules = new ArrayList<>(AllureClient.getInstance().getModuleManager().getSortedDisplayModules.apply
-                    (vanillaFontProperty.getPropertyValue()));
+            final ArrayList<Module> sortedDisplayModules = new ArrayList<>(AllureClient.getInstance().getModuleManager().getSortedDisplayModules(
+                    (vanillaFontProperty.getPropertyValue()), true));
             final AtomicInteger moduleDrawCount = new AtomicInteger();
             sortedDisplayModules.forEach(module -> {
 
                 double targetPosX = render2DEvent.getScaledResolution().getScaledWidth() - getStringWidth(module.getModuleDisplayName()) - 3;
                 double targetPosY = 3 + moduleDrawCount.get() * 13;
 
+                if (listPositionProperty.getPropertyValue().equals(ListPositionModes.BOTTOM)) {
+                    targetPosY = height - 9 - moduleDrawCount.get() * 13;
+                    notificationYOffset = 13 + moduleDrawCount.get() * 13;
+                }
+                else
+                    notificationYOffset = 5;
+
                 module.getAnimatedCoordinate().animateCoordinates(targetPosX, targetPosY, AnimatedCoordinate.AnimationType.EASE_OUT);
 
                 double posX = module.getAnimatedCoordinate().getX();
                 double posY = module.getAnimatedCoordinate().getY();
 
-                if (!module.isVisible())
+                if (!module.isVisible()) {
                     module.getAnimatedCoordinate().setX(width);
-
-                if (!module.isVisible())
                     return;
+                }
 
                 int listColor;
                 switch (listColorProperty.getPropertyValue()) {
@@ -143,7 +150,7 @@ public class HUD extends Module {
                                 gradientStartColorProperty.getPropertyValue(), gradientsEndColorProperty.getPropertyValue()).getRGB();
                         break;
                     case Rainbow:
-                        listColor = ColorUtil.getRainbowColor(1F, moduleDrawCount.get() * 40, 0.7f);
+                        listColor = ColorUtil.getRainbowColor(2F, moduleDrawCount.get() * 48, 0.7f);
                         break;
                     default:
                         listColor = staticColorProperty.getPropertyValueRGB();
@@ -225,9 +232,28 @@ public class HUD extends Module {
         None
     }
 
+    public enum ListPositionModes {
+        TOP("Top"),
+        BOTTOM("Bottom");
+
+        final String name;
+        ListPositionModes(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
     private enum WatermarkModes {
         Solid,
         New,
         CSGO
+    }
+
+    public static HUD getInstance() {
+        return (HUD) AllureClient.getInstance().getModuleManager().getModuleByClass.apply(HUD.class);
     }
 }

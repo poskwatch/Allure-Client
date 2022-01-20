@@ -1,6 +1,7 @@
 package vip.allureclient.impl.module.world;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -10,6 +11,7 @@ import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.potion.Potion;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import org.lwjgl.opengl.GL11;
@@ -29,6 +31,7 @@ import vip.allureclient.base.util.player.MovementUtil;
 import vip.allureclient.base.util.visual.AnimationUtil;
 import vip.allureclient.base.util.visual.GLUtil;
 import vip.allureclient.base.util.world.BlockData;
+import vip.allureclient.impl.event.player.BlockCollisionEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.event.visual.Render2DEvent;
 import vip.allureclient.impl.module.movement.Speed;
@@ -72,6 +75,9 @@ public class Scaffold extends Module implements IRotations {
     EventConsumer<UpdatePositionEvent> onUpdatePositionEvent;
 
     @EventListener
+    EventConsumer<BlockCollisionEvent> onBlockCollisionEvent;
+
+    @EventListener
     EventConsumer<Render2DEvent> onRender2DEvent;
 
     public Scaffold() {
@@ -82,7 +88,7 @@ public class Scaffold extends Module implements IRotations {
                 if (addonsProperty.isSelected(Addons.No_Sprint)) {
                     Wrapper.getPlayer().setSprinting(false);
                     MovementUtil.setSpeed(MovementUtil.getBaseMoveSpeed() *
-                            (Wrapper.getPlayer().isPotionActive(Potion.moveSpeed) ? 0.2 : 0.423));
+                            (Wrapper.getPlayer().isPotionActive(Potion.moveSpeed) ? 0.2 : 0.323));
                 }
                 if (MovementUtil.isMoving())
                     Wrapper.getMinecraft().timer.timerSpeed = timerBoostProperty.getPropertyValue();
@@ -147,6 +153,18 @@ public class Scaffold extends Module implements IRotations {
                 }
             }
         });
+        this.onBlockCollisionEvent = (event -> {
+            if (event.getBlock() instanceof BlockAir && !isOnEdge(2)) {
+                if (Wrapper.getPlayer().isSneaking())
+                    return;
+                double x = event.getBlockPos().getX();
+                double y = event.getBlockPos().getY();
+                double z = event.getBlockPos().getZ();
+                if (y < Wrapper.getPlayer().posY) {
+                    event.setBoundingBox(AxisAlignedBB.fromBounds(-5, -1, -5, 5, 1.0F, 5).offset(x, y, z));
+                }
+            }
+        });
         this.onRender2DEvent = (event -> {
             final float x = event.getScaledResolution().getScaledWidth()/2.0F;
             final float y = event.getScaledResolution().getScaledHeight()/2.0F + 50;
@@ -195,8 +213,8 @@ public class Scaffold extends Module implements IRotations {
 
     @Override
     public float[] getRotations() {
-        final float originalYaw = MovementUtil.getMovementDirection() - 180.0F;
-        return new float[]{(float) MathUtil.linearInterpolate(originalYaw - 20, originalYaw + 20, Math.random()), 75.0F};
+        final float originalYaw = MovementUtil.getMovementDirection() + 180.0F;
+        return new float[]{originalYaw, 80.0F};
     }
 
     @Override
@@ -294,6 +312,18 @@ public class Scaffold extends Module implements IRotations {
         if (block instanceof net.minecraft.block.BlockContainer)
             return false;
         return (!(block instanceof net.minecraft.block.BlockFalling) && block.isFullBlock() && block.isFullCube());
+    }
+
+    private boolean isOnEdge(final double verbose) {
+        double[] verboseArray = new double[]{0, verbose, -verbose};
+        for (double x : verboseArray) {
+            for (double z : verboseArray) {
+                final BlockPos belowBlockPos = new BlockPos(Wrapper.getPlayer().posX + x, Math.floor(Wrapper.getPlayer().posY - 1), Wrapper.getPlayer().posZ + z);
+                if (!(Wrapper.getWorld().getBlockState(belowBlockPos).getBlock() instanceof BlockAir))
+                    return false;
+            }
+        }
+        return true;
     }
 
     private void updateBlockCount() {

@@ -53,6 +53,7 @@ import vip.allureclient.base.util.visual.BlurUtil;
 import vip.allureclient.base.util.visual.ColorUtil;
 import vip.allureclient.impl.event.visual.Render2DEvent;
 import vip.allureclient.impl.module.visual.Crosshair;
+import vip.allureclient.impl.module.visual.HUD;
 
 public class GuiIngame extends Gui
 {
@@ -602,12 +603,13 @@ public class GuiIngame extends Gui
         int j = p_180475_2_.getScaledWidth() - i - b0;
         int k = 0;
 
-        final ArrayList<Module> sortedModulesRemoved = AllureClient.getInstance().getModuleManager().getSortedDisplayModules.apply(
-                false
+        final ArrayList<Module> sortedModulesRemoved = AllureClient.getInstance().getModuleManager().getSortedDisplayModules(
+                false, false
         );
         sortedModulesRemoved.removeIf(module -> !module.isToggled());
+
         GlStateManager.translate(0, Math.max(0,
-                sortedModulesRemoved.size() * 13 - 135), 0);
+                (sortedModulesRemoved.size() * 13 - 135)), 0);
 
         for (Object score1 : arraylist1)
         {

@@ -92,9 +92,9 @@ public class KillAura extends Module implements IRotations {
                         Wrapper.getPlayer().renderYawOffset = getRotations()[0];
                         Wrapper.getPlayer().rotationPitchHead = getRotations()[1];
                         if (apsTimerUtil.hasReached(1000 / averageAPSProperty.getPropertyValue())) {
-                            Wrapper.getPlayer().swingItem();
                             if (attackingModeProperty.getPropertyValue().equals(AttackingMode.Tick) && Wrapper.getPlayer().ticksExisted % 3 != 0)
                                 return;
+                            Wrapper.getPlayer().swingItem();
                             Wrapper.sendPacketDirect(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));
                             for (int i = 0; i < 10; i++) {
                                 World targetWorld = currentTarget.getEntityWorld();
@@ -102,7 +102,7 @@ public class KillAura extends Module implements IRotations {
                                 x = currentTarget.posX;
                                 y = currentTarget.posY;
                                 z = currentTarget.posZ;
-                                targetWorld.spawnParticle(EnumParticleTypes.BLOCK_CRACK,
+                                targetWorld.spawnParticle(EnumParticleTypes.CRIT,
                                         x + ThreadLocalRandom.current().nextDouble(-0.5, 0.5),
                                         y + ThreadLocalRandom.current().nextDouble(-1, 1),
                                         z + ThreadLocalRandom.current().nextDouble(-0.5, 0.5), 23, 23, 23, 152);

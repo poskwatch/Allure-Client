@@ -1,4 +1,4 @@
-package vip.allureclient.base.script.lua.script;
+package vip.allureclient.base.script.lua.script.impl.module;
 
 import org.luaj.vm2.LuaValue;
 

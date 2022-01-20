@@ -80,13 +80,20 @@ public class ModuleManager {
         return filteredModules;
     });
 
-    public Function<Boolean, ArrayList<Module>> getSortedDisplayModules = (isVanillaFont -> {
+    private Comparator<Module> getModuleStringWidthComparator(boolean vanillaFont) {
+        return Comparator.comparingDouble(module -> (vanillaFont ?
+                Wrapper.getMinecraftFontRenderer().getStringWidth(module.getModuleDisplayName()) :
+                AllureClient.getInstance().getFontManager().mediumFontRenderer.getStringWidth(module.getModuleDisplayName())));
+    }
+
+    public ArrayList<Module> getSortedDisplayModules(boolean vanillaFont, boolean reversed) {
         ArrayList<Module> sortedDisplayModules = new ArrayList<>(getModules.get());
-        sortedDisplayModules.sort(Comparator.comparingDouble(module -> (isVanillaFont ?
-                Wrapper.getMinecraftFontRenderer().getStringWidth(((Module)module).getModuleDisplayName()) :
-                AllureClient.getInstance().getFontManager().mediumFontRenderer.getStringWidth(((Module) module).getModuleDisplayName()))).reversed());
+        if (reversed)
+            sortedDisplayModules.sort(getModuleStringWidthComparator(vanillaFont).reversed());
+        else
+            sortedDisplayModules.sort(getModuleStringWidthComparator(vanillaFont));
         return sortedDisplayModules;
-    });
+    }
 
     public Function<String, Module> getModuleByName =
             (label -> getModules.get().stream().filter(module -> module.getModuleName().equals(label)).findFirst().orElse(null));

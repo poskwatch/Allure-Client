@@ -51,14 +51,10 @@ import net.minecraft.util.MovementInput;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
-import vip.allureclient.AllureClient;
 import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.base.util.visual.ChatUtil;
 import vip.allureclient.impl.event.player.ChatMessageSendEvent;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
-import vip.allureclient.impl.module.player.Disabler;
-import vip.allureclient.impl.module.player.NoSlow;
 
 public class EntityPlayerSP extends AbstractClientPlayer
 {
@@ -196,11 +192,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
      */
     public void onUpdateWalkingPlayer()
     {
-
-        UpdatePositionEvent updatePositionEvent = new UpdatePositionEvent(posX, getEntityBoundingBox().minY, posZ, rotationYaw, rotationPitch, onGround, this.isSprinting());
-        Wrapper.getEventManager().callEvent(updatePositionEvent);
-
-        boolean flag = updatePositionEvent.isSprinting();
+        boolean flag = this.isSprinting();
 
         if (flag != this.serverSprintState)
         {
@@ -234,37 +226,46 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
         if (this.isCurrentViewEntity())
         {
-
-            double d0 = updatePositionEvent.getX() - this.lastReportedPosX;
-            double d1 = updatePositionEvent.getY() - this.lastReportedPosY;
-            double d2 = updatePositionEvent.getZ() - this.lastReportedPosZ;
-            double d3 = updatePositionEvent.getYaw() - this.lastReportedYaw;
-            double d4 = updatePositionEvent.getPitch() - this.lastReportedPitch;
+            double d0 = this.posX - this.lastReportedPosX;
+            double d1 = this.getEntityBoundingBox().minY - this.lastReportedPosY;
+            double d2 = this.posZ - this.lastReportedPosZ;
+            double d3 = (double)(this.rotationYaw - this.lastReportedYaw);
+            double d4 = (double)(this.rotationPitch - this.lastReportedPitch);
             boolean flag2 = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4D || this.positionUpdateTicks >= 20;
             boolean flag3 = d3 != 0.0D || d4 != 0.0D;
+
+            final UpdatePositionEvent event = new UpdatePositionEvent(posX, getEntityBoundingBox().minY, posZ, rotationYaw, rotationPitch, onGround);
+            Wrapper.getEventManager().callEvent(event);
+
+            double x = event.getX();
+            double y = event.getY();
+            double z = event.getZ();
+            float yaw = event.getYaw();
+            float pitch = event.getPitch();
+            boolean onGround = event.isOnGround();
 
             if (this.ridingEntity == null)
             {
                 if (flag2 && flag3)
                 {
-                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(updatePositionEvent.getX(), updatePositionEvent.getY(), updatePositionEvent.getZ(), updatePositionEvent.getYaw(), updatePositionEvent.getPitch(), updatePositionEvent.isOnGround()));
+                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(x, y, z, yaw, pitch, onGround));
                 }
                 else if (flag2)
                 {
-                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(updatePositionEvent.getX(), updatePositionEvent.getY(), updatePositionEvent.getZ(), updatePositionEvent.isOnGround()));
+                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(x, y, z, onGround));
                 }
                 else if (flag3)
                 {
-                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C05PacketPlayerLook(updatePositionEvent.getYaw(), updatePositionEvent.getPitch(), updatePositionEvent.isOnGround()));
+                    this.sendQueue.addToSendQueue(new C03PacketPlayer.C05PacketPlayerLook(yaw, pitch, onGround));
                 }
                 else
                 {
-                   // this.sendQueue.addToSendQueue(new C03PacketPlayer(updatePositionEvent.isOnGround()));
+                    this.sendQueue.addToSendQueue(new C03PacketPlayer(onGround));
                 }
             }
             else
             {
-                this.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(this.motionX, -999.0D, this.motionZ, updatePositionEvent.getYaw(), updatePositionEvent.getPitch(), updatePositionEvent.isOnGround()));
+                this.sendQueue.addToSendQueue(new C03PacketPlayer.C06PacketPlayerPosLook(this.motionX, -999.0D, this.motionZ, yaw, pitch, onGround));
                 flag2 = false;
             }
 
@@ -272,30 +273,35 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
             if (flag2)
             {
-                this.lastReportedPosX = updatePositionEvent.getX();
-                this.lastReportedPosY = updatePositionEvent.getY();
-                this.lastReportedPosZ = updatePositionEvent.getZ();
+                this.lastReportedPosX = x;
+                this.lastReportedPosY = y;
+                this.lastReportedPosZ = z;
                 this.positionUpdateTicks = 0;
             }
 
             if (flag3)
             {
-                this.lastReportedYaw = updatePositionEvent.getYaw();
-                this.lastReportedPitch = updatePositionEvent.getPitch();
+                this.lastReportedYaw = yaw;
+                this.lastReportedPitch = pitch;
             }
 
-            updatePositionEvent.setPre(false);
-            Wrapper.getEventManager().callEvent(updatePositionEvent);
+            event.setPre(false);
+            Wrapper.getEventManager().callEvent(event);
         }
     }
 
-    public void moveEntity(double x, double y, double z){
+    @Override
+    public void moveEntity(double x, double y, double z) {
         PlayerMoveEvent playerMoveEvent = new PlayerMoveEvent(x, y, z);
+
         Wrapper.getEventManager().callEvent(playerMoveEvent);
-        if(playerMoveEvent.isCancelled()){
-            return;
-        }
-        super.moveEntity(playerMoveEvent.getX(), playerMoveEvent.getY(), playerMoveEvent.getZ());
+
+        if(!playerMoveEvent.isCancelled())
+            super.moveEntity(playerMoveEvent.getX(), playerMoveEvent.getY(), playerMoveEvent.getZ());
+    }
+
+    public boolean isMovingForward() {
+        return moveForward > 0;
     }
 
     /**
@@ -306,30 +312,6 @@ public class EntityPlayerSP extends AbstractClientPlayer
         C07PacketPlayerDigging.Action c07packetplayerdigging$action = dropAll ? C07PacketPlayerDigging.Action.DROP_ALL_ITEMS : C07PacketPlayerDigging.Action.DROP_ITEM;
         this.sendQueue.addToSendQueue(new C07PacketPlayerDigging(c07packetplayerdigging$action, BlockPos.ORIGIN, EnumFacing.DOWN));
         return null;
-    }
-
-    public void setSpeed(float speed) {
-        this.motionX = (-(Math.sin(getDirection()) * speed));
-        this.motionZ = (Math.cos(getDirection()) * speed);
-    }
-
-    public float getDirection() {
-        float var1 = this.rotationYaw;
-
-        if(this.moveForward < 0)
-            var1 += 180F;
-        float forward = 1F;
-        if(this.moveForward < 0)
-            forward = -.5F;
-        else if(moveForward > 0)
-            forward = .5F;
-
-        if(moveStrafing > 0)
-            var1 -= 90F * forward;
-        if(moveStrafing < 0)
-            var1 += 90F * forward;
-        var1 *= .017453292F;
-        return var1;
     }
 
     /**
@@ -344,11 +326,10 @@ public class EntityPlayerSP extends AbstractClientPlayer
      */
     public void sendChatMessage(String message)
     {
-        ChatMessageSendEvent chatMessageSendEvent = new ChatMessageSendEvent(message);
-        Wrapper.getEventManager().callEvent(chatMessageSendEvent);
-        if (chatMessageSendEvent.isCancelled())
-            return;
-        this.sendQueue.addToSendQueue(new C01PacketChatMessage(chatMessageSendEvent.getMessage()));
+        ChatMessageSendEvent event = new ChatMessageSendEvent(message);
+        Wrapper.getEventManager().callEvent(event);
+        if(!event.isCancelled())
+            this.sendQueue.addToSendQueue(new C01PacketChatMessage(event.getMessage()));
     }
 
     /**
@@ -438,6 +419,34 @@ public class EntityPlayerSP extends AbstractClientPlayer
             {
                 super.addStat(stat, amount);
             }
+        }
+    }
+
+    public void setSpeed(double speed) {
+        double forward = Minecraft.getMinecraft().thePlayer.movementInput.moveForward;
+        double strafe = Minecraft.getMinecraft().thePlayer.movementInput.moveStrafe;
+        float yaw = Minecraft.getMinecraft().thePlayer.rotationYaw;
+        if (forward == 0 && strafe == 0) {
+            this.motionX = (0);
+            this.motionZ = (0);
+        } else {
+            if (forward != 0) {
+                if (strafe > 0) {
+                    yaw += (forward > 0 ? -45 : 45);
+                } else if (strafe < 0) {
+                    yaw += (forward > 0 ? 45 : -45);
+                }
+                strafe = 0;
+                if (forward > 0) {
+                    forward = 1;
+                } else {
+                    forward = -1;
+                }
+            }
+            double cos = Math.cos(Math.toRadians(yaw + 90));
+            double sin = Math.sin(Math.toRadians(yaw + 90));
+            this.motionX = (forward * speed * cos + strafe * speed * sin);
+            this.motionZ = (forward * speed * sin - strafe * speed * cos);
         }
     }
 
@@ -740,6 +749,10 @@ public class EntityPlayerSP extends AbstractClientPlayer
         return flag && !this.sleeping;
     }
 
+    public boolean isMoving() {
+        return this.moveForward != 0 || this.moveStrafing != 0;
+    }
+
     public void updateEntityActionState()
     {
         super.updateEntityActionState();
@@ -838,12 +851,12 @@ public class EntityPlayerSP extends AbstractClientPlayer
         boolean flag2 = this.movementInput.moveForward >= f;
         this.movementInput.updatePlayerMoveState();
 
-        if (this.isUsingItem() && !this.isRiding() && !AllureClient.getInstance().getModuleManager().getModuleByClass.apply(NoSlow.class).isToggled())
-        {
+        if (this.isUsingItem() && !this.isRiding()) {
             this.movementInput.moveStrafe *= 0.2F;
             this.movementInput.moveForward *= 0.2F;
             this.sprintToggleTimer = 0;
         }
+
 
         this.pushOutOfBlocks(this.posX - (double)this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ + (double)this.width * 0.35D);
         this.pushOutOfBlocks(this.posX - (double)this.width * 0.35D, this.getEntityBoundingBox().minY + 0.5D, this.posZ - (double)this.width * 0.35D);

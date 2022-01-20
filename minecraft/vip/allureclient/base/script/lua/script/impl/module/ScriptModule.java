@@ -1,10 +1,11 @@
-package vip.allureclient.base.script.lua.script;
+package vip.allureclient.base.script.lua.script.impl.module;
 
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaValue;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.module.interfaces.ToggleableObject;
+import vip.allureclient.base.util.client.LuaUtil;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 
@@ -18,11 +19,7 @@ public class ScriptModule implements ToggleableObject {
         this.name = name;
         this.luaValue = luaValue;
 
-        this.onUpdatePositionEvent = (event -> {});
-
-        if (!luaValue.get("update_position_event").isnil()) {
-            this.onUpdatePositionEvent = (event -> luaValue.get("update_position_event").call());
-        }
+        this.onUpdatePositionEvent = (event -> LuaUtil.tryCall(luaValue.get("update_position_event")));
     }
 
     @Override

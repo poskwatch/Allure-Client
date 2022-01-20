@@ -15,6 +15,7 @@ import vip.allureclient.base.module.Module;
 import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.base.util.player.MovementUtil;
 import vip.allureclient.base.util.visual.ChatUtil;
 import vip.allureclient.impl.event.network.PacketReceiveEvent;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
@@ -50,8 +51,6 @@ public class LongJump extends Module {
             }
             if (playerMoveEvent.isMoving()) {
                 playerMoveEvent.setSpeed(Wrapper.getPlayer().motionY < 0 ? 0.35 : 0.55);
-                if (Wrapper.getPlayer().motionY < 0)
-                    Wrapper.getPlayer().motionY += 0.05d;
             }
         });
         onUpdatePositionEvent = (updatePositionEvent -> {
@@ -68,8 +67,8 @@ public class LongJump extends Module {
                         chargingTicks = 0;
                     } else {
                         AllureClient.getInstance().getNotificationManager().addNotification("Long Jump",
-                                "You must have a bow in your hotbar for Long Jump", 1000, NotificationType.ERROR);
-                        toggle();
+                                "You must have a bow in your hotbar for Long Jump", 2000, NotificationType.ERROR);
+                        setToggled(false);
                     }
                 } else {
                     chargingTicks++;

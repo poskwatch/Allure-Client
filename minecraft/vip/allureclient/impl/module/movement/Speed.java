@@ -1,6 +1,7 @@
 package vip.allureclient.impl.module.movement;
 
 import org.lwjgl.input.Keyboard;
+import vip.allureclient.base.event.Event;
 import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.module.Module;
@@ -46,9 +47,12 @@ public class Speed extends Module {
         });
         this.onPlayerMoveEvent = (event -> {
            if (event.isMoving() && !Wrapper.getPlayer().isSneaking()) {
-                event.setSpeed(Wrapper.getPlayer().onGround ? MovementUtil.getBaseMoveSpeed() * 1.9138 : MovementUtil.getBaseMoveSpeed());
-                if (lowHopProperty.getPropertyValue() && !MovementUtil.isOverVoid() && event.getY() < 0) {
-                    event.setY(event.getY() - 0.15);
+                event.setSpeed(Wrapper.getPlayer().onGround ? MovementUtil.getBaseMoveSpeed() * 1.91138 : (MovementUtil.getBaseMoveSpeed()));
+                if (lowHopProperty.getPropertyValue() && !MovementUtil.isOverVoid() && Wrapper.getPlayer().fallDistance < 3) {
+                    if (event.getY() < 0)
+                        event.setY(event.getY() - 0.15);
+                    if (event.getY() > 0)
+                        event.setY(Wrapper.getPlayer().motionY *= 0.96);
                 }
            }
         });

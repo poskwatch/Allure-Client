@@ -1,6 +1,5 @@
 package net.minecraft.entity;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -13,7 +12,6 @@ import net.minecraft.block.BlockWall;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockPattern;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.command.CommandResultStats;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.crash.CrashReport;
@@ -48,9 +46,6 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
-import vip.allureclient.AllureClient;
-import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.impl.event.player.PlayerStepEvent;
 
 public abstract class Entity implements ICommandSender
 {
@@ -105,7 +100,7 @@ public abstract class Entity implements ICommandSender
     public float prevRotationPitch;
 
     /** Axis aligned bounding box. */
-    private AxisAlignedBB boundingBox;
+    public AxisAlignedBB boundingBox;
     public boolean onGround;
 
     /**
@@ -715,16 +710,12 @@ public abstract class Entity implements ICommandSender
 
             if (this.stepHeight > 0.0F && flag1 && (d3 != x || d5 != z))
             {
-                PlayerStepEvent playerStepEvent = new PlayerStepEvent(this.stepHeight);
-                if (this instanceof EntityPlayerSP)
-                    Wrapper.getEventManager().callEvent(playerStepEvent);
-
                 double d11 = x;
                 double d7 = y;
                 double d8 = z;
                 AxisAlignedBB axisalignedbb3 = this.getEntityBoundingBox();
                 this.setEntityBoundingBox(axisalignedbb);
-                y = playerStepEvent.getStepHeight();
+                y = (double)this.stepHeight;
                 List<AxisAlignedBB> list = this.worldObj.getCollidingBoundingBoxes(this, this.getEntityBoundingBox().addCoord(d3, y, d5));
                 AxisAlignedBB axisalignedbb4 = this.getEntityBoundingBox();
                 AxisAlignedBB axisalignedbb5 = axisalignedbb4.addCoord(d3, 0.0D, d5);
@@ -801,16 +792,6 @@ public abstract class Entity implements ICommandSender
                 }
 
                 this.setEntityBoundingBox(this.getEntityBoundingBox().offset(0.0D, y, 0.0D));
-
-                if (this instanceof EntityPlayerSP && y > -0.5D) {
-                    double blockHeight = playerStepEvent.getStepHeight() + y;
-                    List<Double> blockHeights = Arrays.asList(0.875D, 0.625D, 0.8125D, 0.9375D, 0.75D, 0.6875D);
-                    if (blockHeight % 0.5D == 0.0D || blockHeights.contains(blockHeight)) {
-                        playerStepEvent.setHeightStepped(blockHeight);
-                        playerStepEvent.setPre(false);
-                        Wrapper.getEventManager().callEvent(playerStepEvent);
-                    }
-                }
 
                 if (d11 * d11 + d8 * d8 >= x * x + z * z)
                 {

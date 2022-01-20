@@ -337,7 +337,7 @@ public class GuiChat extends GuiScreen
             TargetHUD.getInstance().yLocation = mouseY - distY;
         }
 
-        super.drawScreen(mouseX, mouseY, partialTicks);
+        //super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
     public void onAutocompleteResponse(String[] p_146406_1_)

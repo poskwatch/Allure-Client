@@ -1,75 +1,90 @@
 package vip.allureclient.impl.module.movement;
 
 import net.minecraft.network.play.client.C03PacketPlayer;
+import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import org.lwjgl.input.Keyboard;
-import vip.allureclient.AllureClient;
-import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.event.EventConsumer;
+import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.module.Module;
-import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.module.annotations.ModuleData;
+import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.player.MovementUtil;
-import vip.allureclient.base.util.visual.ChatUtil;
+import vip.allureclient.impl.event.network.PacketReceiveEvent;
 import vip.allureclient.impl.event.network.PacketSendEvent;
 import vip.allureclient.impl.event.player.PlayerMoveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.EnumProperty;
 import vip.allureclient.impl.property.ValueProperty;
-import vip.allureclient.visual.notification.NotificationType;
 
 @ModuleData(moduleName = "Flight", moduleBind = Keyboard.KEY_G, moduleCategory = ModuleCategory.MOVEMENT)
 public class Flight extends Module {
 
-    private int groundTicks;
+    private double originalY;
+    private int watchdogStage;
+
+    // TODO: Improve (Can't fly that long...)
+
+    double[] watchdogClipOffsets = {
+            0.41999998688698,
+            0.7531999805212,
+            1.00133597911214,
+            1.16610926093821,
+            1.24918707874468,
+            1.24918707874468,
+            1.1707870772188,
+            1.0155550727022,
+            0.78502770378923,
+            0.48071087633169,
+            0.10408037809304
+    };
 
     public Flight() {
         onUpdatePositionEvent = (updatePositionEvent -> {
-           switch (flightModeProperty.getPropertyValue()){
-               case Vanilla:
-                   Wrapper.getPlayer().cameraYaw = 0.1f;
-                   Wrapper.getPlayer().motionY = 0;
-                   if (Wrapper.getMinecraft().gameSettings.keyBindJump.isKeyDown())
-                       Wrapper.getPlayer().motionY = 0.5d;
-                   if (Wrapper.getMinecraft().gameSettings.keyBindSneak.isKeyDown())
-                       Wrapper.getPlayer().motionY = -0.5d;
-                   break;
-               case Watchdog:
-                   Wrapper.getPlayer().motionY = 0.0D;
-                   ChatUtil.sendMessageToPlayer(String.valueOf(Math.random() * 100));
-                       float yaw = Wrapper.getPlayer().rotationYaw;
-                       double dist = .13;
-                       double x = Wrapper.getPlayer().posX;
-                       double y = Wrapper.getPlayer().posY;
-                       double z = Wrapper.getPlayer().posZ;
-                       updatePositionEvent.setOnGround(true);
-
-                           Wrapper.getPlayer().setPosition(Wrapper.getPlayer().posX + -Math.sin(Math.toRadians(yaw)) * dist,
-                                   Wrapper.getPlayer().posY, Wrapper.getPlayer().posZ + Math.cos(Math.toRadians(yaw)) * dist);
-
-                   break;
-               case Watchmeme:
-
-                   Wrapper.getPlayer().posY -= Wrapper.getPlayer().posY - Wrapper.getPlayer().lastTickPosY;
-                   Wrapper.getPlayer().lastTickPosY -= Wrapper.getPlayer().posY - Wrapper.getPlayer().lastTickPosY;
-
-                   if (MovementUtil.isMoving()) {
-                       if (Wrapper.getPlayer().onGround) {
-                           MovementUtil.setSpeed(MovementUtil.getBaseMoveSpeed() * 2);
-                           Wrapper.getPlayer().jump();
-                       }
-                       if (Wrapper.getPlayer().motionY <= 0)
-                           MovementUtil.setSpeed(MovementUtil.getBaseMoveSpeed() * 1.1);
-                   }
-                   if (Wrapper.getPlayer().onGround && groundTicks++ > 2) {
-                       AllureClient.getInstance().getNotificationManager().addNotification("Flight toggled",
-                               "Flight was automatically toggled to prevent lagbacks", 2500, NotificationType.WARNING);
-                       setToggled(false);
-                   }
-                   break;
+            if (updatePositionEvent.isPre()) {
+                switch (flightModeProperty.getPropertyValue()) {
+                    case Vanilla:
+                        Wrapper.getPlayer().cameraYaw = 0.1f;
+                        Wrapper.getPlayer().motionY = 0;
+                        if (Wrapper.getMinecraft().gameSettings.keyBindJump.isKeyDown())
+                            Wrapper.getPlayer().motionY = 0.5d;
+                        if (Wrapper.getMinecraft().gameSettings.keyBindSneak.isKeyDown())
+                            Wrapper.getPlayer().motionY = -0.5d;
+                        break;
+                    case Watchdog:
+                        if (watchdogStage == 0) {
+                            for (double doubleValue : this.watchdogClipOffsets) {
+                                Wrapper.sendPacketDirect(new C03PacketPlayer.C04PacketPlayerPosition(updatePositionEvent.getX(),
+                                        updatePositionEvent.getY() + doubleValue, updatePositionEvent.getZ(), false));
+                            }
+                            watchdogStage = 1;
+                        }
+                        if (this.watchdogStage == 1) {
+                            Wrapper.getMinecraft().timer.timerSpeed = 1;
+                            updatePositionEvent.setY(updatePositionEvent.getY() - 0.42);
+                            watchdogStage = 1;
+                        }
+                        else if (watchdogStage >= 2) {
+                            updatePositionEvent.setY(originalY);
+                            Wrapper.getPlayer().motionY = 0;
+                            watchdogStage++;
+                        }
+                        break;
+                }
+                Wrapper.getPlayer().cameraYaw = 0.1f;
+                setModuleSuffix(flightModeProperty.getEnumValueAsString());
+            }
+        });
+        this.onPacketReceiveEvent = (packetReceiveEvent -> {
+           if (packetReceiveEvent.getPacket() instanceof S08PacketPlayerPosLook && watchdogStage == 1) {
+               S08PacketPlayerPosLook s08PacketPlayerPosLook = (S08PacketPlayerPosLook) packetReceiveEvent.getPacket();
+               this.originalY = s08PacketPlayerPosLook.getY();
+               Wrapper.sendPacketDirect((new C03PacketPlayer.C04PacketPlayerPosition(
+                       s08PacketPlayerPosLook.getX(), s08PacketPlayerPosLook.getY(), s08PacketPlayerPosLook.getZ(), false)));
+               this.watchdogStage = 2;
+               packetReceiveEvent.setCancelled(true);
            }
-           setModuleSuffix(flightModeProperty.getEnumValueAsString());
         });
         onPacketSendEvent = (packetSendEvent -> {
             if (chokePacketsProperty.getPropertyValue()) {
@@ -79,21 +94,18 @@ public class Flight extends Module {
             }
         });
         onPlayerMoveEvent = (playerMoveEvent -> {
-            if (flightModeProperty.getPropertyValue().equals(flightModes.Watchdog)) {
-                playerMoveEvent.setCancelled(true);
-            }
-            else if (!flightModeProperty.getPropertyValue().equals(flightModes.Watchmeme))
+            if (flightModeProperty.getPropertyValue().equals(flightModes.Vanilla))
                 playerMoveEvent.setSpeed(flightSpeedProperty.getPropertyValue());
+            if (flightModeProperty.getPropertyValue().equals(flightModes.Watchdog)) {
+                    playerMoveEvent.setSpeed(watchdogStage >= 2 ? MovementUtil.getBaseMoveSpeed() : 0);
+            }
         });
     }
 
     @Override
     public void onEnable() {
-        groundTicks = 0;
-        Wrapper.getPlayer().motionX = 0;
-        Wrapper.getPlayer().motionZ = 0;
-        Wrapper.getPlayer().motionY = 0;
         super.onEnable();
+        this.watchdogStage = 0;
     }
 
     @Override
@@ -109,6 +121,9 @@ public class Flight extends Module {
     EventConsumer<PacketSendEvent> onPacketSendEvent;
 
     @EventListener
+    EventConsumer<PacketReceiveEvent> onPacketReceiveEvent;
+
+    @EventListener
     EventConsumer<PlayerMoveEvent> onPlayerMoveEvent;
 
     EnumProperty<flightModes> flightModeProperty = new EnumProperty<>("Flight Mode", flightModes.Vanilla, this);
@@ -119,8 +134,7 @@ public class Flight extends Module {
 
     enum flightModes {
         Vanilla,
-        Watchdog,
-        Watchmeme
+        Watchdog
     }
 
 }

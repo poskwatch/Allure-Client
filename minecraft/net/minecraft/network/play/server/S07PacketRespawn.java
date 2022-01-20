@@ -81,4 +81,8 @@ public class S07PacketRespawn implements Packet<INetHandlerPlayClient>
     {
         return this.worldType;
     }
+
+    public void setGameType(WorldSettings.GameType gameType) {
+        this.gameType = gameType;
+    }
 }

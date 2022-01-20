@@ -1,7 +1,6 @@
 package vip.allureclient.base.util.visual;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.GameSettings;
 import vip.allureclient.base.util.math.MathUtil;
 
 public class AnimationUtil {
@@ -9,7 +8,7 @@ public class AnimationUtil {
     public static double easeOutAnimation(double target, double current, double speed) {
         boolean larger = (target > current);
         double dif = Math.max(target, current) - Math.min(target, current);
-        double factor = dif * (144.0 / Minecraft.getDebugFPS() * speed);
+        double factor = dif * speed;
         if (larger) {
             current += factor;
         } else {

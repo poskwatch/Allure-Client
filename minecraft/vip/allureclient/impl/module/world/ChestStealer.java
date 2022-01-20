@@ -52,7 +52,7 @@ public class ChestStealer extends Module {
         if(Minecraft.getMinecraft().currentScreen instanceof GuiChest) {
             GuiChest chestGui = (GuiChest) Minecraft.getMinecraft().currentScreen;
             String name = chestGui.lowerChestInventory.getDisplayName().getUnformattedText();
-            return name.equals("Large Chest") || name.contains("Chest") || name.equalsIgnoreCase("low");
+            return name.equals("Large Chest") || name.contains("Chest") || name.equalsIgnoreCase("low") || name.equalsIgnoreCase("");
         }
         return false;
     }

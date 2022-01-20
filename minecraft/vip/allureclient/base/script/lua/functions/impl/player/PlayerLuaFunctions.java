@@ -1,10 +1,11 @@
 package vip.allureclient.base.script.lua.functions.impl.player;
 
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
-import vip.allureclient.base.script.lua.functions.LuaFunctionCollection;
 import vip.allureclient.base.script.lua.functions.LuaFunction;
+import vip.allureclient.base.script.lua.functions.LuaFunctionCollection;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.player.MovementUtil;
 
@@ -46,6 +47,19 @@ public class PlayerLuaFunctions extends LuaFunctionCollection {
             @Override
             public LuaValue call() {
                 return LuaValue.valueOf(MovementUtil.getMovementDirection());
+            }
+        });
+        registerLuaFunction("base_move_speed", new ZeroArgFunction() {
+            @Override
+            public LuaValue call() {
+                return LuaValue.valueOf(MovementUtil.getBaseMoveSpeed());
+            }
+        });
+        registerLuaFunction("is_moving", new ZeroArgFunction() {
+            @Override
+            public LuaValue call() {
+
+                return LuaValue.valueOf(MovementUtil.isMoving());
             }
         });
 
@@ -102,7 +116,6 @@ public class PlayerLuaFunctions extends LuaFunctionCollection {
             }
         });
 
-        
     }
 
     public ArrayList<LuaFunction> getLuaFunctions() {

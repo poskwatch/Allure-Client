@@ -7,6 +7,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -32,6 +33,9 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import vip.allureclient.AllureClient;
+import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.impl.event.player.BlockCollisionEvent;
 
 public class Block
 {
@@ -487,6 +491,13 @@ public class Block
     public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity)
     {
         AxisAlignedBB axisalignedbb = this.getCollisionBoundingBox(worldIn, pos, state);
+
+
+        if (collidingEntity == Minecraft.getMinecraft().thePlayer) {
+            final BlockCollisionEvent boundingBoxEvent = new BlockCollisionEvent(this, pos, axisalignedbb);
+            Wrapper.getEventManager().callEvent(boundingBoxEvent);
+            axisalignedbb = boundingBoxEvent.getBoundingBox();
+        }
 
         if (axisalignedbb != null && mask.intersectsWith(axisalignedbb))
         {

@@ -26,7 +26,7 @@ public class Module implements ToggleableObject, BindableObject, ConfigurableObj
     private String moduleSuffix;
     private boolean hidden;
 
-    private final AnimatedCoordinate animatedCoordinate = new AnimatedCoordinate(0, 0);
+    private final AnimatedCoordinate animatedCoordinate;
 
     public Module(){
         if(isIdentified()) {
@@ -40,6 +40,7 @@ public class Module implements ToggleableObject, BindableObject, ConfigurableObj
             this.moduleCategory = ModuleCategory.COMBAT;
         }
         AllureClient.getInstance().getBindManager().registerBind(moduleKeyBind, this);
+        this.animatedCoordinate = new AnimatedCoordinate(GuiScreen.width, 0);
     }
 
     public String getModuleName(){

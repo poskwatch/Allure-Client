@@ -63,7 +63,7 @@ public class AutoHypixel extends Module {
                    if (formattedText.toLowerCase().contains("you died")) {
                        Wrapper.getPlayer().sendChatMessage("/play solo_insane");
                        AllureClient.getInstance().getNotificationManager().addNotification("Auto Hypixel",
-                               "You have been sent to a new game", 3000, NotificationType.INFO);
+                               "You have been sent to a new game", 3000, NotificationType.SUCCESS);
                    }
                }
            }
@@ -74,7 +74,7 @@ public class AutoHypixel extends Module {
                        if (message.toLowerCase().contains("you died") || message.toLowerCase().contains("victory")) {
                            Wrapper.getPlayer().sendChatMessage("/play solo_insane");
                            AllureClient.getInstance().getNotificationManager().addNotification("Auto Hypixel",
-                                   "You have been sent to a new game", 1500, NotificationType.INFO);
+                                   "You have been sent to a new game", 3500, NotificationType.SUCCESS);
                            if (message.toLowerCase().contains("victory"))
                                Statistics.getInstance().addWin();
                        }

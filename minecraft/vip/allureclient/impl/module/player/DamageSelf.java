@@ -7,6 +7,7 @@ import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.module.enums.ModuleCategory;
+import vip.allureclient.base.util.client.TimerUtil;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.event.network.PacketReceiveEvent;
 import vip.allureclient.impl.event.player.UpdatePositionEvent;
@@ -18,21 +19,28 @@ public class DamageSelf extends Module {
     @EventListener
     EventConsumer<UpdatePositionEvent> onUpdatePositionEvent;
 
-    @EventListener
-    EventConsumer<PacketReceiveEvent> onPacketReceiveEvent;
+    private final TimerUtil timerUtil = new TimerUtil();
 
     public DamageSelf() {
-        this.onPacketReceiveEvent = (packetReceiveEvent -> {
-           if (packetReceiveEvent.getPacket() instanceof S12PacketEntityVelocity) {
-               if (((S12PacketEntityVelocity) packetReceiveEvent.getPacket()).getEntityID() == Wrapper.getPlayer().getEntityId()) {
-                   AllureClient.getInstance().getNotificationManager().addNotification("Damaged",
-                           "You have been damaged", 1500, NotificationType.WARNING);
-                   toggle();
-               }
-           }
-        });
         this.onUpdatePositionEvent = (event -> {
+            event.setY(event.getY() + 3);
+            event.setOnGround(false);
+            event.setOnGround(true);
 
+            if (timerUtil.hasReached(300))
+                setToggled(false);
         });
+    }
+
+    @Override
+    public void onEnable() {
+        timerUtil.reset();
+        Wrapper.getPlayer().jump();
+        super.onEnable();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
     }
 }

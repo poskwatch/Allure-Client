@@ -17,6 +17,7 @@ import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.visual.AnimationUtil;
 import vip.allureclient.base.util.visual.ColorUtil;
+import vip.allureclient.base.util.visual.GLUtil;
 import vip.allureclient.impl.event.visual.Render2DEvent;
 import vip.allureclient.impl.module.combat.KillAura;
 import vip.allureclient.impl.property.BooleanProperty;
@@ -49,11 +50,7 @@ public class TargetHUD extends Module {
     public void drawTargetHUD(EntityLivingBase entity) {
         GL11.glPushMatrix();
         GL11.glTranslated(xLocation, yLocation, 0);
-        Gui.drawRectWithWidth(5, 7, 125, 32, 0xff202020);
-        Gui.drawRectWithWidth(4, 7, 1, 32, 0xff101010);
-        Gui.drawRectWithWidth(130, 7, 1, 32, 0xff101010);
-        Gui.drawRectWithWidth(4, 6, 127, 1, 0xff101010);
-        Gui.drawRectWithWidth(4, 39, 127, 1, 0xff101010);
+        GLUtil.glOutlinedFilledQuad(5, 7, 127, 32, 0x90000000, 0xff101010);
         if (entity instanceof EntityPlayer) {
             AbstractClientPlayer abstractClientPlayer = (AbstractClientPlayer) entity;
             Wrapper.getMinecraft().getTextureManager().bindTexture(abstractClientPlayer.getLocationSkin());

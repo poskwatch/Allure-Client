@@ -52,9 +52,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IInteractionObject;
 import net.minecraft.world.World;
 import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.impl.event.player.ChatMessageSendEvent;
-import vip.allureclient.impl.event.player.PlayerMoveEvent;
-import vip.allureclient.impl.event.player.UpdatePositionEvent;
+import vip.allureclient.impl.event.events.player.ChatMessageSendEvent;
+import vip.allureclient.impl.event.events.player.PlayerMoveEvent;
+import vip.allureclient.impl.event.events.player.UpdatePositionEvent;
 
 public class EntityPlayerSP extends AbstractClientPlayer
 {
@@ -226,16 +226,16 @@ public class EntityPlayerSP extends AbstractClientPlayer
 
         if (this.isCurrentViewEntity())
         {
-            double d0 = this.posX - this.lastReportedPosX;
-            double d1 = this.getEntityBoundingBox().minY - this.lastReportedPosY;
-            double d2 = this.posZ - this.lastReportedPosZ;
-            double d3 = (double)(this.rotationYaw - this.lastReportedYaw);
-            double d4 = (double)(this.rotationPitch - this.lastReportedPitch);
+            final UpdatePositionEvent event = new UpdatePositionEvent(posX, getEntityBoundingBox().minY, posZ, rotationYaw, rotationPitch, onGround);
+            Wrapper.getEventBus().invokeEvent(event);
+
+            double d0 = event.getX() - this.lastReportedPosX;
+            double d1 = event.getY() - this.lastReportedPosY;
+            double d2 = event.getZ() - this.lastReportedPosZ;
+            double d3 = (double)(event.getYaw() - this.lastReportedYaw);
+            double d4 = (double)(event.getPitch() - this.lastReportedPitch);
             boolean flag2 = d0 * d0 + d1 * d1 + d2 * d2 > 9.0E-4D || this.positionUpdateTicks >= 20;
             boolean flag3 = d3 != 0.0D || d4 != 0.0D;
-
-            final UpdatePositionEvent event = new UpdatePositionEvent(posX, getEntityBoundingBox().minY, posZ, rotationYaw, rotationPitch, onGround);
-            Wrapper.getEventManager().callEvent(event);
 
             double x = event.getX();
             double y = event.getY();
@@ -286,7 +286,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
             }
 
             event.setPre(false);
-            Wrapper.getEventManager().callEvent(event);
+            Wrapper.getEventBus().invokeEvent(event);
         }
     }
 
@@ -294,7 +294,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
     public void moveEntity(double x, double y, double z) {
         PlayerMoveEvent playerMoveEvent = new PlayerMoveEvent(x, y, z);
 
-        Wrapper.getEventManager().callEvent(playerMoveEvent);
+        Wrapper.getEventBus().invokeEvent(playerMoveEvent);
 
         if(!playerMoveEvent.isCancelled())
             super.moveEntity(playerMoveEvent.getX(), playerMoveEvent.getY(), playerMoveEvent.getZ());
@@ -327,7 +327,7 @@ public class EntityPlayerSP extends AbstractClientPlayer
     public void sendChatMessage(String message)
     {
         ChatMessageSendEvent event = new ChatMessageSendEvent(message);
-        Wrapper.getEventManager().callEvent(event);
+        Wrapper.getEventBus().invokeEvent(event);
         if(!event.isCancelled())
             this.sendQueue.addToSendQueue(new C01PacketChatMessage(event.getMessage()));
     }

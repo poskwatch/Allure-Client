@@ -17,6 +17,7 @@ import org.lwjgl.opengl.GL11;
 import vip.allureclient.base.util.visual.AnimationUtil;
 import vip.allureclient.base.util.visual.BlurUtil;
 import vip.allureclient.base.util.visual.RenderUtil;
+import vip.allureclient.base.util.visual.glsl.GLUtil;
 
 public class GuiNewChat extends Gui
 {
@@ -88,8 +89,7 @@ public class GuiNewChat extends Gui
                                 int i2 = 0;
                                 int j2 = -i1 * 10;
                                 chatline.animation = AnimationUtil.linearAnimation(j2 - 15, chatline.animation, 2.5);
-                                BlurUtil.blurArea(i2, GuiScreen.height - i1 * 10 - 45, l + 6, 10);
-                                drawRect(i2, j2 - 16, i2 + l + 4, j2 - 6, new Color(0, 0, 0, 27).getRGB());
+                                drawRect(i2, j2 - 16, i2 + l + 4, j2 - 6, 0x60000000);
                                 String s = chatline.getChatComponent().getFormattedText();
                                 GlStateManager.enableBlend();
                                 GL11.glEnable(GL11.GL_SCISSOR_TEST);

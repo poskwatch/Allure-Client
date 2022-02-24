@@ -6,7 +6,7 @@ import net.minecraft.client.settings.GameSettings;
 import net.minecraft.client.settings.KeyBinding;
 import org.lwjgl.input.Keyboard;
 import vip.allureclient.AllureClient;
-import vip.allureclient.impl.module.player.GuiMove;
+import vip.allureclient.impl.module.movement.GuiMove;
 
 import java.util.function.Predicate;
 
@@ -25,7 +25,7 @@ public class MovementInputFromOptions extends MovementInput
         this.moveForward = 0.0F;
 
         final Predicate<KeyBinding> isPressed = keyBinding ->
-                AllureClient.getInstance().getModuleManager().getModuleByClass.apply(GuiMove.class).isToggled() ?
+                AllureClient.getInstance().getModuleManager().getModuleOrNull("Gui Move").isToggled() ?
                         Keyboard.isKeyDown(keyBinding.getKeyCode()) && !(Minecraft.getMinecraft().currentScreen instanceof GuiChat) :
                         keyBinding.isKeyDown();
 

@@ -4,7 +4,7 @@ import vip.allureclient.AllureClient;
 import vip.allureclient.base.util.math.MathUtil;
 import vip.allureclient.base.util.visual.AnimationUtil;
 import vip.allureclient.base.util.visual.ColorUtil;
-import vip.allureclient.base.util.visual.GLUtil;
+import vip.allureclient.base.util.visual.glsl.GLUtil;
 import vip.allureclient.impl.property.ValueProperty;
 import vip.allureclient.visual.screens.dropdown.component.Component;
 import vip.allureclient.visual.screens.dropdown.component.sub.ModuleComponent;
@@ -33,7 +33,7 @@ public class ValuePropertyComponent extends Component {
         double x = parent.getParentFrame().getX();
         double y = parent.getParentFrame().getY() + offset;
 
-        GLUtil.glFilledQuad(x, y, 115, 23, isMouseOverSlider(mouseX, mouseY) ? 0xff101010 : 0xff151515);
+        GLUtil.drawFilledRectangle(x, y, 115, 23, isMouseOverSlider(mouseX, mouseY) ? 0xff101010 : 0xff151515);
 
         if (isSliding && isMouseOverSlider(mouseX, mouseY)) {
             double max = property.getMaximumValue().doubleValue();
@@ -55,6 +55,7 @@ public class ValuePropertyComponent extends Component {
             if(property.getPropertyValue() instanceof Byte){
                 property.setPropertyValue((byte) MathUtil.roundToPlace(valueToSet, 2));
             }
+            property.onValueChange.run();
         }
 
         double sliderRectPercentage = (106 *

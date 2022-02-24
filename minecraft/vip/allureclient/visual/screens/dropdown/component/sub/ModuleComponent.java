@@ -1,13 +1,12 @@
 package vip.allureclient.visual.screens.dropdown.component.sub;
 
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.GlStateManager;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.base.property.Property;
-import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.visual.AnimationUtil;
 import vip.allureclient.base.util.visual.ColorUtil;
-import vip.allureclient.base.util.visual.GLUtil;
+import vip.allureclient.base.util.visual.glsl.GLUtil;
 import vip.allureclient.impl.property.*;
 import vip.allureclient.visual.screens.dropdown.component.Component;
 import vip.allureclient.visual.screens.dropdown.component.sub.impl.*;
@@ -69,20 +68,38 @@ public class ModuleComponent extends Component {
             y = Math.round(animationFlowY);
         }
 
-        GLUtil.glFilledQuad(getParentFrame().getX(), y, getParentFrame().frameWidth, getParentFrame().frameHeight,
-                isHoveringButton(mouseX, mouseY) ? 0xff303030 : 0xff202020);
+        // Render module name
+        GlStateManager.color(1, 1, 1);
+        AllureClient.getInstance().getFontManager().smallFontRenderer.drawString(module.getModuleName(), getParentFrame().getX() + 4, y + 4,
+                module.isToggled() ? ColorUtil.getClientColors()[1].getRGB() : 0xff909090);
 
-        GLUtil.glHorizontalGradientQuad(getParentFrame().getX(), y, Math.round(animationToggleBar), getParentFrame().frameHeight,
-                ColorUtil.getClientColors()[0].getRGB(), ColorUtil.getClientColors()[1].getRGB());
+        // Unless component is last, render a separator quad below
+        if (getParentFrame().getChildrenComponents().indexOf(this) != getParentFrame().getChildrenComponents().size() - 1)
+            GLUtil.drawFilledRectangle(getParentFrame().getX() + 6, y + 14, 109, 0.5, 0xff707070);
 
-        AllureClient.getInstance().getFontManager().smallFontRenderer.drawStringWithShadow(module.getModuleName(), getParentFrame().getX() + 4, y + 4, -1);
-        final String ARROW_UP = "F";
-        final String ARROW_DOWN = "G";
-        AllureClient.getInstance().getFontManager().iconFontRenderer.drawString(expanded ? ARROW_DOWN : ARROW_UP, getParentFrame().getX() + getParentFrame().frameWidth - 10, y + 5, -1);
+        // If module is enabled, render an indicator to the left.
+        //if (module.isToggled())
+          //  GLUtil.glRoundedFilledQuad(getParentFrame().getX() + 1, y + 0.5, 1, 14, 7, ColorUtil.getClientColors()[1].getRGB());
+
+        // Render arrow indicating whether the component is expanded
+        GLUtil.glFilledEquilateralTriangle(getParentFrame().getX() + 100, y + 5, 4, expanded,
+                module.isToggled() ? ColorUtil.getClientColors()[1].getRGB() : 0xff909090
+        );
+
+
+        /*
+        final String ARROW_UP = "F", ARROW_DOWN = "G";
+        GlStateManager.color(1, 1, 1);
+        AllureClient.getInstance().getFontManager().iconFontRenderer.drawString(expanded ? ARROW_DOWN : ARROW_UP, getParentFrame().getX() + getParentFrame().frameWidth - 10, y + 5,
+                module.isToggled() ? ColorUtil.getClientColors()[1].getRGB() : 0xff909090);
+
+         */
+
+        // Animate
         animationToggleBar = AnimationUtil.easeOutAnimation(animationToggleBarTarget, animationToggleBar, 0.03);
         animationFlowY = AnimationUtil.linearAnimation(animationFlowYTarget, animationFlowY, 2);
         if(module.isToggled()) {
-            animationToggleBarTarget = getParentFrame().frameWidth;
+            animationToggleBarTarget = 1;
         }
         else{
             animationToggleBarTarget = 0;

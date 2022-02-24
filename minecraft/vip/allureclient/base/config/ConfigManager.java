@@ -3,21 +3,22 @@ package vip.allureclient.base.config;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import io.github.poskwatch.eventbus.api.annotations.EventHandler;
+import io.github.poskwatch.eventbus.api.enums.Priority;
+import io.github.poskwatch.eventbus.api.interfaces.IEventCallable;
+import io.github.poskwatch.eventbus.api.interfaces.IEventListener;
 import vip.allureclient.AllureClient;
-import vip.allureclient.base.event.EventConsumer;
-import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.base.util.visual.ChatUtil;
-import vip.allureclient.impl.event.client.ClientExitEvent;
-import vip.allureclient.impl.event.world.WorldLoadEvent;
+import vip.allureclient.impl.event.events.world.WorldLoadEvent;
 
 import java.io.*;
 import java.util.Objects;
 
 public class ConfigManager {
 
-    public final File CONFIG_FOLDER = new File(AllureClient.getInstance().getFileManager().getClientDirectory().getPath() + "/Configs");
+    public final File CONFIG_FOLDER = new File(AllureClient.getInstance().getFileManager().getClientDirectory().getPath() + "/configs");
     public final String FILE_EXTENSION = ".json";
+
     private boolean hasLoadedDefault = false;
 
     public ConfigManager() {
@@ -28,14 +29,16 @@ public class ConfigManager {
             else
                 System.out.println("Couldn't create config directory");
         }
-        this.onClientExit = (event -> saveDefaultConfig());
-        this.onWorldLoadEvent = (event -> {
-            if (!hasLoadedDefault) {
-                loadDefaultConfig();
-                hasLoadedDefault = true;
-            }
+        Wrapper.getEventBus().registerListener(new IEventListener() {
+            @EventHandler(events = WorldLoadEvent.class, priority = Priority.VERY_HIGH)
+            final IEventCallable<WorldLoadEvent> onWorldLoad = (event -> {
+                if (!hasLoadedDefault) {
+                    // Only load once
+                    loadDefaultConfig();
+                    hasLoadedDefault = true;
+                }
+            });
         });
-        Wrapper.getEventManager().subscribe(this);
     }
 
     public boolean loadConfig(String configName) {
@@ -91,10 +94,4 @@ public class ConfigManager {
             System.out.println("Couldn't load default settings");
         }
     }
-
-    @EventListener
-    EventConsumer<WorldLoadEvent> onWorldLoadEvent;
-
-    @EventListener
-    EventConsumer<ClientExitEvent> onClientExit;
 }

@@ -1,10 +1,10 @@
 package vip.allureclient.visual.screens.dropdown.component.sub;
 
-import net.minecraft.client.gui.Gui;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.util.visual.AnimationUtil;
+import vip.allureclient.base.util.visual.glsl.GLUtil;
 import vip.allureclient.visual.screens.dropdown.component.Component;
 
 import java.util.ArrayList;
@@ -26,21 +26,23 @@ public class ModuleCategoryFrame {
         this.y = y;
 
         int buttonOffset = 14;
-        for(Module module : AllureClient.getInstance().getModuleManager().getModulesByCategory.apply(category)){
+        for (Module module : AllureClient.getInstance().getModuleManager().getModulesByCategory(category)){
             addChildComponent(new ModuleComponent(module, buttonOffset));
             buttonOffset += 14;
         }
     }
 
     public void onDrawScreen(int mouseX, int mouseY) {
-        Gui.drawRectWithWidth(x - 1, y, frameWidth + 2, frameHeight, 0xff101010);
+
+        outlineAnimation = AnimationUtil.linearAnimation(getFrameHeight() + 1, outlineAnimation, 2);
+        if (frameExpanded)
+            GLUtil.glRoundedFilledQuad(x - 1, y, (float) (frameWidth + 2), completedOutlineAnimation ? getFrameHeight() + 15 : (float) outlineAnimation + 15, 10.0F, 0xff202020);
+        // Separator
+        GLUtil.drawFilledRectangle(x - 1, y + 14, frameWidth + 2, 0.5, 0xff999999);
 
         AllureClient.getInstance().getFontManager().smallFontRenderer.drawStringWithShadow(category.categoryName, x + 17, y + 4, -1);
         AllureClient.getInstance().getFontManager().iconFontRenderer.drawString(category.iconCode, x + 4, y + 5, -1);
 
-        outlineAnimation = AnimationUtil.linearAnimation(getFrameHeight() + 1, outlineAnimation, 2);
-        if(frameExpanded)
-            Gui.drawRectWithWidth(x - 1, y + 14, frameWidth + 2, completedOutlineAnimation ? getFrameHeight() + 1 : outlineAnimation, 0xff101010);
         if(isDraggingFrame){
             x = mouseX - distX;
             y = mouseY - distY;

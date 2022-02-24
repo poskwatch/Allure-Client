@@ -22,7 +22,8 @@ public class ValueProperty<T extends Number> extends Property<T> {
     @Override
     public void setPropertyValue(T propertyValue) {
         super.setPropertyValue(propertyValue);
-        onValueChange.run();
+        if (getParentModule().isToggled())
+            onValueChange.run();
     }
 
     public T getMinimumValue() {

@@ -1,104 +1,91 @@
 package vip.allureclient.base.module;
 
-import vip.allureclient.AllureClient;
 import vip.allureclient.base.module.enums.ModuleCategory;
-import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.impl.module.combat.AntiBot;
-import vip.allureclient.impl.module.combat.Velocity;
-import vip.allureclient.impl.module.combat.KillAura;
+import vip.allureclient.impl.module.combat.*;
 import vip.allureclient.impl.module.movement.*;
 import vip.allureclient.impl.module.player.*;
 import vip.allureclient.impl.module.visual.*;
+import vip.allureclient.impl.module.visual.hud.HUD;
 import vip.allureclient.impl.module.world.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ModuleManager {
 
-    private final ArrayList<Module> modules = new ArrayList<>();
+    // Use a string to instance map, with the module name and module instance
+    private final Map<String, Module> stringToModuleInstanceMap;
+
+    // Method to put module(s) into map (ignoring case by using toLowerCase())
+    private void registerToInstanceMap(Module... modules) {
+        Arrays.asList(modules).forEach(module -> this.stringToModuleInstanceMap.put(module.getModuleName().toLowerCase(), module));
+    }
 
     public ModuleManager(){
-        final Runnable onModuleManagerStart = () -> {
-            registerModules.accept(new Module[]{
-                    // Combat Modules
-                    new KillAura(),
-                    new Velocity(),
-                    new AntiBot(),
-                    // Player Modules
-                    new NoFall(),
-                    new PingSpoof(),
-                    new Disabler(),
-                    new NoSlow(),
-                    new GuiMove(),
-                    new AntiVoid(),
-                    new DamageSelf(),
-                    // Movement Modules
-                    new Sprint(),
-                    new Flight(),
-                    new LongJump(),
-                    new Speed(),
-                    new Step(),
-                    new VerusFlight(),
-                    // Visual Modules
-                    new HUD(),
-                    new Animations(),
-                    new Crosshair(),
-                    new TargetHUD(),
-                    new PlayerESP(),
-                    new ChestESP(),
-                    new HitMarkers(),
-                    new Statistics(),
-                    // World Modules
-                    new Atmosphere(),
-                    new ChestStealer(),
-                    new GameSpeed(),
-                    new Scaffold(),
-                    new ChatBypass(),
-                    new AntiDeath(),
-                    new EntityDesync(),
-                    new AutoHypixel()
-                }
-            );
-            modules.forEach(module -> AllureClient.getInstance().getPropertyManager().getPropertiesByModule(module).forEach(property -> property.onValueChange.run()));
-            System.out.println("Module Manager Initiated...");
-        };
-        onModuleManagerStart.run();
+        // Instantiate map using HashMap implementation. Very fast for this context
+        this.stringToModuleInstanceMap = new HashMap<>();
+        // Put all module instances into map
+
+        this.registerToInstanceMap(
+                // Combat Modules
+                new KillAura(),
+                new Velocity(),
+                new AntiBot(),
+                new AimBot(),
+                new AutoArmor(),
+                // Player Modules
+                new NoFall(),
+                new Disabler(),
+                new NoSlowdown(),
+                new GuiMove(),
+                new AntiVoid(),
+                new Regeneration(),
+                new Blink(),
+                // Movement Modules
+                new Sprint(),
+                new Flight(),
+                new LongJump(),
+                new Speed(),
+                new Step(),
+                new PacketSpeed(),
+                new WatchdogFlight(),
+                new SpartanFly(),
+                // Visual Modules
+                new HUD(),
+                new Animations(),
+                new Crosshair(),
+                new TargetHUD(),
+                new PlayerESP(),
+                new HitMarkers(),
+                new Statistics(),
+                new Brightness(),
+                // World Modules
+                new Atmosphere(),
+                new ChestStealer(),
+                new GameSpeed(),
+                new Scaffold(),
+                new EntityDesync(),
+                new AutoHypixel()
+        );
+        // TODO: handle property change, etc
     }
 
-    private final Consumer<Module[]> registerModules = (modulesArray -> modules.addAll(Arrays.asList(modulesArray)));
-
-    public Supplier<ArrayList<Module>> getModules = () -> modules;
-
-    public final Function<ModuleCategory, ArrayList<Module>> getModulesByCategory = (moduleCategory -> {
-        ArrayList<Module> filteredModules = new ArrayList<>();
-        getModules.get().stream().filter(module -> module.getModuleCategory() == moduleCategory).forEach(filteredModules::add);
-        return filteredModules;
-    });
-
-    private Comparator<Module> getModuleStringWidthComparator(boolean vanillaFont) {
-        return Comparator.comparingDouble(module -> (vanillaFont ?
-                Wrapper.getMinecraftFontRenderer().getStringWidth(module.getModuleDisplayName()) :
-                AllureClient.getInstance().getFontManager().mediumFontRenderer.getStringWidth(module.getModuleDisplayName())));
+    // Getter for module by its name, uses string to instance map to find (ignoring case by using toLowerCase())
+    public Module getModuleOrNull(String moduleName) {
+        return this.stringToModuleInstanceMap.get(moduleName.toLowerCase());
     }
 
-    public ArrayList<Module> getSortedDisplayModules(boolean vanillaFont, boolean reversed) {
-        ArrayList<Module> sortedDisplayModules = new ArrayList<>(getModules.get());
-        if (reversed)
-            sortedDisplayModules.sort(getModuleStringWidthComparator(vanillaFont).reversed());
-        else
-            sortedDisplayModules.sort(getModuleStringWidthComparator(vanillaFont));
-        return sortedDisplayModules;
+    // Getter for modules in array list, used for displaying modules
+    public ArrayList<Module> getModulesAsArraylist() {
+        return new ArrayList<>(this.stringToModuleInstanceMap.values());
     }
 
-    public Function<String, Module> getModuleByName =
-            (label -> getModules.get().stream().filter(module -> module.getModuleName().equals(label)).findFirst().orElse(null));
-
-    public Function<Class<? extends Module>, Module> getModuleByClass =
-            (moduleClass -> getModules.get().stream().filter(module -> module.getClass() == moduleClass).findFirst().orElse(null));
-
+    // Used to get modules by their categories, used for GUI panels
+    public ArrayList<Module> getModulesByCategory(ModuleCategory moduleCategory) {
+        return this.stringToModuleInstanceMap.values().stream().filter(module ->
+                module.getModuleCategory().equals(moduleCategory)).collect(Collectors.toCollection(ArrayList::new));
+    }
 }

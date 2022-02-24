@@ -1,28 +1,26 @@
 package vip.allureclient.visual.notification;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.GLU;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.font.MinecraftFontRenderer;
-import vip.allureclient.base.util.client.TimerUtil;
-import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.base.util.client.Stopwatch;
 import vip.allureclient.base.util.visual.AnimatedCoordinate;
-import vip.allureclient.base.util.visual.ChatUtil;
-import vip.allureclient.base.util.visual.GLUtil;
+import vip.allureclient.base.util.visual.glsl.GLUtil;
 
 import java.awt.*;
 
 public class Notification {
 
     private final String title, body;
-    private double width, height;
+    private final double width;
+    private final double height;
     private final int color;
     private final long duration;
     private final NotificationType type;
     private final AnimatedCoordinate animatedCoordinate;
     private final MinecraftFontRenderer fontRenderer = AllureClient.getInstance().getFontManager().smallFontRenderer;
-    private final TimerUtil timerUtil = new TimerUtil();
+    private final Stopwatch stopwatch = new Stopwatch();
 
     public boolean completed;
 
@@ -34,10 +32,10 @@ public class Notification {
         this.height = 25;
         this.width = Math.max(fontRenderer.getStringWidth(title), fontRenderer.getStringWidth(body)) + 4;
         this.color = type.getColor();
-        this.timerUtil.reset();
+        this.stopwatch.reset();
         this.completed = false;
 
-        ScaledResolution scaledResolution = new ScaledResolution(Wrapper.getMinecraft());
+        ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
         this.animatedCoordinate = new AnimatedCoordinate(scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight());
     }
 
@@ -47,7 +45,7 @@ public class Notification {
         final double xPosition = screenWidth - width;
         final double yPosition = screenHeight - (height + 2) - yOffset - (index * (height + 1));
 
-        if (this.timerUtil.hasReached(duration))
+        if (this.stopwatch.hasReached(duration))
             animatedCoordinate.animateCoordinates(screenWidth, yPosition, AnimatedCoordinate.AnimationType.EASE_OUT);
         else {
             animatedCoordinate.animateCoordinates(xPosition, yPosition, AnimatedCoordinate.AnimationType.EASE_OUT);
@@ -61,10 +59,10 @@ public class Notification {
             return;
         }
 
-        GLUtil.glFilledQuad(x, y, width, height, 0x90000000);
-        final double progress = (double) (System.currentTimeMillis() - this.timerUtil.lastMS) / this.duration * width;
-        GLUtil.glFilledQuad(x, y + (height - 2), width, 2, new Color(color).darker().darker().darker().darker().getRGB());
-        GLUtil.glFilledQuad(x, y + (height - 2), width - progress, 2, color);
+        GLUtil.drawFilledRectangle(x, y, width, height, 0x90000000);
+        final double progress = (double) (System.currentTimeMillis() - this.stopwatch.lastMS) / this.duration * width;
+        GLUtil.drawFilledRectangle(x, y + (height - 2), width, 2, new Color(color).darker().darker().darker().darker().getRGB());
+        GLUtil.drawFilledRectangle(x, y + (height - 2), width - progress, 2, color);
         fontRenderer.drawStringWithShadow(title, x + 3, y + 3, -1);
         fontRenderer.drawStringWithShadow(body, x + 3, y + 13, 0xff909090);
     }

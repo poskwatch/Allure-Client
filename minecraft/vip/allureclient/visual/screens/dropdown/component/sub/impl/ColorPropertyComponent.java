@@ -5,7 +5,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.util.visual.ColorUtil;
-import vip.allureclient.base.util.visual.GLUtil;
+import vip.allureclient.base.util.visual.glsl.GLUtil;
 import vip.allureclient.base.util.visual.RenderUtil;
 import vip.allureclient.impl.property.ColorProperty;
 import vip.allureclient.visual.screens.dropdown.component.Component;

@@ -6,6 +6,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
+import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.impl.event.events.world.UpdateWorldTimeEvent;
 
 public class WorldServerOF extends WorldServer
 {
@@ -67,6 +69,10 @@ public class WorldServerOF extends WorldServer
 
     private void fixWorldTime()
     {
+        UpdateWorldTimeEvent updateWorldTimeEvent = new UpdateWorldTimeEvent();
+        Wrapper.getEventBus().invokeEvent(updateWorldTimeEvent);
+        if (updateWorldTimeEvent.isCancelled())
+            return;
         if (this.worldInfo.getGameType().getID() == 1)
         {
             long i = this.getWorldTime();

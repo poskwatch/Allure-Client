@@ -187,10 +187,8 @@ import org.lwjgl.util.glu.GLU;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.base.util.visual.BlurUtil;
-import vip.allureclient.impl.event.client.ClientExitEvent;
-import vip.allureclient.impl.event.client.ClientStartEvent;
-import vip.allureclient.impl.event.client.KeyPressedEvent;
-import vip.allureclient.impl.event.world.WorldLoadEvent;
+import vip.allureclient.impl.event.events.client.KeyPressedEvent;
+import vip.allureclient.impl.event.events.world.WorldLoadEvent;
 
 public class Minecraft implements IThreadListener, IPlayerUsage
 {
@@ -568,10 +566,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
         this.ingameGUI = new GuiIngame(this);
 
         Wrapper.initEventManager();
-        Wrapper.getEventManager().subscribe(AllureClient.getInstance());
-
-        ClientStartEvent clientStartEvent = new ClientStartEvent();
-        Wrapper.getEventManager().callEvent(clientStartEvent);
+        AllureClient.getInstance().onPostInitiation();
 
         if (this.serverName != null)
         {
@@ -1039,8 +1034,6 @@ public class Minecraft implements IThreadListener, IPlayerUsage
      */
     public void shutdownMinecraftApplet()
     {
-        ClientExitEvent clientExitEvent = new ClientExitEvent();
-        Wrapper.getEventManager().callEvent(clientExitEvent);
         try
         {
             this.stream.shutdownStream();
@@ -1941,7 +1934,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
                     {
 
                         KeyPressedEvent keyPressedEvent = new KeyPressedEvent(k);
-                        Wrapper.getEventManager().callEvent(keyPressedEvent);
+                        Wrapper.getEventBus().invokeEvent(keyPressedEvent);
 
                         if (k == 1)
                         {
@@ -2416,7 +2409,7 @@ public class Minecraft implements IThreadListener, IPlayerUsage
             this.thePlayer.movementInput = new MovementInputFromOptions(this.gameSettings);
             this.playerController.setPlayerCapabilities(this.thePlayer);
             this.renderViewEntity = this.thePlayer;
-            Wrapper.getEventManager().callEvent(new WorldLoadEvent());
+            Wrapper.getEventBus().invokeEvent(new WorldLoadEvent());
         }
         else
         {

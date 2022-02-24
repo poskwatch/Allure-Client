@@ -32,8 +32,9 @@ import optifine.Reflector;
 import org.lwjgl.opengl.GL11;
 import shadersmod.client.Shaders;
 import vip.allureclient.impl.module.combat.KillAura;
-import vip.allureclient.impl.module.player.NoSlow;
 import vip.allureclient.impl.module.visual.Animations;
+
+import java.util.function.Supplier;
 
 public class ItemRenderer
 {
@@ -348,7 +349,7 @@ public class ItemRenderer
             {
                 this.renderItemMap(entityplayersp, f2, f, f1);
             }
-            else if (entityplayersp.getItemInUseCount() > 0 || KillAura.getInstance().isBlocking() || (NoSlow.getInstance().isBlocking && NoSlow.getInstance().isToggled()))
+            else if (entityplayersp.getItemInUseCount() > 0 || KillAura.getInstance().isBlocking())
             {
                 EnumAction enumaction = this.itemToRender.getItemUseAction();
 
@@ -369,40 +370,45 @@ public class ItemRenderer
                                 Animations.getInstance().yValueProperty.getPropertyValue(),
                                 Animations.getInstance().zValueProperty.getPropertyValue());
                         switch (Animations.getInstance().blockModeProperty.getPropertyValue()){
-                            case Swing:
-                                this.transformFirstPersonItem(- 0.25f, f1);
+                            case NORMALFUCKINGGAYRETARD:
+                                this.transformFirstPersonItem(0, f1);
+                                GL11.glTranslated(0, 0.25, 0);
                                 this.func_178103_d();
                                 break;
-                            case Swong:
+                            case SWING:
+                                this.transformFirstPersonItem(f - 0.25f, f1);
+                                this.func_178103_d();
+                                break;
+                            case SWONG:
                                 this.transformFirstPersonItem(f/2, 0);
                                 GlStateManager.translate(0F, 0.3F, 0);
                                 GL11.glRotated(-scalableProg * 25.0F, scalableProg / 4.9, 0, 2.0F);
                                 GL11.glRotated(-scalableProg * 55.0F, 4.0F, scalableProg * 1.7, 0F);
                                 this.func_178103_d();
                                 break;
-                            case Swang:
+                            case SWANG:
                                 this.transformFirstPersonItem(f/2 - 0.15f, f1);
                                 GlStateManager.rotate(scalableProg * 35.0F / 2.0F, -scalableProg, -0.0F, 23.0F);
                                 GlStateManager.rotate(scalableProg * 50.0F, 1.0F, -scalableProg / 2.0F, 0.F);
                                 this.func_178103_d();
                                 break;
-                            case Swank:
+                            case SWANK:
                                 this.transformFirstPersonItem(f/2 - 0.15f, f1);
                                 GlStateManager.rotate(scalableProg * 35.0F / 2.0F, -scalableProg, -0.0F, 23.0F);
-                                GlStateManager.rotate(scalableProg * 30.0F, 1.0F, -scalableProg / 2.0F, 0.F);
+                                GlStateManager.rotate(scalableProg * 40.0F, 1.0F, -scalableProg / 2.0F, 0.F);
                                 this.func_178103_d();
                                 break;
-                            case Slide:
+                            case SLIDE:
                                 this.transformFirstPersonItem(f - 0.15f, 0);
                                 GlStateManager.rotate(scalableProg * -35.0F, 1, -0.0F, 0.0F);
                                 this.func_178103_d();
                                 break;
-                            case Flux:
+                            case FLUX:
                                 this.transformFirstPersonItem(f/2, 0);
                                 GlStateManager.rotate(scalableProg * -35.0F, 1, -1, 0);
                                 this.func_178103_d();
                                 break;
-                            case Exhibition:
+                            case EXHIBITION:
                                 this.transformFirstPersonItem(f/2, 0);
                                 GlStateManager.translate(0F, 0.25F, 0);
                                 GL11.glRotated(-scalableProg * 25.0F, scalableProg / 4.9, 0, 2.0F);

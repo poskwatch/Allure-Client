@@ -9,11 +9,10 @@ public class AnimationUtil {
         boolean larger = (target > current);
         double dif = Math.max(target, current) - Math.min(target, current);
         double factor = dif * speed;
-        if (larger) {
+        if (larger)
             current += factor;
-        } else {
+        else
             current -= factor;
-        }
         return current;
     }
 
@@ -23,14 +22,12 @@ public class AnimationUtil {
         if (dif > 0.0D) {
             double animationSpeed = MathUtil.roundToPlace(Math.min(
                     10.0D, Math.max(0.005D, 144.0D / fps * speed)), 3);
-            if (dif < animationSpeed) {
+            if (dif < animationSpeed)
                 animationSpeed = dif;
-            }
             if (current < target)
                 return current + animationSpeed;
-            if (current > target) {
+            if (current > target)
                 return current - animationSpeed;
-            }
         }
         return current;
     }

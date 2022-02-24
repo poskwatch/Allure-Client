@@ -1,6 +1,9 @@
 package vip.allureclient.impl.module.combat;
 
-import io.netty.util.internal.ThreadLocalRandom;
+import io.github.poskwatch.eventbus.api.annotations.EventHandler;
+import io.github.poskwatch.eventbus.api.enums.Priority;
+import io.github.poskwatch.eventbus.api.interfaces.IEventCallable;
+import io.github.poskwatch.eventbus.api.interfaces.IEventListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -11,25 +14,20 @@ import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
 import org.lwjgl.input.Keyboard;
 import vip.allureclient.AllureClient;
-import vip.allureclient.base.event.EventConsumer;
-import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.module.Module;
-import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.module.enums.ModuleCategory;
 import vip.allureclient.base.util.client.NetworkUtil;
-import vip.allureclient.base.util.client.TimerUtil;
-import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.base.util.math.MathUtil;
+import vip.allureclient.base.util.client.Stopwatch;
 import vip.allureclient.base.util.player.IRotations;
-import vip.allureclient.base.util.visual.ChatUtil;
-import vip.allureclient.base.util.visual.GLUtil;
-import vip.allureclient.impl.event.player.UpdatePositionEvent;
-import vip.allureclient.impl.event.visual.Render3DEvent;
+import vip.allureclient.base.util.player.MovementUtil;
+import vip.allureclient.base.util.player.PacketUtil;
+import vip.allureclient.base.util.visual.glsl.GLUtil;
+import vip.allureclient.impl.event.events.player.PlayerMoveEvent;
+import vip.allureclient.impl.event.events.player.UpdatePositionEvent;
+import vip.allureclient.impl.event.events.visual.Render3DEvent;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.impl.property.EnumProperty;
 import vip.allureclient.impl.property.MultiSelectEnumProperty;
@@ -38,16 +36,9 @@ import vip.allureclient.impl.property.ValueProperty;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-@ModuleData(moduleName = "Kill Aura", moduleBind = Keyboard.KEY_Y, moduleCategory = ModuleCategory.COMBAT)
 public class KillAura extends Module implements IRotations {
 
-    @EventListener
-    EventConsumer<UpdatePositionEvent> onUpdatePositionEvent;
-
-    @EventListener
-    EventConsumer<Render3DEvent> onRender3DEvent;
-
-    private final TimerUtil apsTimerUtil = new TimerUtil();
+    private final Stopwatch apsStopwatch = new Stopwatch();
 
     private final ValueProperty<Integer> averageAPSProperty = new ValueProperty<>("Average APS", 13, 1, 20, this);
 
@@ -55,11 +46,15 @@ public class KillAura extends Module implements IRotations {
 
     private final BooleanProperty autoBlockProperty = new BooleanProperty("Auto Block", true, this);
 
-    private final MultiSelectEnumProperty<Targets> targetsProperty = new MultiSelectEnumProperty<>("Targets", this, Targets.Players);
+    private final MultiSelectEnumProperty<Targets> targetsProperty = new MultiSelectEnumProperty<>("Targets", this, Targets.PLAYERS);
 
-    private final EnumProperty<TargetingMode> targetingModeProperty = new EnumProperty<>("Target by", TargetingMode.Distance, this);
+    private final EnumProperty<TargetingMode> targetingModeProperty = new EnumProperty<>("Target by", TargetingMode.DISTANCE, this);
 
-    private final EnumProperty<AttackingMode> attackingModeProperty = new EnumProperty<>("Attacking Mode", AttackingMode.Always, this);
+    private final EnumProperty<AttackingMode> attackingModeProperty = new EnumProperty<>("Attacking Mode", AttackingMode.ALWAYS, this);
+
+    private final BooleanProperty raytraceProperty = new BooleanProperty("Ray trace", true, this);
+
+    private final BooleanProperty followTargetProperty = new BooleanProperty("Follow Target", false, this);
 
     private final BooleanProperty renderRangeProperty = new BooleanProperty("Render Range", true, this);
 
@@ -67,119 +62,136 @@ public class KillAura extends Module implements IRotations {
     private boolean isBlocking;
 
     public KillAura(){
-        this.onUpdatePositionEvent = (updatePositionEvent -> {
-            setModuleSuffix(targetingModeProperty.getEnumValueAsString());
-            ArrayList<Entity> targetEntities = new ArrayList<>(Wrapper.getWorld().loadedEntityList);
-            targetEntities.removeIf(entity -> !isEntityValid(entity));
-            switch (targetingModeProperty.getPropertyValue()) {
-                case Distance:
-                    targetEntities.sort(Comparator.comparingDouble(entity -> Wrapper.getPlayer().getDistanceToEntity(entity)));
-                    break;
-                case Health:
-                    targetEntities.sort(Comparator.comparingDouble(entity -> ((EntityLivingBase) (entity)).getHealth()));
-                    break;
-                case Hurt_Time:
-                    targetEntities.sort(Comparator.comparingInt(entity -> ((EntityLivingBase) (entity)).hurtTime));
-                    break;
-            }
-            if (updatePositionEvent.isPre()) {
-                if (!targetEntities.isEmpty()) {
-                    currentTarget = targetEntities.get(0);
-                    if (currentTarget != null) {
-                        if (!NetworkUtil.isOnHypixel())
-                            setRotations(updatePositionEvent, getRotations(), true);
-                        Wrapper.getPlayer().rotationYawHead = getRotations()[0];
-                        Wrapper.getPlayer().renderYawOffset = getRotations()[0];
-                        Wrapper.getPlayer().rotationPitchHead = getRotations()[1];
-                        if (apsTimerUtil.hasReached(1000 / averageAPSProperty.getPropertyValue())) {
-                            if (attackingModeProperty.getPropertyValue().equals(AttackingMode.Tick) && Wrapper.getPlayer().ticksExisted % 3 != 0)
-                                return;
-                            Wrapper.getPlayer().swingItem();
-                            Wrapper.sendPacketDirect(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));
-                            for (int i = 0; i < 10; i++) {
-                                World targetWorld = currentTarget.getEntityWorld();
-                                double x, y, z;
-                                x = currentTarget.posX;
-                                y = currentTarget.posY;
-                                z = currentTarget.posZ;
-                                targetWorld.spawnParticle(EnumParticleTypes.CRIT,
-                                        x + ThreadLocalRandom.current().nextDouble(-0.5, 0.5),
-                                        y + ThreadLocalRandom.current().nextDouble(-1, 1),
-                                        z + ThreadLocalRandom.current().nextDouble(-0.5, 0.5), 23, 23, 23, 152);
+        super("Kill Aura", Keyboard.KEY_Y, ModuleCategory.COMBAT);
+        this.setListener(new IEventListener() {
+            @EventHandler(events = UpdatePositionEvent.class, priority = Priority.HIGH)
+            final IEventCallable<UpdatePositionEvent> onUpdatePosition = (event -> {
+                // Create cache for world's loaded entities
+                ArrayList<Entity> loadedEntityCache = new ArrayList<>(mc.theWorld.loadedEntityList);
+                // Remove if deemed invalid by method
+                loadedEntityCache.removeIf(entity -> !isEntityValid(entity));
+
+                // Sort the cache by (Distance/Health/Hurt-Time) based on respective settings
+                switch (targetingModeProperty.getPropertyValue()) {
+                    case DISTANCE:
+                        loadedEntityCache.sort(Comparator.comparingDouble(entity -> mc.thePlayer.getDistanceToEntity(entity)));
+                        break;
+                    case HEALTH:
+                        loadedEntityCache.sort(Comparator.comparingDouble(entity -> ((EntityLivingBase) (entity)).getHealth()));
+                        break;
+                    case HURT_TIME:
+                        loadedEntityCache.sort(Comparator.comparingInt(entity -> ((EntityLivingBase) (entity)).hurtTime));
+                        break;
+                }
+
+                if (event.isPre()) {
+                    if (!loadedEntityCache.isEmpty()) {
+                        // Set current target to the first entity in cache
+                        currentTarget = loadedEntityCache.get(0);
+                        if (currentTarget != null) {
+                            // Hypixel doesn't need actual rotations for hitting
+                            if (!NetworkUtil.isOnHypixel())
+                                setRotations(event, getRotations(), true);
+                            // Visual for Hypixel playing
+                            else {
+                                mc.thePlayer.rotationYawHead = getRotations()[0];
+                                mc.thePlayer.renderYawOffset = getRotations()[0];
+                                mc.thePlayer.rotationPitchHead = getRotations()[1];
                             }
-                            apsTimerUtil.reset();
+                            if (mc.objectMouseOver.entityHit != null) {
+                                if (raytraceProperty.getPropertyValue() && !mc.objectMouseOver.entityHit.equals(currentTarget))
+                                    return;
+                            }
+                            // Attack if APS ticks have reached necessary point...
+                            if (apsStopwatch.hasReached(1000 / averageAPSProperty.getPropertyValue())) {
+                                // Unless it isn't the third tick (Tick attack mode)
+                                if (attackingModeProperty.getPropertyValue().equals(AttackingMode.TICK) && mc.thePlayer.ticksExisted % 3 != 0)
+                                    return;
+                                mc.thePlayer.swingItem();
+                                PacketUtil.sendPacketDirect(new C02PacketUseEntity(currentTarget, C02PacketUseEntity.Action.ATTACK));
+                                apsStopwatch.reset();
+                            }
                         }
+                    }
+                    else {
+                        currentTarget = null;
                     }
                 }
                 else {
-                    currentTarget = null;
+                    // Send C08 to tell the server the player is blocking
+                    if (autoBlockProperty.getPropertyValue() && currentTarget != null && isHoldingSword()){
+                        PacketUtil.sendPacketDirect(new C08PacketPlayerBlockPlacement(new BlockPos(-Double.MIN_VALUE, -Double.MIN_VALUE, -Double.MIN_VALUE),
+                                255, mc.thePlayer.getHeldItem(), 0.0f, 0.0f, 0.0f));
+                        isBlocking = true;
+                    }
+                    else
+                        isBlocking = false;
                 }
-            }
-            else {
-                if (autoBlockProperty.getPropertyValue() && currentTarget != null && isHoldingSword()){
-                    Wrapper.sendPacketDirect(new C08PacketPlayerBlockPlacement(new BlockPos(-Double.MIN_VALUE, -Double.MIN_VALUE, -Double.MIN_VALUE),
-                            255, Wrapper.getPlayer().getHeldItem(), 0.0f, 0.0f, 0.0f));
-                    isBlocking = true;
+            });
+            @EventHandler(events = PlayerMoveEvent.class, priority = Priority.VERY_HIGH)
+            final IEventCallable<PlayerMoveEvent> onPlayerMove = event -> {
+                if (followTargetProperty.getPropertyValue() && currentTarget != null) {
+                    final double[] calculations = {
+                            (-Math.sin(Math.toRadians(-getCurrentTarget().rotationYaw))) * MovementUtil.getBaseMoveSpeed(),
+                            (Math.cos(Math.toRadians(-getCurrentTarget().rotationYaw))) * MovementUtil.getBaseMoveSpeed()
+                    };
+                    event.setX(calculations[0]);
+                    event.setZ(calculations[1]);
                 }
-                else
-                    isBlocking = false;
-            }
-        });
-
-        this.onRender3DEvent = (render3DEvent -> {
-            if (renderRangeProperty.getPropertyValue())
-                GLUtil.gl3DEllipse(Wrapper.getPlayer(), render3DEvent.getPartialTicks(), 100, attackRangeProperty.getPropertyValue().floatValue(), -1);
+            };
+            @EventHandler(events = Render3DEvent.class, priority = Priority.HIGH)
+            final IEventCallable<Render3DEvent> onRender3D = (event -> {
+                // Render range using a 3D ellipse
+                if (renderRangeProperty.getPropertyValue())
+                    GLUtil.gl3DEllipse(mc.thePlayer, event.getPartialTicks(), 100, attackRangeProperty.getPropertyValue().floatValue(), 0x30FFFFFF);
+            });
         });
     }
 
     @Override
     public void onEnable() {
         currentTarget = null;
-        apsTimerUtil.reset();
+        apsStopwatch.reset();
         super.onEnable();
     }
 
     @Override
     public void onDisable() {
-        if (isBlocking) {
-            isBlocking = false;
-            Wrapper.sendPacketDirect(new C08PacketPlayerBlockPlacement( new BlockPos(-1, -1, -1), 255, null, 0.0F, 0.0F, 0.0F));
-        }
         currentTarget = null;
-        apsTimerUtil.reset();
-        Wrapper.getMinecraft().timer.timerSpeed = 1;
+        isBlocking = false;
         super.onDisable();
     }
 
     private boolean isEntityValid(Entity entity) {
         if(!(entity instanceof EntityLivingBase))
             return false;
-        if (entity.isDead || Wrapper.getPlayer().getDistanceToEntity(entity) > attackRangeProperty.getPropertyValue() || entity == Wrapper.getPlayer() || !(((EntityLivingBase) (entity)).getHealth() > 0))
+        if (entity.isDead ||
+                mc.thePlayer.getDistanceToEntity(entity) > attackRangeProperty.getPropertyValue() ||
+                entity == mc.thePlayer || !(((EntityLivingBase) (entity)).getHealth() > 0))
             return false;
-        boolean mobs = targetsProperty.isSelected(Targets.Monsters);
+        boolean mobs = targetsProperty.isSelected(Targets.MONSTERS);
         if (!mobs && entity instanceof EntityMob)
             return false;
-        boolean players = targetsProperty.isSelected(Targets.Players);
+        boolean players = targetsProperty.isSelected(Targets.PLAYERS);
         if (!players && entity instanceof EntityPlayer)
             return false;
-        boolean animals = targetsProperty.isSelected(Targets.Animals);
+        boolean animals = targetsProperty.isSelected(Targets.ANIMALS);
         if (!animals && entity instanceof EntityAnimal)
             return false;
         if (entity instanceof EntityPlayer) {
             boolean antiBot = AntiBot.getInstance().isToggled()
-                    && (AntiBot.getInstance().antiBotModeProperty.getPropertyValue().equals(AntiBot.AntiBotMode.Watchdog)
-                    || AntiBot.getInstance().antiBotModeProperty.getPropertyValue().equals(AntiBot.AntiBotMode.Watchdog));
-            if (antiBot && !NetworkUtil.isPlayerPingNull((EntityPlayer) entity))
+                    && (AntiBot.getInstance().antiBotModeProperty.getPropertyValue().equals(AntiBot.AntiBotMode.WATCHDOG)
+                    || AntiBot.getInstance().antiBotModeProperty.getPropertyValue().equals(AntiBot.AntiBotMode.WATCHDOG));
+            if (antiBot && !NetworkUtil.isPlayerPingValid((EntityPlayer) entity))
                 return false;
         }
-        return targetsProperty.isSelected(Targets.Invisibles) || !entity.isInvisible();
+        return targetsProperty.isSelected(Targets.INVISIBLES) || !entity.isInvisible();
     }
 
     private boolean isHoldingSword() {
-        if (Wrapper.getPlayer().getCurrentEquippedItem() == null) {
+        if (mc.thePlayer.getCurrentEquippedItem() == null)
             return false;
-        }
-        return Wrapper.getPlayer().getCurrentEquippedItem().getItem() instanceof ItemSword;
+        return mc.thePlayer.getCurrentEquippedItem().getItem() instanceof ItemSword;
     }
 
     public boolean isBlocking() {
@@ -188,10 +200,6 @@ public class KillAura extends Module implements IRotations {
 
     public Entity getCurrentTarget() {
         return currentTarget;
-    }
-
-    public static KillAura getInstance() {
-        return (KillAura) AllureClient.getInstance().getModuleManager().getModuleByClass.apply(KillAura.class);
     }
 
     private float[] getRotationFromPosition(double x, double z, double y) {
@@ -219,20 +227,57 @@ public class KillAura extends Module implements IRotations {
     }
 
     private enum TargetingMode {
-        Distance,
-        Health,
-        Hurt_Time
+        DISTANCE("Distance"),
+        HEALTH("Health"),
+        HURT_TIME("Hurt Time");
+
+        private final String name;
+
+        TargetingMode(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
     private enum AttackingMode {
-        Always,
-        Tick
+        ALWAYS("Always"),
+        TICK("Tick");
+
+        private final String name;
+
+        AttackingMode(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
     private enum Targets {
-        Players,
-        Monsters,
-        Animals,
-        Invisibles
+        PLAYERS("Players"),
+        MONSTERS("Monsters"),
+        ANIMALS("Animals"),
+        INVISIBLES("Invisibles");
+
+        private final String name;
+
+        Targets(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    public static KillAura getInstance() {
+        return (KillAura) AllureClient.getInstance().getModuleManager().getModuleOrNull("Kill Aura");
     }
 }

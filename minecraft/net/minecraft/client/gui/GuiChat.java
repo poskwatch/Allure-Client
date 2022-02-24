@@ -187,10 +187,13 @@ public class GuiChat extends GuiScreen
                 return;
             }
 
-            if (mouseX >= 5 + TargetHUD.getInstance().xLocation && mouseX <= 5 + TargetHUD.getInstance().xLocation + 125 && mouseY >= 7 + TargetHUD.getInstance().yLocation && mouseY <= 7 + TargetHUD.getInstance().yLocation + 32) {
+            if (mouseX >= 5 + TargetHUD.getInstance().xCoordinateProperty.getPropertyValue() &&
+                    mouseX <= 5 + TargetHUD.getInstance().xCoordinateProperty.getPropertyValue() + 125 &&
+                    mouseY >= 7 + TargetHUD.getInstance().yCoordinateProperty.getPropertyValue() &&
+                    mouseY <= 7 + TargetHUD.getInstance().yCoordinateProperty.getPropertyValue() + 32) {
                 draggingTargetHUD = true;
-                distX = mouseX - TargetHUD.getInstance().xLocation;
-                distY = mouseY - TargetHUD.getInstance().yLocation;
+                distX = mouseX - TargetHUD.getInstance().xCoordinateProperty.getPropertyValue();
+                distY = mouseY - TargetHUD.getInstance().yCoordinateProperty.getPropertyValue();
             }
         }
 
@@ -321,9 +324,8 @@ public class GuiChat extends GuiScreen
      */
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
-        double chatBoxWidth = Math.max(GuiNewChat.calculateChatboxWidth(Wrapper.getMinecraft().gameSettings.chatWidth) + 6, fontRendererObj.getStringWidth(inputField.getText()) + 11);
-        BlurUtil.blurArea(2, this.height - 14, chatBoxWidth - 2, 12);
-        drawRect(2, this.height - 14, chatBoxWidth, this.height - 2, 0x40000000);
+        double chatBoxWidth = Math.max(GuiNewChat.calculateChatboxWidth(mc.gameSettings.chatWidth) + 6, fontRendererObj.getStringWidth(inputField.getText()) + 11);
+        drawRect(2, this.height - 14, chatBoxWidth, this.height - 2, 0x60000000);
         this.inputField.drawTextBox();
         IChatComponent ichatcomponent = this.mc.ingameGUI.getChatGUI().getChatComponent(Mouse.getX(), Mouse.getY());
 
@@ -333,8 +335,8 @@ public class GuiChat extends GuiScreen
         }
 
         if (draggingTargetHUD) {
-            TargetHUD.getInstance().xLocation = mouseX - distX;
-            TargetHUD.getInstance().yLocation = mouseY - distY;
+            TargetHUD.getInstance().xCoordinateProperty.setPropertyValue(mouseX - distX);
+            TargetHUD.getInstance().yCoordinateProperty.setPropertyValue(mouseY - distY);
         }
 
         //super.drawScreen(mouseX, mouseY, partialTicks);

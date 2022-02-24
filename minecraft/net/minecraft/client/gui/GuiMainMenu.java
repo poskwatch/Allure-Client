@@ -539,9 +539,9 @@ public class GuiMainMenu extends GuiScreen implements GuiYesNoCallback
         GlStateManager.scale(f, f, f);
         //this.drawCenteredString(this.fontRendererObj, this.splashText, 0, -8, -256);
         GlStateManager.popMatrix();
-        String s = "Allure Client Version " + AllureClient.getInstance().CLIENT_VERSION;
+        String s = "Allure Client | Version " + AllureClient.getInstance().getVersion().toString();
 
-        AllureClient.getInstance().getFontManager().smallFontRenderer.drawStringWithShadow(s, 2, this.height - 10, -1);
+        AllureClient.getInstance().getFontManager().smallFontRenderer.drawString(s, 2, this.height - 10, -1);
 
         if (this.openGLWarning1 != null && this.openGLWarning1.length() > 0)
         {

@@ -49,4 +49,13 @@ public class ColorUtil {
     }
 
     private static final Color[] clientColors = {  new Color(0xffff70bf), new Color(0xff9234eb)    };
+
+    public static Color getClientColor(ClientColor color) {
+        return color == ClientColor.SECONDARY ? clientColors[0] : clientColors[1];
+    }
+
+    public enum ClientColor {
+        PRIMARY,
+        SECONDARY
+    }
 }

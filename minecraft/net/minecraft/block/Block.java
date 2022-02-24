@@ -33,9 +33,8 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import vip.allureclient.AllureClient;
 import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.impl.event.player.BlockCollisionEvent;
+import vip.allureclient.impl.event.events.player.BlockCollisionEvent;
 
 public class Block
 {
@@ -495,7 +494,7 @@ public class Block
 
         if (collidingEntity == Minecraft.getMinecraft().thePlayer) {
             final BlockCollisionEvent boundingBoxEvent = new BlockCollisionEvent(this, pos, axisalignedbb);
-            Wrapper.getEventManager().callEvent(boundingBoxEvent);
+            Wrapper.getEventBus().invokeEvent(boundingBoxEvent);
             axisalignedbb = boundingBoxEvent.getBoundingBox();
         }
 

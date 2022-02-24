@@ -1,5 +1,9 @@
 package vip.allureclient.impl.module.world;
 
+import io.github.poskwatch.eventbus.api.annotations.EventHandler;
+import io.github.poskwatch.eventbus.api.enums.Priority;
+import io.github.poskwatch.eventbus.api.interfaces.IEventCallable;
+import io.github.poskwatch.eventbus.api.interfaces.IEventListener;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockContainer;
@@ -9,60 +13,46 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.client.C0APacketAnimation;
-import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.potion.Potion;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import org.lwjgl.opengl.GL11;
 import vip.allureclient.AllureClient;
-import vip.allureclient.base.event.EventConsumer;
-import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.font.MinecraftFontRenderer;
 import vip.allureclient.base.module.Module;
-import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.module.enums.ModuleCategory;
-import vip.allureclient.base.util.client.NetworkUtil;
-import vip.allureclient.base.util.client.TimerUtil;
-import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.base.util.math.MathUtil;
+import vip.allureclient.base.util.client.Stopwatch;
 import vip.allureclient.base.util.player.IRotations;
 import vip.allureclient.base.util.player.MovementUtil;
-import vip.allureclient.base.util.visual.AnimationUtil;
-import vip.allureclient.base.util.visual.GLUtil;
+import vip.allureclient.base.util.player.PacketUtil;
+import vip.allureclient.base.util.visual.ColorUtil;
+import vip.allureclient.base.util.visual.glsl.GLUtil;
 import vip.allureclient.base.util.world.BlockData;
-import vip.allureclient.impl.event.player.BlockCollisionEvent;
-import vip.allureclient.impl.event.player.UpdatePositionEvent;
-import vip.allureclient.impl.event.visual.Render2DEvent;
-import vip.allureclient.impl.module.movement.Speed;
+import vip.allureclient.impl.event.events.player.BlockCollisionEvent;
+import vip.allureclient.impl.event.events.player.UpdatePositionEvent;
+import vip.allureclient.impl.event.events.visual.Render2DEvent;
 import vip.allureclient.impl.property.EnumProperty;
 import vip.allureclient.impl.property.MultiSelectEnumProperty;
 import vip.allureclient.impl.property.ValueProperty;
 import vip.allureclient.visual.notification.NotificationType;
 
-import java.awt.*;
-
-@ModuleData(moduleName = "Scaffold", moduleBind = 0, moduleCategory = ModuleCategory.WORLD)
 public class Scaffold extends Module implements IRotations {
 
-    private final MultiSelectEnumProperty<Addons> addonsProperty = new MultiSelectEnumProperty<>("Addons", this,
-            Addons.No_Sprint, Addons.Spoof_Swing);
+    private final MultiSelectEnumProperty<ScaffoldAddons> addonsProperty = new MultiSelectEnumProperty<>("Addons", this,
+            ScaffoldAddons.NO_SPRINT, ScaffoldAddons.SPOOF_SWING);
 
     private final ValueProperty<Float> timerBoostProperty = new ValueProperty<>("Scaffold Timer Boost", 1.0F, 1.0F, 2.0F, this);
 
-    private final EnumProperty<TowerMode> towerModeProperty = new EnumProperty<TowerMode>("Tower Mode", TowerMode.Watchdog, this) {
+    private final EnumProperty<TowerMode> towerModeProperty = new EnumProperty<TowerMode>("Tower Mode", TowerMode.WATCHDOG, this) {
         @Override
         public boolean isPropertyHidden() {
-            return !addonsProperty.isSelected(Addons.Tower);
+            return !addonsProperty.isSelected(ScaffoldAddons.TOWER);
         }
     };
-
-    private final EnumProperty<DisplayType> displayTypeProperty = new EnumProperty<>("Display Type", DisplayType.Text, this);
 
     private static final BlockPos[] BLOCK_POSITIONS = new BlockPos[] { new BlockPos(-1, 0, 0), new BlockPos(1, 0, 0), new BlockPos(0, 0, -1), new BlockPos(0, 0, 1) };
     private static final EnumFacing[] FACINGS = new EnumFacing[] { EnumFacing.EAST, EnumFacing.WEST, EnumFacing.SOUTH, EnumFacing.NORTH };
 
-    private final TimerUtil clickTimer = new TimerUtil();
+    private final Stopwatch clickTimer = new Stopwatch();
     private int originalHotBarSlot;
     private int blockCount;
     private int bestBlockStack;
@@ -71,132 +61,115 @@ public class Scaffold extends Module implements IRotations {
 
     private double blockBarAnimation;
 
-    @EventListener
-    EventConsumer<UpdatePositionEvent> onUpdatePositionEvent;
-
-    @EventListener
-    EventConsumer<BlockCollisionEvent> onBlockCollisionEvent;
-
-    @EventListener
-    EventConsumer<Render2DEvent> onRender2DEvent;
-
     public Scaffold() {
-        this.onUpdatePositionEvent = (event -> {
-            if (event.isPre()) {
-                setModuleSuffix("Watchdog");
-                updateBlockCount();
-                if (addonsProperty.isSelected(Addons.No_Sprint)) {
-                    Wrapper.getPlayer().setSprinting(false);
-                    MovementUtil.setSpeed(MovementUtil.getBaseMoveSpeed() *
-                            (Wrapper.getPlayer().isPotionActive(Potion.moveSpeed) ? 0.2 : 0.323));
-                }
-                if (MovementUtil.isMoving())
-                    Wrapper.getMinecraft().timer.timerSpeed = timerBoostProperty.getPropertyValue();
-                this.data = null;
-                this.bestBlockStack = findBestBlockStack();
-                if (this.bestBlockStack != -1) {
-                    if (this.bestBlockStack < 36 && this.clickTimer.hasReached(250L)) {
-                        for (int i = 44; i >= 36; i--) {
-                            ItemStack stack = Wrapper.getPlayer().inventoryContainer.getSlot(i).getStack();
-                            if (stack != null && stack.stackSize > 1 && stack.getItem() instanceof ItemBlock && isValidBlock(((ItemBlock) stack.getItem()).getBlock())) {
-                                Wrapper.getMinecraft().playerController.windowClick(Wrapper.getPlayer().inventoryContainer.windowId, this.bestBlockStack, i - 36, 2, Wrapper.getPlayer());
-                                this.bestBlockStack = i;
-                                break;
+        super("Scaffold", ModuleCategory.WORLD);
+        this.setListener(new IEventListener() {
+            @EventHandler(events = UpdatePositionEvent.class, priority = Priority.HIGH)
+            final IEventCallable<UpdatePositionEvent> onUpdatePosition = (event -> {
+                if (event.isPre()) {
+                    setModuleSuffix("Watchdog");
+                    updateBlockCount();
+                    if (addonsProperty.isSelected(ScaffoldAddons.NO_SPRINT)) {
+                        mc.thePlayer.setSprinting(false);
+                        MovementUtil.setSpeed(MovementUtil.getBaseMoveSpeed() *
+                                (mc.thePlayer.isPotionActive(Potion.moveSpeed) ? 0.2 : 0.423));
+                    }
+                    if (MovementUtil.isMoving())
+                        mc.timer.timerSpeed = timerBoostProperty.getPropertyValue();
+                    data = null;
+                    bestBlockStack = findBestBlockStack();
+                    if (bestBlockStack != -1) {
+                        if (bestBlockStack < 36 && clickTimer.hasReached(250L)) {
+                            for (int i = 44; i >= 36; i--) {
+                                ItemStack stack = mc.thePlayer.inventoryContainer.getSlot(i).getStack();
+                                if (stack != null && stack.stackSize > 1 && stack.getItem() instanceof ItemBlock && isValidBlock(((ItemBlock) stack.getItem()).getBlock())) {
+                                    mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, bestBlockStack, i - 36, 2, mc.thePlayer);
+                                    bestBlockStack = i;
+                                    break;
+                                }
                             }
                         }
+                        BlockPos blockUnder = MovementUtil.getBlockUnder();
+                        BlockData data = getBlockData(blockUnder);
+                        if (data == null) {
+                            data = getBlockData(blockUnder.add(0, -1, 0));
+                        }
+                        if (data != null && bestBlockStack >= 36) {
+                            if (validateReplaceable(data) && data.hitVec != null) {
+                                getInstance().angles = getRotations();
+                            } else
+                                data = null;
+                        }
+                        if (getInstance().angles != null) {
+                            setRotations(event, angles, true);
+                        }
+                        getInstance().data = data;
                     }
-                    BlockPos blockUnder = MovementUtil.getBlockUnder();
-                    BlockData data = getBlockData(blockUnder);
-                    if (data == null) {
-                        data = getBlockData(blockUnder.add(0, -1, 0));
+                } else if (data != null && bestBlockStack != -1 && bestBlockStack >= 36) {
+                    int hotBarSlot = bestBlockStack - 36;
+                    if (mc.thePlayer.inventory.currentItem != hotBarSlot) {
+                        if (addonsProperty.isSelected(ScaffoldAddons.SPOOF_SWITCH))
+                            PacketUtil.sendPacketDirect(new C09PacketHeldItemChange(hotBarSlot));
+                        else
+                            mc.thePlayer.inventory.currentItem = hotBarSlot;
                     }
-                    if (data != null && this.bestBlockStack >= 36) {
-                        if (validateReplaceable(data) && data.hitVec != null) {
-                            this.angles = getRotations();
-                        } else
-                            data = null;
-                    }
-                    if (this.angles != null) {
-                        setRotations(event, angles, true);
-                    }
-                    this.data = data;
-                }
-        } else if (this.data != null && this.bestBlockStack != -1 && this.bestBlockStack >= 36) {
-                int hotBarSlot = this.bestBlockStack - 36;
-                if (Wrapper.getPlayer().inventory.currentItem != hotBarSlot) {
-                    if (addonsProperty.isSelected(Addons.Spoof_Switch))
-                        Wrapper.sendPacketDirect(new C09PacketHeldItemChange(hotBarSlot));
-                    else
-                        Wrapper.getPlayer().inventory.currentItem = hotBarSlot;
-                }
-                if (Wrapper.getMinecraft().playerController.onPlayerRightClick(Wrapper.getPlayer(), Wrapper.getWorld(), Wrapper.getPlayer().inventory.getStackInSlot(hotBarSlot), this.data.pos, this.data.face, this.data.hitVec)) {
-                    if (addonsProperty.isSelected(Addons.Spoof_Swing))
-                        Wrapper.sendPacketDirect(new C0APacketAnimation());
-                    else
-                        Wrapper.getPlayer().swingItem();
-                    if (addonsProperty.isSelected(Addons.Tower)) {
-                        if (Wrapper.getMinecraft().gameSettings.keyBindJump.isKeyDown() &&
-                            Wrapper.getWorld().checkBlockCollision(Wrapper.getPlayer().getEntityBoundingBox().addCoord(0, -0.0626D, 0))
-                        && !MovementUtil.isMoving())
-                        switch (towerModeProperty.getPropertyValue()) {
-                            case NCP:
-                                Wrapper.getPlayer().motionY = MovementUtil.getJumpHeight() - 4.54352838557992E-4D;
-                                break;
-                            case Watchdog:
-                                Wrapper.getPlayer().motionX = 0;
-                                Wrapper.getPlayer().motionZ = 0;
-                                if (Wrapper.getPlayer().ticksExisted % 2 != 0)
-                                    Wrapper.getPlayer().jump();
-                                break;
+                    if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.inventory.getStackInSlot(hotBarSlot), data.pos, data.face, data.hitVec)) {
+                        if (addonsProperty.isSelected(ScaffoldAddons.SPOOF_SWING))
+                            PacketUtil.sendPacketDirect(new C0APacketAnimation());
+                        else
+                            mc.thePlayer.swingItem();
+                        if (addonsProperty.isSelected(ScaffoldAddons.TOWER)) {
+                            if (mc.gameSettings.keyBindJump.isKeyDown() &&
+                                    mc.theWorld.checkBlockCollision(mc.thePlayer.getEntityBoundingBox().addCoord(0, -0.0626D, 0))
+                                    && !MovementUtil.isMoving())
+                                switch (towerModeProperty.getPropertyValue()) {
+                                    case NCP:
+                                        mc.thePlayer.motionY = MovementUtil.getJumpHeight() - 4.54352838557992E-4D;
+                                        break;
+                                    case WATCHDOG:
+                                        mc.thePlayer.motionX = 0;
+                                        mc.thePlayer.motionZ = 0;
+                                        if (mc.thePlayer.ticksExisted % 2 != 0)
+                                            mc.thePlayer.jump();
+                                        break;
+                                }
                         }
                     }
                 }
-            }
-        });
-        this.onBlockCollisionEvent = (event -> {
-            if (event.getBlock() instanceof BlockAir && !isOnEdge(2)) {
-                if (Wrapper.getPlayer().isSneaking())
-                    return;
-                double x = event.getBlockPos().getX();
-                double y = event.getBlockPos().getY();
-                double z = event.getBlockPos().getZ();
-                if (y < Wrapper.getPlayer().posY) {
-                    event.setBoundingBox(AxisAlignedBB.fromBounds(-5, -1, -5, 5, 1.0F, 5).offset(x, y, z));
+            });
+            @EventHandler(events = Render2DEvent.class, priority = Priority.VERY_LOW)
+            final IEventCallable<Render2DEvent> onRender2D = (event -> {
+                final float x = event.getScaledResolution().getScaledWidth()/2.0F;
+                final float y = event.getScaledResolution().getScaledHeight()/2.0F + 50;
+                final MinecraftFontRenderer textRenderer = AllureClient.getInstance().getFontManager().mediumFontRenderer;
+                final String text = String.format("%d Blocks", blockCount);
+                GLUtil.glOutlinedFilledQuad(x - textRenderer.getStringWidth(text)/2 - 3, y- 5, textRenderer.getStringWidth(text) + 6, 16,
+                        0x90000000, ColorUtil.getClientColor(ColorUtil.ClientColor.PRIMARY).getRGB());
+                textRenderer.drawCenteredString(text, x, y - 1, ColorUtil.getClientColor(ColorUtil.ClientColor.PRIMARY).getRGB());
+            });
+            @EventHandler(events = BlockCollisionEvent.class, priority = Priority.VERY_LOW)
+            final IEventCallable<BlockCollisionEvent> onBlockCollision = (event -> {
+                if (event.getBlock() instanceof BlockAir && !isOnEdge(2)) {
+                    if (mc.thePlayer.isSneaking())
+                        return;
+                    double x = event.getBlockPos().getX();
+                    double y = event.getBlockPos().getY();
+                    double z = event.getBlockPos().getZ();
+                    if (y < mc.thePlayer.posY) {
+                     //   event.setBoundingBox(AxisAlignedBB.fromBounds(-5, -1, -5, 5, 1.0F, 5).offset(x, y, z));
+                    }
                 }
-            }
-        });
-        this.onRender2DEvent = (event -> {
-            final float x = event.getScaledResolution().getScaledWidth()/2.0F;
-            final float y = event.getScaledResolution().getScaledHeight()/2.0F + 50;
-            switch (displayTypeProperty.getPropertyValue()) {
-                case Text:
-                    final MinecraftFontRenderer textRenderer = AllureClient.getInstance().getFontManager().mediumFontRenderer;
-                    final String text = String.format("%d Blocks", blockCount);
-                    GLUtil.glFilledQuad(x - textRenderer.getStringWidth(text)/2 - 3, y- 5, textRenderer.getStringWidth(text) + 6, 16, 0x90000000);
-                    textRenderer.drawCenteredStringWithShadow(text, x, y, -1);
-                    break;
-                case Bar:
-                    blockBarAnimation = AnimationUtil.linearAnimation(98 * (Math.min(blockCount / 128.0F, 1.0F)), blockBarAnimation, 1);
-                    GLUtil.glFilledQuad(x - 50, y, 100, 6, 0x90000000);
-                    GL11.glPushMatrix();
-                    GL11.glEnable(GL11.GL_SCISSOR_TEST);
-                    GLUtil.glScissor(x - 49, y + 1, blockBarAnimation, 6);
-                    GLUtil.glHorizontalGradientQuad(x - 49, y + 1, 98, 4, Color.GREEN.getRGB(), Color.MAGENTA.getRGB());
-                    GL11.glDisable(GL11.GL_SCISSOR_TEST);
-                    GL11.glPopMatrix();
-                    GL11.glColor4f(1, 1, 1, 1);
-                    break;
-            }
-
+            });
         });
     }
 
     @Override
     public void onEnable() {
-        this.originalHotBarSlot = Wrapper.getPlayer().inventory.currentItem;
+        this.originalHotBarSlot = mc.thePlayer.inventory.currentItem;
         super.onEnable();
-        if (AllureClient.getInstance().getModuleManager().getModuleByClass.apply(Speed.class).isToggled()) {
-            AllureClient.getInstance().getModuleManager().getModuleByClass.apply(Speed.class).setToggled(false);
+        final Module speedModuleInstance = AllureClient.getInstance().getModuleManager().getModuleOrNull("Speed");
+        if (speedModuleInstance.isToggled()) {
+            speedModuleInstance.setToggled(false);
             AllureClient.getInstance().getNotificationManager().addNotification("Module Toggled",
                     "Speed was automatically toggled to prevent lag-back(s)", 1500, NotificationType.WARNING);
         }
@@ -205,9 +178,9 @@ public class Scaffold extends Module implements IRotations {
     @Override
     public void onDisable() {
         this.angles = null;
-        Wrapper.getMinecraft().timer.timerSpeed = 1.0F;
-        Wrapper.getPlayer().inventory.currentItem = originalHotBarSlot;
-        Wrapper.sendPacketDirect(new C09PacketHeldItemChange(originalHotBarSlot));
+        mc.timer.timerSpeed = 1.0F;
+        mc.thePlayer.inventory.currentItem = originalHotBarSlot;
+        PacketUtil.sendPacketDirect(new C09PacketHeldItemChange(originalHotBarSlot));
         super.onDisable();
     }
 
@@ -223,11 +196,11 @@ public class Scaffold extends Module implements IRotations {
         event.setPitch(rotations[1], visualize);
     }
 
-    private static int findBestBlockStack() {
+    private int findBestBlockStack() {
         int bestSlot = -1;
         int blockCount = -1;
         for (int i = 44; i >= 9; i--) {
-            ItemStack stack = Wrapper.getPlayer().inventoryContainer.getSlot(i).getStack();
+            ItemStack stack = mc.thePlayer.inventoryContainer.getSlot(i).getStack();
             if (stack != null &&
                     stack.getItem() instanceof net.minecraft.item.ItemBlock &&
                     stack.stackSize > 1 && !(Block.getBlockFromItem(stack.getItem()) instanceof BlockContainer) &&
@@ -242,23 +215,23 @@ public class Scaffold extends Module implements IRotations {
         return bestSlot;
     }
 
-    private static boolean validateReplaceable(BlockData data) {
-        return Wrapper.getWorld().getBlockState(data.pos.offset(data.face)).getBlock().isReplaceable(Wrapper.getWorld(), data.pos.offset(data.face));
+    private boolean validateReplaceable(BlockData data) {
+        return mc.theWorld.getBlockState(data.pos.offset(data.face)).getBlock().isReplaceable(mc.theWorld, data.pos.offset(data.face));
     }
 
-    private static boolean validateBlockRange(BlockData data) {
+    private boolean validateBlockRange(BlockData data) {
         if (data.hitVec == null)
             return false;
-        double x = data.hitVec.xCoord - Wrapper.getPlayer().posX;
-        double y = data.hitVec.yCoord - Wrapper.getPlayer().posY + Wrapper.getPlayer().getEyeHeight();
-        double z = data.hitVec.zCoord - Wrapper.getPlayer().posZ;
+        double x = data.hitVec.xCoord - mc.thePlayer.posX;
+        double y = data.hitVec.yCoord - mc.thePlayer.posY + mc.thePlayer.getEyeHeight();
+        double z = data.hitVec.zCoord - mc.thePlayer.posZ;
         return (StrictMath.sqrt(x * x + y * y + z * z) <= 4.0D);
     }
 
     private BlockData getBlockData(BlockPos pos) {
         BlockPos[] blockPositions = BLOCK_POSITIONS;
         EnumFacing[] facings = FACINGS;
-        WorldClient world = Wrapper.getWorld();
+        WorldClient world = mc.theWorld;
         for (int i = 0; i < blockPositions.length; i++) {
             BlockPos blockPos = pos.add(blockPositions[i]);
             if (isValidBlock(world.getBlockState(blockPos).getBlock())) {
@@ -318,8 +291,8 @@ public class Scaffold extends Module implements IRotations {
         double[] verboseArray = new double[]{0, verbose, -verbose};
         for (double x : verboseArray) {
             for (double z : verboseArray) {
-                final BlockPos belowBlockPos = new BlockPos(Wrapper.getPlayer().posX + x, Math.floor(Wrapper.getPlayer().posY - 1), Wrapper.getPlayer().posZ + z);
-                if (!(Wrapper.getWorld().getBlockState(belowBlockPos).getBlock() instanceof BlockAir))
+                final BlockPos belowBlockPos = new BlockPos(mc.thePlayer.posX + x, Math.floor(mc.thePlayer.posY - 1), mc.thePlayer.posZ + z);
+                if (!(mc.theWorld.getBlockState(belowBlockPos).getBlock() instanceof BlockAir))
                     return false;
             }
         }
@@ -329,28 +302,48 @@ public class Scaffold extends Module implements IRotations {
     private void updateBlockCount() {
         this.blockCount = 0;
         for (int i = 9; i < 45; i++) {
-            ItemStack stack = Wrapper.getPlayer().inventoryContainer.getSlot(i).getStack();
+            ItemStack stack = mc.thePlayer.inventoryContainer.getSlot(i).getStack();
             if (stack != null && stack.getItem() instanceof net.minecraft.item.ItemBlock &&
                     isValidBlock(Block.getBlockFromItem(stack.getItem())))
                 this.blockCount += stack.stackSize;
         }
     }
 
-    private enum Addons {
-        Spoof_Swing,
-        Spoof_Switch,
-        No_Sprint,
-        Tower
+    private enum ScaffoldAddons {
+        SPOOF_SWING("Spoof Swing"),
+        SPOOF_SWITCH("Spoof Switch"),
+        NO_SPRINT("No Sprint"),
+        TOWER("Tower");
+
+        private final String name;
+
+        ScaffoldAddons(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
     private enum TowerMode {
-        NCP,
-        Watchdog
+        NCP("NCP"),
+        WATCHDOG("Watchdog");
+
+        private final String name;
+
+        TowerMode(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 
-    private enum DisplayType {
-        None,
-        Text,
-        Bar
+    public static Scaffold getInstance() {
+        return (Scaffold) AllureClient.getInstance().getModuleManager().getModuleOrNull("Scaffold");
     }
 }

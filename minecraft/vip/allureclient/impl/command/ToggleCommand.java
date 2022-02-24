@@ -1,11 +1,9 @@
 package vip.allureclient.impl.command;
 
-import org.lwjgl.input.Keyboard;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.command.Command;
-import vip.allureclient.base.command.CommandArgumentException;
+import vip.allureclient.base.command.ArgumentException;
 import vip.allureclient.base.module.Module;
-import vip.allureclient.base.util.visual.ChatUtil;
 
 public class ToggleCommand implements Command {
     @Override
@@ -14,17 +12,16 @@ public class ToggleCommand implements Command {
     }
 
     @Override
-    public void execute(String[] arguments) throws CommandArgumentException {
+    public void execute(String[] arguments) throws ArgumentException {
         if (arguments.length == 2) {
-            for (Module module : AllureClient.getInstance().getModuleManager().getModules.get()) {
-                if (arguments[1].equalsIgnoreCase(module.getModuleName())) {
-                    module.toggle();
-                    return;
-                }
+            final Module module = AllureClient.getInstance().getModuleManager().getModuleOrNull(arguments[1]);
+            if (module != null) {
+                module.toggle();
+                return;
             }
-            throw new CommandArgumentException(getUsage());
+            throw new ArgumentException(getUsage());
         }
-        throw new CommandArgumentException(getUsage());
+        throw new ArgumentException(getUsage());
     }
 
     @Override

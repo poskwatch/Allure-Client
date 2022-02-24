@@ -1,9 +1,11 @@
 package vip.allureclient.base.bind;
 
-import vip.allureclient.base.event.EventConsumer;
-import vip.allureclient.base.event.EventListener;
+import io.github.poskwatch.eventbus.api.annotations.EventHandler;
+import io.github.poskwatch.eventbus.api.enums.Priority;
+import io.github.poskwatch.eventbus.api.interfaces.IEventCallable;
+import io.github.poskwatch.eventbus.api.interfaces.IEventListener;
 import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.impl.event.client.KeyPressedEvent;
+import vip.allureclient.impl.event.events.client.KeyPressedEvent;
 
 import java.util.HashMap;
 
@@ -12,19 +14,16 @@ public class BindManager<T extends BindableObject> {
     private final HashMap<Integer, T> keyToObjectMap = new HashMap<>();
     private final HashMap<Integer, Runnable> keyToActionMap = new HashMap<>();
 
-    @EventListener
-    EventConsumer<KeyPressedEvent> onKeyPressEvent;
-
     public BindManager() {
-        this.onKeyPressEvent = (keyPressEvent -> {
-            if (keyToObjectMap.containsKey(keyPressEvent.getKey())) {
-                keyToObjectMap.get(keyPressEvent.getKey()).onPressed();
-            }
-            if (keyToActionMap.containsKey(keyPressEvent.getKey())) {
-                keyToActionMap.get(keyPressEvent.getKey()).run();
-            }
+        Wrapper.getEventBus().registerListener(new IEventListener() {
+            @EventHandler(events = KeyPressedEvent.class, priority = Priority.VERY_HIGH)
+            final IEventCallable<KeyPressedEvent> onKeyPressed = (event -> {
+                if (keyToObjectMap.containsKey(event.getKey()))
+                    keyToObjectMap.get(event.getKey()).onPressed();
+                if (keyToActionMap.containsKey(event.getKey()))
+                    keyToActionMap.get(event.getKey()).run();
+            });
         });
-        Wrapper.getEventManager().subscribe(this);
     }
 
     public void registerBind(int bind, T register) {

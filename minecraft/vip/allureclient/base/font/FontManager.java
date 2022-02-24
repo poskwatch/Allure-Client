@@ -58,8 +58,8 @@ public class FontManager {
             Map<String, Font> locationMap = new HashMap<>();
 
             smallFontRendererFont = getFont(locationMap, "font.ttf", 19);
-            mediumFontRendererFont = getFont(locationMap, "font.ttf", 20);
-            largeFontRendererFont = getFont(locationMap, "font.ttf", 21);
+            mediumFontRendererFont = getFont(locationMap, "font.ttf", 21);
+            largeFontRendererFont = getFont(locationMap, "font.ttf", 23);
             csgoFontRendererFont = new Font("tahoma", Font.PLAIN, 15);
             iconFontRendererFont = getFont(locationMap, "icon.ttf", 19);
 

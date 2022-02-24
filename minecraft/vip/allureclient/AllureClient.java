@@ -1,46 +1,56 @@
 package vip.allureclient;
 
+import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
 import vip.allureclient.base.bind.BindManager;
 import vip.allureclient.base.bind.BindableObject;
 import vip.allureclient.base.command.CommandManager;
 import vip.allureclient.base.config.ConfigManager;
-import vip.allureclient.base.event.EventConsumer;
-import vip.allureclient.base.event.EventListener;
 import vip.allureclient.base.file.FileManager;
 import vip.allureclient.base.font.FontManager;
 import vip.allureclient.base.module.ModuleManager;
 import vip.allureclient.base.property.PropertyManager;
 import vip.allureclient.base.script.ScriptManager;
-import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.impl.event.client.ClientExitEvent;
-import vip.allureclient.impl.event.client.ClientStartEvent;
+import vip.allureclient.base.util.client.FlagCache;
+import vip.allureclient.base.util.client.Version;
 import vip.allureclient.visual.notification.NotificationManager;
 import vip.allureclient.visual.screens.dropdown.GuiDropDown;
+import vip.allureclient.visual.screens.windowed.impl.screen.GuiWindowedUI;
 
 public class AllureClient {
 
+    // Client identifiers. Name, version, build.
     public final String CLIENT_NAME = "Allure";
-    public String CUSTOM_CLIENT_NAME = CLIENT_NAME;
-    public final double CLIENT_VERSION = 0.1;
+
+    // Version Object
+    private final Version version = new Version(0, 1,
+            new char[]{'0', '2', '1', '0', '2', '0', '2', '2'});
+
+    // Client instance, used to get managers and identifiers.
     private static final AllureClient INSTANCE = new AllureClient();
 
+    // Client managers for modules, properties, configs, etc.
     private ModuleManager moduleManager;
     private FontManager fontManager;
     private PropertyManager propertyManager;
     private BindManager<BindableObject> bindManager;
     private FileManager fileManager;
     private ConfigManager configManager;
-    private CommandManager commandManager;
     private NotificationManager notificationManager;
     private ScriptManager scriptManager;
+
+    // Client UI instance for easy access
     private final GuiDropDown guiDropDown = new GuiDropDown();
 
-    @EventListener
-    @SuppressWarnings("unused")
-    EventConsumer<ClientStartEvent> onClientStart = (event -> {
-        System.out.printf("Starting %s Client. Version %s%n", getInstance().CLIENT_NAME, getInstance().CLIENT_VERSION);
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> Wrapper.getEventManager().callEvent(new ClientExitEvent())));
+    private final GuiWindowedUI guiWindowedUI = new GuiWindowedUI();
+
+    // Method called on Minecraft's post initiation phase
+    public void onPostInitiation() {
+        // Print starting log
+        System.out.printf("Starting %s Client. Version %s, Build %s\n", CLIENT_NAME, this.getVersion().toString(), this.getVersion().getBuild());
+        // Add runtime shutdown hook to call on exit
+        Runtime.getRuntime().addShutdownHook(new Thread(this::onRuntimeClosed));
+        // Instantiate managers
         this.fontManager = new FontManager();
         this.notificationManager = new NotificationManager();
         this.propertyManager = new PropertyManager();
@@ -48,19 +58,37 @@ public class AllureClient {
         this.moduleManager = new ModuleManager();
         this.fileManager = new FileManager();
         this.configManager = new ConfigManager();
-        this.commandManager = new CommandManager();
         this.scriptManager = new ScriptManager();
+        // Initiate client commands TODO: not shitty like this
+        new CommandManager();
+        CommandManager.registerCommands();
+        // Run the Client UI initiation
         this.guiDropDown.onStartTask.run();
-        getBindManager().registerBind(Keyboard.KEY_RSHIFT, () -> Wrapper.getMinecraft().displayGuiScreen(guiDropDown));
-    });
+        // Register bind to open the UI with Bind Manager
+        getBindManager().registerBind(Keyboard.KEY_RSHIFT,
+                () -> Minecraft.getMinecraft().displayGuiScreen(guiDropDown));
 
-    @EventListener
-    @SuppressWarnings("unused")
-    EventConsumer<ClientExitEvent> onClientExit = (event -> {
-        System.out.printf("Exiting %s Client. Version %s%n", getInstance().CLIENT_NAME, getInstance().CLIENT_VERSION);
-        System.out.println("Exited Safely!");
-    });
+        getBindManager().registerBind(Keyboard.KEY_INSERT,
+                () -> Minecraft.getMinecraft().displayGuiScreen(guiWindowedUI));
 
+        // Initiate flag cache
+        FlagCache.startCache();
+    }
+
+    // Method called when runtime is exited
+    public void onRuntimeClosed() {
+        // Print exiting log
+        System.out.printf("Exiting %s Client. Version %s, Build %s\n", CLIENT_NAME, this.getVersion().toString(), this.getVersion().getBuild());
+        // Save default settings
+        this.configManager.saveDefaultConfig();
+    }
+
+    // Getter for client instance
+    public static AllureClient getInstance(){
+        return INSTANCE;
+    }
+
+    // Needed manager getters
     public ModuleManager getModuleManager(){
         return moduleManager;
     }
@@ -89,15 +117,11 @@ public class AllureClient {
         return notificationManager;
     }
 
-    public CommandManager getCommandManager() {
-        return commandManager;
-    }
-
     public ScriptManager getScriptManager() {
         return scriptManager;
     }
 
-    public static AllureClient getInstance(){
-        return INSTANCE;
+    public Version getVersion() {
+        return version;
     }
 }

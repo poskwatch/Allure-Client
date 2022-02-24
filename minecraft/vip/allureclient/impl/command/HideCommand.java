@@ -2,7 +2,7 @@ package vip.allureclient.impl.command;
 
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.command.Command;
-import vip.allureclient.base.command.CommandArgumentException;
+import vip.allureclient.base.command.ArgumentException;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.visual.notification.NotificationType;
 
@@ -13,9 +13,9 @@ public class HideCommand implements Command {
     }
 
     @Override
-    public void execute(String[] arguments) throws CommandArgumentException {
+    public void execute(String[] arguments) throws ArgumentException {
         if (arguments.length == 2) {
-            for (Module module : AllureClient.getInstance().getModuleManager().getModules.get()) {
+            for (Module module : AllureClient.getInstance().getModuleManager().getModulesAsArraylist()) {
                 if (arguments[1].equalsIgnoreCase(module.getModuleName().replaceAll(" ", ""))) {
                     module.setHidden(!module.isHidden());
                     AllureClient.getInstance().getNotificationManager().addNotification("Module Hidden",
@@ -24,9 +24,9 @@ public class HideCommand implements Command {
                     return;
                 }
             }
-            throw new CommandArgumentException(getUsage());
+            throw new ArgumentException(getUsage());
         }
-        throw new CommandArgumentException(getUsage());
+        throw new ArgumentException(getUsage());
     }
 
     @Override

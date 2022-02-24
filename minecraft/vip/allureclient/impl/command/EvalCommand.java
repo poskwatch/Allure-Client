@@ -3,7 +3,7 @@ package vip.allureclient.impl.command;
 
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.command.Command;
-import vip.allureclient.base.command.CommandArgumentException;
+import vip.allureclient.base.command.ArgumentException;
 
 
 public class EvalCommand implements Command {
@@ -14,7 +14,7 @@ public class EvalCommand implements Command {
     }
 
     @Override
-    public void execute(String[] arguments) throws CommandArgumentException {
+    public void execute(String[] arguments) throws ArgumentException {
         AllureClient.getInstance().getScriptManager().runTestScript();
     }
 

@@ -1,7 +1,7 @@
 package vip.allureclient.impl.command;
 
 import vip.allureclient.base.command.Command;
-import vip.allureclient.base.command.CommandArgumentException;
+import vip.allureclient.base.command.ArgumentException;
 import vip.allureclient.base.util.client.Wrapper;
 
 public class VClipCommand implements Command {
@@ -11,20 +11,20 @@ public class VClipCommand implements Command {
     }
 
     @Override
-    public void execute(String[] arguments) throws CommandArgumentException {
+    public void execute(String[] arguments) throws ArgumentException {
        if (arguments.length == 2) {
            double parsedDistance;
            try {
                parsedDistance = Double.parseDouble(arguments[1]);
-               Wrapper.getPlayer().setEntityBoundingBox(Wrapper.getPlayer().getEntityBoundingBox().offset(0, parsedDistance, 0));
+               mc().thePlayer.setEntityBoundingBox(mc().thePlayer.getEntityBoundingBox().offset(0, parsedDistance, 0));
                return;
            }
            catch (NumberFormatException e) {
                e.printStackTrace();
-               throw new CommandArgumentException(getUsage());
+               throw new ArgumentException(getUsage());
            }
        }
-       throw new CommandArgumentException(getUsage());
+       throw new ArgumentException(getUsage());
     }
 
     @Override

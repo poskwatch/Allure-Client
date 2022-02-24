@@ -39,6 +39,8 @@ import optifine.Config;
 import optifine.DynamicLights;
 import optifine.PlayerControllerOF;
 import optifine.Reflector;
+import vip.allureclient.base.util.client.Wrapper;
+import vip.allureclient.impl.event.events.world.UpdateWorldTimeEvent;
 
 public class WorldClient extends World
 {
@@ -87,11 +89,14 @@ public class WorldClient extends World
     public void tick()
     {
         super.tick();
-        this.setTotalWorldTime(this.getTotalWorldTime() + 1L);
+        UpdateWorldTimeEvent updateWorldTimeEvent = new UpdateWorldTimeEvent();
+        Wrapper.getEventBus().invokeEvent(updateWorldTimeEvent);
+        if (!updateWorldTimeEvent.isCancelled()) {
+            this.setTotalWorldTime(this.getTotalWorldTime() + 1L);
 
-        if (this.getGameRules().getBoolean("doDaylightCycle"))
-        {
-            this.setWorldTime(this.getWorldTime() + 1L);
+            if (this.getGameRules().getBoolean("doDaylightCycle")) {
+                this.setWorldTime(this.getWorldTime() + 1L);
+            }
         }
 
         this.theProfiler.startSection("reEntryProcessing");

@@ -1,5 +1,6 @@
 package vip.allureclient.base.script.lua.functions.impl.player;
 
+import net.minecraft.client.Minecraft;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.OneArgFunction;
@@ -14,33 +15,34 @@ import java.util.ArrayList;
 public class PlayerLuaFunctions extends LuaFunctionCollection {
 
     private final ArrayList<LuaFunction> luaFunctions = new ArrayList<>();
+    private final Minecraft mc = Minecraft.getMinecraft();
 
     public PlayerLuaFunctions() {
         registerLuaFunction("send_chat_message", new OneArgFunction() {
             @Override
             public LuaValue call(LuaValue luaValue) {
-                Wrapper.getPlayer().sendChatMessage(luaValue.checkjstring());
+                mc.thePlayer.sendChatMessage(luaValue.checkjstring());
                 return null;
             }
         });
         registerLuaFunction("set_speed", new OneArgFunction() {
             @Override
             public LuaValue call(LuaValue luaValue) {
-                Wrapper.getPlayer().setSpeed(luaValue.tofloat());
+                mc.thePlayer.setSpeed(luaValue.tofloat());
                 return null;
             }
         });
         registerLuaFunction("jump", new ZeroArgFunction() {
             @Override
             public LuaValue call() {
-                Wrapper.getPlayer().jump();
+                mc.thePlayer.jump();
                 return null;
             }
         });
         registerLuaFunction("on_ground", new ZeroArgFunction() {
             @Override
             public LuaValue call() {
-                return LuaValue.valueOf(Wrapper.getPlayer().onGround);
+                return LuaValue.valueOf(mc.thePlayer.onGround);
             }
         });
         registerLuaFunction("movement_direction", new ZeroArgFunction() {
@@ -68,19 +70,19 @@ public class PlayerLuaFunctions extends LuaFunctionCollection {
         registerLuaFunction("motion_x", new ZeroArgFunction() {
             @Override
             public LuaValue call() {
-                return LuaValue.valueOf(Wrapper.getPlayer().motionX);
+                return LuaValue.valueOf(mc.thePlayer.motionX);
             }
         });
         registerLuaFunction("motion_y", new ZeroArgFunction() {
             @Override
             public LuaValue call() {
-                return LuaValue.valueOf(Wrapper.getPlayer().motionY);
+                return LuaValue.valueOf(mc.thePlayer.motionY);
             }
         });
         registerLuaFunction("motion_z", new ZeroArgFunction() {
             @Override
             public LuaValue call() {
-                return LuaValue.valueOf(Wrapper.getPlayer().motionZ);
+                return LuaValue.valueOf(mc.thePlayer.motionZ);
             }
         });
 
@@ -89,21 +91,21 @@ public class PlayerLuaFunctions extends LuaFunctionCollection {
         registerLuaFunction("set_motion_x", new OneArgFunction() {
             @Override
             public LuaValue call(LuaValue var1) {
-                Wrapper.getPlayer().motionX = var1.checkdouble();
+                mc.thePlayer.motionX = var1.checkdouble();
                 return null;
             }
         });
         registerLuaFunction("set_motion_y", new OneArgFunction() {
             @Override
             public LuaValue call(LuaValue var1) {
-                Wrapper.getPlayer().motionY = var1.checkdouble();
+                mc.thePlayer.motionY = var1.checkdouble();
                 return null;
             }
         });
         registerLuaFunction("set_motion_z", new OneArgFunction() {
             @Override
             public LuaValue call(LuaValue var1) {
-                Wrapper.getPlayer().motionZ = var1.checkdouble();
+                mc.thePlayer.motionZ = var1.checkdouble();
                 return null;
             }
         });
@@ -111,7 +113,7 @@ public class PlayerLuaFunctions extends LuaFunctionCollection {
         registerLuaFunction("swing_item", new ZeroArgFunction() {
             @Override
             public LuaValue call() {
-                Wrapper.getPlayer().swingItem();
+                mc.thePlayer.swingItem();
                 return null;
             }
         });

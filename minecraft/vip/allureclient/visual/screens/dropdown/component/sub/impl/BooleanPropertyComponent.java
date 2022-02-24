@@ -4,7 +4,7 @@ import net.minecraft.client.gui.Gui;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.util.visual.AnimationUtil;
 import vip.allureclient.base.util.visual.ColorUtil;
-import vip.allureclient.base.util.visual.GLUtil;
+import vip.allureclient.base.util.visual.glsl.GLUtil;
 import vip.allureclient.impl.property.BooleanProperty;
 import vip.allureclient.visual.screens.dropdown.component.Component;
 import vip.allureclient.visual.screens.dropdown.component.sub.ModuleComponent;
@@ -37,7 +37,7 @@ public class BooleanPropertyComponent extends Component {
         final int backgroundBox = 0xff222222;
         GLUtil.glFilledEllipse(x + 115 - 8, y + 7, 23, backgroundBox);
         GLUtil.glFilledEllipse(x + 115 - 20, y + 7, 23, backgroundBox);
-        GLUtil.glFilledQuad(x + 115 - 20, y + 1.5, 13, 11, backgroundBox);
+        GLUtil.drawFilledRectangle(x + 115 - 20, y + 1.5, 13, 11, backgroundBox);
 
         GLUtil.glFilledEllipse(checkboxAnimation, y + 7, 20, property.getPropertyValue() ? ColorUtil.getClientColors()[1].getRGB() : 0xffe1e1e1);
 

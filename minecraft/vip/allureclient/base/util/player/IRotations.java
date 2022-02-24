@@ -1,6 +1,6 @@
 package vip.allureclient.base.util.player;
 
-import vip.allureclient.impl.event.player.UpdatePositionEvent;
+import vip.allureclient.impl.event.events.player.UpdatePositionEvent;
 
 public interface IRotations {
 

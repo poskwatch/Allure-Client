@@ -12,6 +12,7 @@ import java.util.UUID;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.BaseAttributeMap;
@@ -50,8 +51,10 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
+import vip.allureclient.AllureClient;
+import vip.allureclient.base.module.Module;
 import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.impl.event.player.PlayerHurtSoundEvent;
+import vip.allureclient.impl.event.events.player.PlayerHurtSoundEvent;
 import vip.allureclient.impl.module.visual.Animations;
 
 public abstract class EntityLivingBase extends Entity
@@ -1335,9 +1338,9 @@ public abstract class EntityLivingBase extends Entity
      */
     private int getArmSwingAnimationEnd()
     {
-        return this.isPotionActive(Potion.digSpeed) ? 6 - (1 + this.getActivePotionEffect(Potion.digSpeed).getAmplifier()) * 1 : (int) ((this.isPotionActive(Potion.digSlowdown) ? 6 + (1 + this.getActivePotionEffect(Potion.digSlowdown).getAmplifier()) * 2 : 6) * (1 + (Animations.getInstance().slowDownProperty.getPropertyValue()) / 2));
+        return this.isPotionActive(Potion.digSpeed) ? 6 - (1 + this.getActivePotionEffect(Potion.digSpeed).getAmplifier()) * 1 : (int) ((int) ((int) ((this.isPotionActive(Potion.digSlowdown) ? 6 + (1 + this.getActivePotionEffect(Potion.digSlowdown).getAmplifier()) * 2 : 6)))
+                * (!(this instanceof EntityPlayerSP) ? 1 : Animations.getInstance().slowDownProperty.getPropertyValue()));
     }
-
     /**
      * Swings the item the player is holding.
      */
@@ -1370,7 +1373,7 @@ public abstract class EntityLivingBase extends Entity
                 this.playSound(this.getHurtSound(), this.getSoundVolume(), (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1.0F);
                 // PlayerHurtSoundEvent
                 PlayerHurtSoundEvent playerHurtSoundEvent = new PlayerHurtSoundEvent(this);
-                Wrapper.getEventManager().callEvent(playerHurtSoundEvent);
+                Wrapper.getEventBus().invokeEvent(playerHurtSoundEvent);
             }
 
             this.attackEntityFrom(DamageSource.generic, 0.0F);

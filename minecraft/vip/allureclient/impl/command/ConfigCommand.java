@@ -2,8 +2,7 @@ package vip.allureclient.impl.command;
 
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.command.Command;
-import vip.allureclient.base.command.CommandArgumentException;
-import vip.allureclient.base.util.visual.ChatUtil;
+import vip.allureclient.base.command.ArgumentException;
 import vip.allureclient.visual.notification.NotificationType;
 
 public class ConfigCommand implements Command {
@@ -13,7 +12,7 @@ public class ConfigCommand implements Command {
     }
 
     @Override
-    public void execute(String[] arguments) throws CommandArgumentException {
+    public void execute(String[] arguments) throws ArgumentException {
         if (arguments.length == 3) {
             if (arguments[1].equalsIgnoreCase("save")) {
                 if (AllureClient.getInstance().getConfigManager().saveConfig(arguments[2]))
@@ -33,10 +32,10 @@ public class ConfigCommand implements Command {
                             1500, NotificationType.ERROR);
                 return;
             } else {
-                throw new CommandArgumentException(getUsage());
+                throw new ArgumentException(getUsage());
             }
         }
-        throw new CommandArgumentException(getUsage());
+        throw new ArgumentException(getUsage());
     }
 
     @Override

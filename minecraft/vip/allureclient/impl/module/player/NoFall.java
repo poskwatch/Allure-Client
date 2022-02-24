@@ -1,43 +1,35 @@
 package vip.allureclient.impl.module.player;
 
+import io.github.poskwatch.eventbus.api.annotations.EventHandler;
+import io.github.poskwatch.eventbus.api.enums.Priority;
+import io.github.poskwatch.eventbus.api.interfaces.IEventCallable;
+import io.github.poskwatch.eventbus.api.interfaces.IEventListener;
 import net.minecraft.network.play.client.C03PacketPlayer;
-import vip.allureclient.base.event.EventListener;
-import vip.allureclient.base.event.EventConsumer;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.base.module.enums.ModuleCategory;
-import vip.allureclient.base.module.annotations.ModuleData;
-import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.impl.event.player.UpdatePositionEvent;
+import vip.allureclient.impl.event.events.player.UpdatePositionEvent;
 import vip.allureclient.impl.property.EnumProperty;
 
-@ModuleData(moduleName = "No Fall", moduleBind = 0, moduleCategory = ModuleCategory.PLAYER)
 public class NoFall extends Module {
 
-    @EventListener
-    EventConsumer<UpdatePositionEvent> onUpdatePositionEvent;
-
-    private final EnumProperty<NoFallModes> mode = new EnumProperty<>("Mode", NoFallModes.Edit, this);
-
-    private enum NoFallModes {
-        Packet,
-        Edit
-    }
+    private final EnumProperty<NoFallMode> mode = new EnumProperty<>("Mode", NoFallMode.EDIT, this);
 
     public NoFall() {
-        this.onUpdatePositionEvent = (updatePositionEvent -> {
-            setModuleSuffix(mode.getEnumValueAsString());
-            if(updatePositionEvent.isPre()) {
-                if (mode.getPropertyValue().equals(NoFallModes.Packet)) {
-                    if (Wrapper.getPlayer().fallDistance >= 3) {
-                        Wrapper.getPlayer().sendQueue.addToSendQueue(new C03PacketPlayer(true));
+        super("No Fall", ModuleCategory.PLAYER);
+        this.setListener(new IEventListener() {
+            @EventHandler(events = UpdatePositionEvent.class, priority = Priority.LOW)
+            final IEventCallable<UpdatePositionEvent> onUpdatePosition = (event -> {
+                if(event.isPre()) {
+                    if (mode.getPropertyValue().equals(NoFallMode.PACKET)) {
+                        if (mc.thePlayer.fallDistance >= 3)
+                            mc.thePlayer.sendQueue.addToSendQueue(new C03PacketPlayer(true));
+                    }
+                    if (mode.getPropertyValue().equals(NoFallMode.EDIT)) {
+                        if (mc.thePlayer.fallDistance >= 3)
+                            event.setOnGround(true);
                     }
                 }
-                if (mode.getPropertyValue().equals(NoFallModes.Edit)) {
-                    if (Wrapper.getPlayer().fallDistance >= 3) {
-                        updatePositionEvent.setOnGround(true);
-                    }
-                }
-            }
+            });
         });
     }
 
@@ -49,5 +41,21 @@ public class NoFall extends Module {
     @Override
     public void onDisable() {
         super.onDisable();
+    }
+
+    private enum NoFallMode {
+        PACKET("Packet"),
+        EDIT("Edit");
+
+        private final String name;
+
+        NoFallMode(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 }

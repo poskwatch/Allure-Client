@@ -5,12 +5,9 @@ import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
-import vip.allureclient.base.util.visual.AnimationUtil;
 import vip.allureclient.base.util.visual.BlurUtil;
 import vip.allureclient.base.util.visual.ColorUtil;
-import vip.allureclient.base.util.visual.GLUtil;
-
-import java.awt.*;
+import vip.allureclient.base.util.visual.glsl.GLUtil;
 
 public class GuiButton extends Gui
 {
@@ -100,7 +97,6 @@ public class GuiButton extends Gui
             GLUtil.glOutlinedFilledQuad(this.xPosition, this.yPosition, this.width, height, hovered ? 0x99000000 : 0x60000000, ColorUtil.getClientColors()[1].getRGB());
 
 
-            BlurUtil.blurArea(xPosition, yPosition, width, height);
             this.mouseDragged(mc, mouseX, mouseY);
             int j = 14737632;
 

@@ -3,10 +3,8 @@ package vip.allureclient.impl.command;
 import org.lwjgl.input.Keyboard;
 import vip.allureclient.AllureClient;
 import vip.allureclient.base.command.Command;
-import vip.allureclient.base.command.CommandArgumentException;
+import vip.allureclient.base.command.ArgumentException;
 import vip.allureclient.base.module.Module;
-import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.base.util.visual.ChatUtil;
 import vip.allureclient.visual.notification.NotificationType;
 
 public class BindCommand implements Command {
@@ -16,9 +14,9 @@ public class BindCommand implements Command {
     }
 
     @Override
-    public void execute(String[] arguments) throws CommandArgumentException {
+    public void execute(String[] arguments) throws ArgumentException {
         if (arguments.length == 3 && arguments[2].length() == 1) {
-            for (Module module : AllureClient.getInstance().getModuleManager().getModules.get()) {
+            for (Module module : AllureClient.getInstance().getModuleManager().getModulesAsArraylist()) {
                 if (arguments[1].equalsIgnoreCase(module.getModuleName())) {
                     module.setBind(Keyboard.getKeyIndex(arguments[2]));
                     AllureClient.getInstance().getNotificationManager().addNotification("Bound Module",
@@ -26,9 +24,9 @@ public class BindCommand implements Command {
                     return;
                 }
             }
-            throw new CommandArgumentException(getUsage());
+            throw new ArgumentException(getUsage());
         }
-        throw new CommandArgumentException(getUsage());
+        throw new ArgumentException(getUsage());
     }
 
     @Override

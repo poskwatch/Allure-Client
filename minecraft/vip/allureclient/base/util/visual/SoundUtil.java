@@ -1,10 +1,8 @@
 package vip.allureclient.base.util.visual;
 
-import net.minecraft.util.ResourceLocation;
 import sun.audio.AudioPlayer;
 import sun.audio.AudioStream;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 

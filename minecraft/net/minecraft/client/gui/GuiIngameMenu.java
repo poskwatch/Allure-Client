@@ -108,7 +108,7 @@ public class GuiIngameMenu extends GuiScreen
      */
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
-        BlurUtil.blurArea(0, 0, width, height);
+        Gui.drawRectWithWidth(0, 0, width, height, 0x80000000);
         this.drawCenteredString(this.fontRendererObj, I18n.format("menu.game", new Object[0]), this.width / 2, 40, 16777215);
         super.drawScreen(mouseX, mouseY, partialTicks);
     }

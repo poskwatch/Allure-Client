@@ -20,6 +20,8 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 import vip.allureclient.base.util.visual.BlurUtil;
+import vip.allureclient.base.util.visual.glsl.GLShader;
+import vip.allureclient.base.util.visual.glsl.GLUtil;
 
 public abstract class GuiContainer extends GuiScreen
 {
@@ -100,7 +102,8 @@ public abstract class GuiContainer extends GuiScreen
      */
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
-        BlurUtil.blurArea(0, 0, width, height);
+        Gui.drawRectWithWidth(0, 0, width, height, 0x80000000);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         int i = this.guiLeft;
         int j = this.guiTop;
         this.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);

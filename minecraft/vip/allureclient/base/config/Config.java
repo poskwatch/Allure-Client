@@ -18,7 +18,7 @@ public class Config implements ConfigurableObject {
     public JsonObject save() {
         JsonObject object = new JsonObject();
         JsonObject modulesObject = new JsonObject();
-        AllureClient.getInstance().getModuleManager().getModules.get().forEach(module -> modulesObject.add(module.getModuleName(), module.save()));
+        AllureClient.getInstance().getModuleManager().getModulesAsArraylist().forEach(module -> modulesObject.add(module.getModuleName(), module.save()));
         object.add("modules", modulesObject);
         return object;
     }
@@ -27,7 +27,7 @@ public class Config implements ConfigurableObject {
     public void load(JsonObject jsonObject) {
         if (jsonObject.has("modules")) {
             JsonObject modulesJson = jsonObject.getAsJsonObject("modules");
-            AllureClient.getInstance().getModuleManager().getModules.get().forEach(module -> {
+            AllureClient.getInstance().getModuleManager().getModulesAsArraylist().forEach(module -> {
                 if (modulesJson.has(module.getModuleName())) {
                     module.load(modulesJson.getAsJsonObject(module.getModuleName()));
                 }

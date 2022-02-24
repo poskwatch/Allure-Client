@@ -1,24 +1,24 @@
 package vip.allureclient.impl.module.movement;
 
-import vip.allureclient.base.event.EventListener;
-import vip.allureclient.base.event.EventConsumer;
+import io.github.poskwatch.eventbus.api.annotations.EventHandler;
+import io.github.poskwatch.eventbus.api.enums.Priority;
+import io.github.poskwatch.eventbus.api.interfaces.IEventCallable;
+import io.github.poskwatch.eventbus.api.interfaces.IEventListener;
 import vip.allureclient.base.module.Module;
 import vip.allureclient.base.module.enums.ModuleCategory;
-import vip.allureclient.base.module.annotations.ModuleData;
 import vip.allureclient.base.util.client.Wrapper;
-import vip.allureclient.impl.event.player.PlayerMoveEvent;
+import vip.allureclient.impl.event.events.player.PlayerMoveEvent;
 
-@ModuleData(moduleName = "Sprint", moduleBind = 0, moduleCategory = ModuleCategory.MOVEMENT)
 public class Sprint extends Module {
 
-    @EventListener
-    EventConsumer<PlayerMoveEvent> onPlayerMoveEvent;
-
     public Sprint(){
-        this.onPlayerMoveEvent = (moveEvent -> {
-           if (Wrapper.getPlayer().moveForward > 0 && (Wrapper.getPlayer().capabilities.isCreativeMode || Wrapper.getPlayer().getFoodStats().getFoodLevel() > 3)){
-               Wrapper.getPlayer().setSprinting(true);
-           }
+        super("Sprint", ModuleCategory.MOVEMENT);
+        this.setListener(new IEventListener() {
+            @EventHandler(events = PlayerMoveEvent.class, priority = Priority.HIGH)
+            final IEventCallable<PlayerMoveEvent> onPlayerMove = (event -> {
+                if (mc.thePlayer.moveForward > 0 && (mc.thePlayer.capabilities.isCreativeMode || mc.thePlayer.getFoodStats().getFoodLevel() > 3))
+                    mc.thePlayer.setSprinting(true);
+            });
         });
     }
 

@@ -3,6 +3,8 @@ package vip.allureclient.base.util.visual;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.shader.Framebuffer;
 import org.lwjgl.opengl.Display;
+import vip.allureclient.base.util.visual.glsl.GLShader;
+import vip.allureclient.base.util.visual.glsl.GLUtil;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
@@ -77,16 +79,6 @@ public final class BlurUtil {
                     1.0f / Display.getWidth(),
                     1.0f / Display.getHeight());
         }
-
-        @Override
-        public void updateUniforms(float radius) {
-
-        }
-
-        @Override
-        public void use(float radius) {
-
-        }
     };
 
     private static Framebuffer framebuffer, framebufferRender;
@@ -108,7 +100,7 @@ public final class BlurUtil {
         framebufferRender.bindFramebuffer(false);
         // Draw the areas to be blurred
         for (final double[] area : blurAreas) {
-            GLUtil.glFilledQuad(area[0], area[1], area[2], area[3], 0xFF << 24);
+            GLUtil.drawFilledRectangle(area[0], area[1], area[2], area[3], 0xFF << 24);
         }
 
         blurAreas.clear();

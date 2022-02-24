@@ -10,7 +10,6 @@ import net.minecraft.client.renderer.WorldRenderer;
 import optifine.ModelSprite;
 
 import org.lwjgl.opengl.GL11;
-import vip.allureclient.base.util.visual.GLUtil;
 
 public class ModelRenderer
 {

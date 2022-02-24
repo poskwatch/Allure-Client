@@ -34,7 +34,6 @@ public class GuiAltLogin extends GuiScreen {
         buttonList.add(new GuiButton(3, sr.getScaledWidth()/2 - 100, var3 + 72 + 12 + 24, "Back to menu"));
     }
 
-
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         drawDefaultBackground();
         emailField.drawTextBox();
@@ -61,7 +60,6 @@ public class GuiAltLogin extends GuiScreen {
     }
 
     public void actionPerformed(GuiButton button){
-
         switch(button.id){
             case 1:
                 String clipBoardText = getClipboardString();

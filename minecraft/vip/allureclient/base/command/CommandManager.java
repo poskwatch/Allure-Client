@@ -1,57 +1,61 @@
 package vip.allureclient.base.command;
 
-import net.minecraft.util.ChatComponentText;
-import vip.allureclient.base.event.EventConsumer;
-import vip.allureclient.base.event.EventListener;
+import io.github.poskwatch.eventbus.api.annotations.EventHandler;
+import io.github.poskwatch.eventbus.api.enums.Priority;
+import io.github.poskwatch.eventbus.api.interfaces.IEventCallable;
+import io.github.poskwatch.eventbus.api.interfaces.IEventListener;
 import vip.allureclient.base.util.client.Wrapper;
 import vip.allureclient.impl.command.*;
-import vip.allureclient.impl.event.player.ChatMessageSendEvent;
+import vip.allureclient.impl.event.events.player.ChatMessageSendEvent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class CommandManager {
 
-    private final String commandPrefix = ".";
+    // Prefix all commands must start with
+    private final String PREFIX = ".";
 
-    @EventListener
-    EventConsumer<ChatMessageSendEvent> onSendChatMessageEvent;
-
-    private final ArrayList<Command> commands = new ArrayList<>();
+    // Map storing command aliases to their instances
+    private final static ArrayList<Command> commandStorage = new ArrayList<>();
 
     public CommandManager() {
-        this.onSendChatMessageEvent = (chatEvent -> {
-            if (chatEvent.getMessage().startsWith(commandPrefix)) {
-                chatEvent.setCancelled(true);
-                String afterPrefix = chatEvent.getMessage().substring(1);
-                String[] afterPrefixSplit = afterPrefix.split(" ");
-                for (Command command : commands) {
-                    for (String alias : command.getAliases()) {
-                        if (afterPrefixSplit[0].equalsIgnoreCase(alias)) {
-                            try {
-                                command.execute(afterPrefixSplit);
+        Wrapper.getEventBus().registerListener(new IEventListener() {
+            @EventHandler(events = ChatMessageSendEvent.class, priority = Priority.HIGH)
+            final IEventCallable<ChatMessageSendEvent> onSendChatMessage = (event -> {
+                // If chat message has pre-fix, it's a command
+                if (event.getMessage().startsWith(PREFIX)) {
+                    // Cancel the event so the message isn't sent
+                    event.setCancelled(true);
+                    // Create split string array after prefix by spaces
+                    final String[] formattedCommand = event.getMessage().substring(1).split(" ");
+                    // Iterate through command aliases checking if it matches
+                    for (Command command : commandStorage) {
+                        for (String commandAlias : command.getAliases()) {
+                            // Check if first element is an alias, ignoring case iteration
+                            if (formattedCommand[0].equalsIgnoreCase(commandAlias)) {
+                                try {
+                                    command.execute(formattedCommand);
+                                } catch (ArgumentException e) {
+                                    // If arguments are incorrect, throws exception
+                                    e.printStackTrace();
+                                }
                             }
-                            catch (CommandArgumentException e) {
-                                Wrapper.getPlayer().addChatMessage(new ChatComponentText(e.getMessage()));
-                            }
-                            break;
                         }
                     }
                 }
-            }
+            });
         });
-        registerCommands();
-        Wrapper.getEventManager().subscribe(this);
     }
 
-    private void registerCommands() {
-        commands.add(new ConfigCommand());
-        commands.add(new VClipCommand());
-        commands.add(new ToggleCommand());
-        commands.add(new BindCommand());
-        commands.add(new HideCommand());
-        commands.add(new RenameCommand());
-        commands.add(new EvalCommand());
-        commands.add(new MemeCommand());
+    // Register commands into storage via addAll
+    public static void registerCommands() {
+        commandStorage.add(new ConfigCommand());
+        commandStorage.add(new VClipCommand());
+        commandStorage.add(new ToggleCommand());
+        commandStorage.add(new BindCommand());
+        commandStorage.add(new HideCommand());
+        commandStorage.add(new EvalCommand());
+        commandStorage.add(new DebugCommand());
     }
-
 }
